@@ -40,6 +40,14 @@ export function Footer() {
                 Subscribe for exclusive drops, early access, and 10% off your first order.
               </p>
             </div>
+            <a
+              href="https://t.me/+OQrO3Aya1NQ4YmZi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary whitespace-nowrap flex items-center gap-2"
+            >
+              ПОНЯЛ
+            </a>
           </div>
         </div>
       </div>
