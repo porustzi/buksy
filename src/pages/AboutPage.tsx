@@ -92,9 +92,14 @@ export function AboutPage() {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {aboutPage.values.items.map((v, index) => (
+            {[
+              { titleKey: 'about.valueIntentionality', descKey: 'about.valueIntentionalityDesc' },
+              { titleKey: 'about.valueQuality', descKey: 'about.valueQualityDesc' },
+              { titleKey: 'about.valueRebellion', descKey: 'about.valueRebellionDesc' },
+              { titleKey: 'about.valueSustainable', descKey: 'about.valueSustainableDesc' },
+            ].map((v, index) => (
               <motion.div
-                key={v.title}
+                key={v.titleKey}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -103,10 +108,10 @@ export function AboutPage() {
               >
                 <span className="font-mono text-blood text-sm mb-4 block">0{index + 1}</span>
                 <h3 className="font-heading text-lg tracking-wider mb-3 group-hover:text-blood transition-colors duration-300">
-                  {v.title}
+                  {t(v.titleKey)}
                 </h3>
                 <p className="text-white/60 font-body text-sm leading-relaxed">
-                  {v.description}
+                  {t(v.descKey)}
                 </p>
               </motion.div>
             ))}
@@ -173,7 +178,14 @@ export function AboutPage() {
             <div className="absolute left-1/2 top-0 bottom-0 w-px bg-blood/20 hidden md:block" />
 
             <div className="space-y-12">
-              {aboutPage.timeline.events.map((item, index) => (
+              {[
+                { year: '2019', eventKey: 'about.event2019' },
+                { year: '2020', eventKey: 'about.event2020' },
+                { year: '2021', eventKey: 'about.event2021' },
+                { year: '2022', eventKey: 'about.event2022' },
+                { year: '2023', eventKey: 'about.event2023' },
+                { year: '2024', eventKey: 'about.event2024' },
+              ].map((item, index) => (
                 <motion.div
                   key={item.year}
                   initial={{ opacity: 0, y: 20 }}
@@ -186,7 +198,7 @@ export function AboutPage() {
                     {index % 2 === 0 ? (
                       <>
                         <span className="font-mono text-blood text-3xl">{item.year}</span>
-                        <h4 className="font-heading text-lg mt-2">{item.event}</h4>
+                        <h4 className="font-heading text-lg mt-2">{t(item.eventKey)}</h4>
                       </>
                     ) : (
                       <div className="hidden md:block" />
@@ -197,7 +209,7 @@ export function AboutPage() {
                     {index % 2 === 1 ? (
                       <>
                         <span className="font-mono text-blood text-3xl">{item.year}</span>
-                        <h4 className="font-heading text-lg mt-2">{item.event}</h4>
+                        <h4 className="font-heading text-lg mt-2">{t(item.eventKey)}</h4>
                       </>
                     ) : (
                       <div className="hidden md:block" />
@@ -206,7 +218,7 @@ export function AboutPage() {
                   {/* Mobile view */}
                   <div className="flex items-center gap-4 md:hidden">
                     <span className="font-mono text-blood text-2xl">{item.year}</span>
-                    <h4 className="font-heading text-base">{item.event}</h4>
+                    <h4 className="font-heading text-base">{t(item.eventKey)}</h4>
                   </div>
                 </motion.div>
               ))}
