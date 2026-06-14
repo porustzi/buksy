@@ -28,27 +28,8 @@ function saveCache() {
 
 loadCache();
 
-export async function translateText(text: string, to: string): Promise<string> {
-  if (!text || to === 'uk') return text;
-
-  const key = cacheKey(text, to);
-  if (cache.has(key)) return cache.get(key)!;
-
-  try {
-    // Dynamic import to avoid build issues
-    const { translate } = await import('@vitalets/google-translate-api');
-    const result = await translate(text, { to });
-    const translated = result.text;
-    cache.set(key, translated);
-    saveCache();
-    return translated;
-  } catch {
-    return text;
-  }
-}
-
 export async function translateMany(texts: string[], to: string): Promise<string[]> {
-  if (to === 'uk') return texts;
+  if (to === 'uk' || !texts.length) return texts;
 
   const results: string[] = [];
   const uncached: { idx: number; text: string }[] = [];
@@ -66,15 +47,16 @@ export async function translateMany(texts: string[], to: string): Promise<string
 
   if (uncached.length > 0) {
     try {
-      const { translate } = await import('@vitalets/google-translate-api');
-      // Batch: join with separator, translate, split back
-      const separator = '\n---\n';
-      const batch = uncached.map(u => u.text).join(separator);
-      const { text: translated } = await translate(batch, { to });
+      const res = await fetch('/.netlify/functions/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texts: uncached.map(u => u.text), to }),
+      });
+      const data = await res.json();
+      const translations: string[] = data.translations || [];
 
-      const parts = translated.split(separator);
       for (let i = 0; i < uncached.length; i++) {
-        const tr = (parts[i] || uncached[i].text).trim();
+        const tr = (translations[i] || uncached[i].text).trim();
         results[uncached[i].idx] = tr;
         cache.set(cacheKey(uncached[i].text, to), tr);
       }
