@@ -106,7 +106,7 @@ export function Footer() {
                 <div className="absolute top-1/4 left-1/3 w-8 h-8 bg-rose-200/30 rounded-full blur-md" />
               </div>
               <a href="https://krvtsv.netlify.app" target="_blank" rel="noopener noreferrer" className="relative block text-center text-rose-600 font-bold text-[11px] md:text-[10px] uppercase tracking-widest whitespace-nowrap hover:text-rose-500 transition-colors">
-                {t('footer.made_by')}
+                Сайт зроблений KRVTSV CORP
               </a>
             </div>
             <div className="text-center text-sm text-white/40 font-body">
