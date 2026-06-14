@@ -31,9 +31,9 @@ export function Footer() {
             </Link>
             <p className="text-white/60 font-body text-sm leading-relaxed mb-6">{f.brand?.description}</p>
             <div className="flex gap-4">
-              <a href={footerData.social?.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Instagram size={18} /></a>
-              <a href={footerData.social?.twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Twitter size={18} /></a>
-              <a href={footerData.social?.youtube} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Youtube size={18} /></a>
+              <a href={f.social?.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Instagram size={18} /></a>
+              <a href={f.social?.twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Twitter size={18} /></a>
+              <a href={f.social?.youtube} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Youtube size={18} /></a>
             </div>
           </div>
 
