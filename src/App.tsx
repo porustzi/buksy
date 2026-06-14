@@ -13,6 +13,7 @@ import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
 import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
+import { InfoPage } from './pages/InfoPage';
 
 function PageWrapper({ children }: { children: React.ReactNode }) {
   return (
@@ -86,6 +87,14 @@ function AppRoutes() {
           element={
             <PageWrapper>
               <CheckoutPage />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/:slug"
+          element={
+            <PageWrapper>
+              <InfoPage />
             </PageWrapper>
           }
         />

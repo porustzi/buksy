@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Menu, X } from 'lucide-react';
+import { ShoppingBag, Menu, X, Search, User } from 'lucide-react';
 import { useCart } from '../store/CartContext';
 
 const navLinks = [
@@ -14,7 +14,19 @@ const navLinks = [
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { toggleCart, totalItems } = useCart();
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/shop?q=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false);
+      setSearchQuery('');
+    }
+  };
   const location = useLocation();
 
   useEffect(() => {
@@ -86,6 +98,18 @@ export function Header() {
 
             {/* Right Icons */}
             <div className="flex items-center gap-4">
+              <button
+                onClick={() => setIsSearchOpen(!isSearchOpen)}
+                className="p-2 text-white/70 hover:text-white transition-colors duration-300 hidden md:block"
+              >
+                <Search size={20} />
+              </button>
+              <Link
+                to="/contact"
+                className="p-2 text-white/70 hover:text-white transition-colors duration-300 hidden md:block"
+              >
+                <User size={20} />
+              </Link>
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={toggleCart}
@@ -141,8 +165,57 @@ export function Header() {
                   </Link>
                 </motion.div>
               ))}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="flex gap-6 mt-8"
+              >
+                <button onClick={() => setIsSearchOpen(true)} className="p-3 text-white/70">
+                  <Search size={24} />
+                </button>
+                <Link to="/contact" className="p-3 text-white/70">
+                  <User size={24} />
+                </Link>
+              </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-            </div>
+      {/* Search Overlay */}
+      <AnimatePresence>
+        {isSearchOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[60] bg-noir/95 backdrop-blur-xl flex items-start justify-center pt-32"
+            onClick={() => setIsSearchOpen(false)}
+          >
+            <motion.div
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              className="w-full max-w-2xl mx-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <form onSubmit={handleSearch}>
+                <div className="relative">
+                  <Search size={24} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search products..."
+                    autoFocus
+                    className="w-full px-6 py-5 pl-14 bg-ash border border-white/10 text-white text-lg placeholder:text-white/30 focus:outline-none focus:border-blood/50 transition-colors duration-300 font-body"
+                  />
+                </div>
+              </form>
+              <div className="mt-4 text-white/40 text-sm font-body text-center">
+                Press Enter to search
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
