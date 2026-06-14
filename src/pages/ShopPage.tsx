@@ -16,6 +16,7 @@ const sortOptions = [
 export function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || 'all';
+  const searchQuery = searchParams.get('q') || '';
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [sortBy, setSortBy] = useState('featured');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -26,6 +27,17 @@ export function ShopPage() {
     // Filter by category
     if (selectedCategory !== 'all') {
       result = result.filter((p) => p.category === selectedCategory);
+    }
+
+    // Filter by search query
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.description.toLowerCase().includes(q) ||
+          p.category.toLowerCase().includes(q)
+      );
     }
 
     // Sort
@@ -135,23 +147,39 @@ export function ShopPage() {
           </div>
         </motion.div>
 
-        {/* Active Filter Tag */}
-        {selectedCategory !== 'all' && (
+        {/* Active Filters */}
+        {(selectedCategory !== 'all' || searchQuery) && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="flex items-center gap-3 py-4"
           >
             <span className="text-white/40 font-body text-sm">Showing:</span>
-            <span className="inline-flex items-center gap-2 px-3 py-1 bg-blood/20 border border-blood/30 text-blood font-body text-sm">
-              {categories.find((c) => c.id === selectedCategory)?.name}
-              <button
-                onClick={() => handleCategoryChange('all')}
-                className="hover:text-white transition-colors duration-200"
-              >
-                <X size={14} />
-              </button>
-            </span>
+            {selectedCategory !== 'all' && (
+              <span className="inline-flex items-center gap-2 px-3 py-1 bg-blood/20 border border-blood/30 text-blood font-body text-sm">
+                {categories.find((c) => c.id === selectedCategory)?.name}
+                <button
+                  onClick={() => handleCategoryChange('all')}
+                  className="hover:text-white transition-colors duration-200"
+                >
+                  <X size={14} />
+                </button>
+              </span>
+            )}
+            {searchQuery && (
+              <span className="inline-flex items-center gap-2 px-3 py-1 bg-blood/20 border border-blood/30 text-blood font-body text-sm">
+                "{searchQuery}"
+                <button
+                  onClick={() => {
+                    searchParams.delete('q');
+                    setSearchParams(searchParams);
+                  }}
+                  className="hover:text-white transition-colors duration-200"
+                >
+                  <X size={14} />
+                </button>
+              </span>
+            )}
           </motion.div>
         )}
       </div>
@@ -173,7 +201,9 @@ export function ShopPage() {
             <div className="w-16 h-16 border border-white/10 rounded-full flex items-center justify-center mb-4">
               <span className="text-3xl text-white/20">?</span>
             </div>
-            <p className="text-white/60 font-body mb-4">No products found in this category</p>
+            <p className="text-white/60 font-body mb-4">
+              {searchQuery ? `No products found for "${searchQuery}"` : 'No products found in this category'}
+            </p>
             <button
               onClick={() => handleCategoryChange('all')}
               className="text-blood hover:text-white transition-colors duration-300 font-body text-sm"
