@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Instagram, Twitter, Youtube } from 'lucide-react';
+import { Instagram, Twitter, Youtube, Send } from 'lucide-react';
 
 const navLinks = [
   { name: 'Home', href: '/' },
@@ -40,14 +40,6 @@ export function Footer() {
                 Subscribe for exclusive drops, early access, and 10% off your first order.
               </p>
             </div>
-            <a
-              href="https://t.me/+OQrO3Aya1NQ4YmZi"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary whitespace-nowrap flex items-center gap-2"
-            >
-              ПОНЯЛ
-            </a>
           </div>
         </div>
       </div>
@@ -94,6 +86,15 @@ export function Footer() {
                          hover:border-blood hover:text-blood transition-all duration-300"
               >
                 <Youtube size={18} />
+              </a>
+              <a
+                href="https://t.me/+OQrO3Aya1NQ4YmZi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60
+                         hover:border-blood hover:text-blood transition-all duration-300"
+              >
+                <Send size={18} />
               </a>
             </div>
           </div>
