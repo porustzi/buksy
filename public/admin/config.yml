@@ -65,6 +65,8 @@ collections:
     folder: "content/products"
     create: true
     slug: "{{slug}}"
+    summary: "{{name}} — ${{price}}"
+    identifier_field: "slug"
     editor: { preview: false }
     fields:
       - { label: "ID", name: id, widget: string }
