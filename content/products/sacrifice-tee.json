@@ -1,36 +1,68 @@
 {
-  "id": "2",
-  "name": "SACRIFICE TEE",
-  "slug": "sacrifice-tee",
-  "price": 89,
-  "category": "t-shirts",
-  "images": [
-    "https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg?auto=compress&cs=tinysrgb&w=800",
-    "https://images.pexels.com/photos/17854971/pexels-photo-17854971.jpeg?auto=compress&cs=tinysrgb&w=800",
-    "https://images.pexels.com/photos/1043473/pexels-photo-1043473.jpeg?auto=compress&cs=tinysrgb&w=800"
-  ],
-  "sizes": [
-    { "name": "XS", "available": true },
-    { "name": "S", "available": true },
-    { "name": "M", "available": true },
-    { "name": "L", "available": true },
-    { "name": "XL", "available": true },
-    { "name": "XXL", "available": true }
-  ],
-  "inStock": true,
-  "isFeatured": true,
-  "isBestseller": true,
-  "rating": 4.8,
-  "shortDescription": "Футболка з японської бавовни з графічним принтом ручної роботи",
-  "description": "Sacrifice Tee представляє наш культовий принт на преміальній японській бавовні. Кожен виріб проходить унікальний процес прання, що дає ледь помітні варіації та робить кожну футболку єдиною у своєму роді. Вільний крій та посилена горловина забезпечують тривалий комфорт і міцність.",
-  "details": [
-    "Японська бавовна 180 г/м²",
-    "Унікальна обробка stone-wash",
-    "Вільний крій",
-    "Посилена горловина",
-    "Шовкографічний принт"
-  ],
-  "reviews": [
-    { "id": "2", "author": "Elena K.", "rating": 5, "title": "Вартує кожної копійки", "content": "Сумнівалася щодо ціни, але в момент, коли одягла, все зрозуміла. Майстерність виконання на іншому рівні. Дуже рекомендую.", "date": "2024-01-10", "verified": true }
-  ]
+    "id":  "2",
+    "name":  "SACRIFICE TEE",
+    "slug":  "sacrifice-tee",
+    "price":  89,
+    "category":  "t-shirts",
+    "images":  [
+                   {
+                       "url":  "https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   },
+                   {
+                       "url":  "https://images.pexels.com/photos/17854971/pexels-photo-17854971.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   },
+                   {
+                       "url":  "https://images.pexels.com/photos/1043473/pexels-photo-1043473.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   }
+               ],
+    "sizes":  [
+                  {
+                      "name":  "XS",
+                      "available":  true
+                  },
+                  {
+                      "name":  "S",
+                      "available":  true
+                  },
+                  {
+                      "name":  "M",
+                      "available":  true
+                  },
+                  {
+                      "name":  "L",
+                      "available":  true
+                  },
+                  {
+                      "name":  "XL",
+                      "available":  true
+                  },
+                  {
+                      "name":  "XXL",
+                      "available":  true
+                  }
+              ],
+    "inStock":  true,
+    "isFeatured":  true,
+    "isBestseller":  true,
+    "rating":  4.8,
+    "shortDescription":  "Р¤СѓС‚Р±РѕР»РєР° Р· СЏРїРѕРЅСЃСЊРєРѕС— Р±Р°РІРѕРІРЅРё Р· РіСЂР°С„С–С‡РЅРёРј РїСЂРёРЅС‚РѕРј СЂСѓС‡РЅРѕС— СЂРѕР±РѕС‚Рё",
+    "description":  "Sacrifice Tee РїСЂРµРґСЃС‚Р°РІР»СЏС” РЅР°С€ РєСѓР»СЊС‚РѕРІРёР№ РїСЂРёРЅС‚ РЅР° РїСЂРµРјС–Р°Р»СЊРЅС–Р№ СЏРїРѕРЅСЃСЊРєС–Р№ Р±Р°РІРѕРІРЅС–. РљРѕР¶РµРЅ РІРёСЂС–Р± РїСЂРѕС…РѕРґРёС‚СЊ СѓРЅС–РєР°Р»СЊРЅРёР№ РїСЂРѕС†РµСЃ РїСЂР°РЅРЅСЏ, С‰Рѕ РґР°С” Р»РµРґСЊ РїРѕРјС–С‚РЅС– РІР°СЂС–Р°С†С–С— С‚Р° СЂРѕР±РёС‚СЊ РєРѕР¶РЅСѓ С„СѓС‚Р±РѕР»РєСѓ С”РґРёРЅРѕСЋ Сѓ СЃРІРѕС”РјСѓ СЂРѕРґС–. Р’С–Р»СЊРЅРёР№ РєСЂС–Р№ С‚Р° РїРѕСЃРёР»РµРЅР° РіРѕСЂР»РѕРІРёРЅР° Р·Р°Р±РµР·РїРµС‡СѓСЋС‚СЊ С‚СЂРёРІР°Р»РёР№ РєРѕРјС„РѕСЂС‚ С– РјС–С†РЅС–СЃС‚СЊ.",
+    "details":  [
+                    "РЇРїРѕРЅСЃСЊРєР° Р±Р°РІРѕРІРЅР° 180 Рі/РјВІ",
+                    "РЈРЅС–РєР°Р»СЊРЅР° РѕР±СЂРѕР±РєР° stone-wash",
+                    "Р’С–Р»СЊРЅРёР№ РєСЂС–Р№",
+                    "РџРѕСЃРёР»РµРЅР° РіРѕСЂР»РѕРІРёРЅР°",
+                    "РЁРѕРІРєРѕРіСЂР°С„С–С‡РЅРёР№ РїСЂРёРЅС‚"
+                ],
+    "reviews":  [
+                    {
+                        "id":  "2",
+                        "author":  "Elena K.",
+                        "rating":  5,
+                        "title":  "Р’Р°СЂС‚СѓС” РєРѕР¶РЅРѕС— РєРѕРїС–Р№РєРё",
+                        "content":  "РЎСѓРјРЅС–РІР°Р»Р°СЃСЏ С‰РѕРґРѕ С†С–РЅРё, Р°Р»Рµ РІ РјРѕРјРµРЅС‚, РєРѕР»Рё РѕРґСЏРіР»Р°, РІСЃРµ Р·СЂРѕР·СѓРјС–Р»Р°. РњР°Р№СЃС‚РµСЂРЅС–СЃС‚СЊ РІРёРєРѕРЅР°РЅРЅСЏ РЅР° С–РЅС€РѕРјСѓ СЂС–РІРЅС–. Р”СѓР¶Рµ СЂРµРєРѕРјРµРЅРґСѓСЋ.",
+                        "date":  "2024-01-10",
+                        "verified":  true
+                    }
+                ]
 }

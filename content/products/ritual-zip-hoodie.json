@@ -1,30 +1,50 @@
 {
-  "id": "7",
-  "name": "RITUAL ZIP HOODIE",
-  "slug": "ritual-zip-hoodie",
-  "price": 219,
-  "category": "hoodies",
-  "images": [
-    "https://images.pexels.com/photos/6311390/pexels-photo-6311390.jpeg?auto=compress&cs=tinysrgb&w=800",
-    "https://images.pexels.com/photos/6311387/pexels-photo-6311387.jpeg?auto=compress&cs=tinysrgb&w=800",
-    "https://images.pexels.com/photos/17854971/pexels-photo-17854971.jpeg?auto=compress&cs=tinysrgb&w=800"
-  ],
-  "sizes": [
-    { "name": "S", "available": true },
-    { "name": "M", "available": true },
-    { "name": "L", "available": false },
-    { "name": "XL", "available": true }
-  ],
-  "inStock": true,
-  "rating": 4.6,
-  "shortDescription": "Подвійний трикотаж з важкої бавовни з матовою чорною фурнітурою",
-  "description": "Ritual Zip Hoodie виготовлений з подвійного трикотажу важкої бавовни зі структурованим капюшоном та матовою чорною фурнітурою. Подовжений силует і отвори для пальців створюють безперервний потік від плеча до руки.",
-  "details": [
-    "Подвійний трикотаж 400 г/м²",
-    "Подовжена довжина з боковими розрізами",
-    "Матова чорна блискавка",
-    "Структурований подвійний капюшон",
-    "Отвори для пальців на манжетах"
-  ],
-  "reviews": []
+    "id":  "7",
+    "name":  "RITUAL ZIP HOODIE",
+    "slug":  "ritual-zip-hoodie",
+    "price":  219,
+    "category":  "hoodies",
+    "images":  [
+                   {
+                       "url":  "https://images.pexels.com/photos/6311390/pexels-photo-6311390.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   },
+                   {
+                       "url":  "https://images.pexels.com/photos/6311387/pexels-photo-6311387.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   },
+                   {
+                       "url":  "https://images.pexels.com/photos/17854971/pexels-photo-17854971.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   }
+               ],
+    "sizes":  [
+                  {
+                      "name":  "S",
+                      "available":  true
+                  },
+                  {
+                      "name":  "M",
+                      "available":  true
+                  },
+                  {
+                      "name":  "L",
+                      "available":  false
+                  },
+                  {
+                      "name":  "XL",
+                      "available":  true
+                  }
+              ],
+    "inStock":  true,
+    "rating":  4.6,
+    "shortDescription":  "РџРѕРґРІС–Р№РЅРёР№ С‚СЂРёРєРѕС‚Р°Р¶ Р· РІР°Р¶РєРѕС— Р±Р°РІРѕРІРЅРё Р· РјР°С‚РѕРІРѕСЋ С‡РѕСЂРЅРѕСЋ С„СѓСЂРЅС–С‚СѓСЂРѕСЋ",
+    "description":  "Ritual Zip Hoodie РІРёРіРѕС‚РѕРІР»РµРЅРёР№ Р· РїРѕРґРІС–Р№РЅРѕРіРѕ С‚СЂРёРєРѕС‚Р°Р¶Сѓ РІР°Р¶РєРѕС— Р±Р°РІРѕРІРЅРё Р·С– СЃС‚СЂСѓРєС‚СѓСЂРѕРІР°РЅРёРј РєР°РїСЋС€РѕРЅРѕРј С‚Р° РјР°С‚РѕРІРѕСЋ С‡РѕСЂРЅРѕСЋ С„СѓСЂРЅС–С‚СѓСЂРѕСЋ. РџРѕРґРѕРІР¶РµРЅРёР№ СЃРёР»СѓРµС‚ С– РѕС‚РІРѕСЂРё РґР»СЏ РїР°Р»СЊС†С–РІ СЃС‚РІРѕСЂСЋСЋС‚СЊ Р±РµР·РїРµСЂРµСЂРІРЅРёР№ РїРѕС‚С–Рє РІС–Рґ РїР»РµС‡Р° РґРѕ СЂСѓРєРё.",
+    "details":  [
+                    "РџРѕРґРІС–Р№РЅРёР№ С‚СЂРёРєРѕС‚Р°Р¶ 400 Рі/РјВІ",
+                    "РџРѕРґРѕРІР¶РµРЅР° РґРѕРІР¶РёРЅР° Р· Р±РѕРєРѕРІРёРјРё СЂРѕР·СЂС–Р·Р°РјРё",
+                    "РњР°С‚РѕРІР° С‡РѕСЂРЅР° Р±Р»РёСЃРєР°РІРєР°",
+                    "РЎС‚СЂСѓРєС‚СѓСЂРѕРІР°РЅРёР№ РїРѕРґРІС–Р№РЅРёР№ РєР°РїСЋС€РѕРЅ",
+                    "РћС‚РІРѕСЂРё РґР»СЏ РїР°Р»СЊС†С–РІ РЅР° РјР°РЅР¶РµС‚Р°С…"
+                ],
+    "reviews":  [
+
+                ]
 }

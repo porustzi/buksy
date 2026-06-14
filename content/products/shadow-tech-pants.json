@@ -1,31 +1,54 @@
 {
-  "id": "8",
-  "name": "SHADOW TECH PANTS",
-  "slug": "shadow-tech-pants",
-  "price": 179,
-  "category": "pants",
-  "images": [
-    "https://images.pexels.com/photos/1598503/pexels-photo-1598503.jpeg?auto=compress&cs=tinysrgb&w=800",
-    "https://images.pexels.com/photos/10409446/pexels-photo-10409446.jpeg?auto=compress&cs=tinysrgb&w=800",
-    "https://images.pexels.com/photos/1082529/pexels-photo-1082529.jpeg?auto=compress&cs=tinysrgb&w=800"
-  ],
-  "sizes": [
-    { "name": "28", "available": false },
-    { "name": "30", "available": true },
-    { "name": "32", "available": true },
-    { "name": "34", "available": true },
-    { "name": "36", "available": true }
-  ],
-  "inStock": true,
-  "rating": 4.5,
-  "shortDescription": "Запатентована тканина shadow-tech з артикульованими колінами",
-  "description": "Shadow Tech Pants використовують нашу запатентовану тканину shadow-tech, яка виглядає повністю чорною на прямому світлі, але виявляє тонкий візерунок у тіні. Розроблені для руху з артикульованими колінами та дихаючими панелями.",
-  "details": [
-    "Запатентована тканина shadow-tech",
-    "Водовідштовхувальне покриття",
-    "Артикульовані коліна",
-    "Приховані кишені на блискавці",
-    "Еластичний манжет"
-  ],
-  "reviews": []
+    "id":  "8",
+    "name":  "SHADOW TECH PANTS",
+    "slug":  "shadow-tech-pants",
+    "price":  179,
+    "category":  "pants",
+    "images":  [
+                   {
+                       "url":  "https://images.pexels.com/photos/1598503/pexels-photo-1598503.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   },
+                   {
+                       "url":  "https://images.pexels.com/photos/10409446/pexels-photo-10409446.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   },
+                   {
+                       "url":  "https://images.pexels.com/photos/1082529/pexels-photo-1082529.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   }
+               ],
+    "sizes":  [
+                  {
+                      "name":  "28",
+                      "available":  false
+                  },
+                  {
+                      "name":  "30",
+                      "available":  true
+                  },
+                  {
+                      "name":  "32",
+                      "available":  true
+                  },
+                  {
+                      "name":  "34",
+                      "available":  true
+                  },
+                  {
+                      "name":  "36",
+                      "available":  true
+                  }
+              ],
+    "inStock":  true,
+    "rating":  4.5,
+    "shortDescription":  "Р—Р°РїР°С‚РµРЅС‚РѕРІР°РЅР° С‚РєР°РЅРёРЅР° shadow-tech Р· Р°СЂС‚РёРєСѓР»СЊРѕРІР°РЅРёРјРё РєРѕР»С–РЅР°РјРё",
+    "description":  "Shadow Tech Pants РІРёРєРѕСЂРёСЃС‚РѕРІСѓСЋС‚СЊ РЅР°С€Сѓ Р·Р°РїР°С‚РµРЅС‚РѕРІР°РЅСѓ С‚РєР°РЅРёРЅСѓ shadow-tech, СЏРєР° РІРёРіР»СЏРґР°С” РїРѕРІРЅС–СЃС‚СЋ С‡РѕСЂРЅРѕСЋ РЅР° РїСЂСЏРјРѕРјСѓ СЃРІС–С‚Р»С–, Р°Р»Рµ РІРёСЏРІР»СЏС” С‚РѕРЅРєРёР№ РІС–Р·РµСЂСѓРЅРѕРє Сѓ С‚С–РЅС–. Р РѕР·СЂРѕР±Р»РµРЅС– РґР»СЏ СЂСѓС…Сѓ Р· Р°СЂС‚РёРєСѓР»СЊРѕРІР°РЅРёРјРё РєРѕР»С–РЅР°РјРё С‚Р° РґРёС…Р°СЋС‡РёРјРё РїР°РЅРµР»СЏРјРё.",
+    "details":  [
+                    "Р—Р°РїР°С‚РµРЅС‚РѕРІР°РЅР° С‚РєР°РЅРёРЅР° shadow-tech",
+                    "Р’РѕРґРѕРІС–РґС€С‚РѕРІС…СѓРІР°Р»СЊРЅРµ РїРѕРєСЂРёС‚С‚СЏ",
+                    "РђСЂС‚РёРєСѓР»СЊРѕРІР°РЅС– РєРѕР»С–РЅР°",
+                    "РџСЂРёС…РѕРІР°РЅС– РєРёС€РµРЅС– РЅР° Р±Р»РёСЃРєР°РІС†С–",
+                    "Р•Р»Р°СЃС‚РёС‡РЅРёР№ РјР°РЅР¶РµС‚"
+                ],
+    "reviews":  [
+
+                ]
 }

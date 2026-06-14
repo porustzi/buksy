@@ -1,36 +1,56 @@
 {
-  "id": "5",
-  "name": "BLOOD MOON CHAIN",
-  "slug": "blood-moon-chain",
-  "price": 149,
-  "category": "accessories",
-  "images": [
-    "https://images.pexels.com/photos/11229341/pexels-photo-11229341.jpeg?auto=compress&cs=tinysrgb&w=800",
-    "https://images.pexels.com/photos/12982896/pexels-photo-12982896.jpeg?auto=compress&cs=tinysrgb&w=800",
-    "https://images.pexels.com/photos/723509/pexels-photo-723509.jpeg?auto=compress&cs=tinysrgb&w=800"
-  ],
-  "sizes": [
-    { "name": "18\"", "available": true },
-    { "name": "20\"", "available": true },
-    { "name": "22\"", "available": true },
-    { "name": "24\"", "available": false }
-  ],
-  "inStock": true,
-  "isFeatured": true,
-  "rating": 4.9,
-  "shortDescription": "Оксидоване стерлінгове срібло з криваво-червоною емаллю 24k",
-  "description": "Blood Moon Chain — це акцентний виріб, що поєднує стрітвір і тонку ювелірну майстерність. Виготовлений вручну з оксидованого стерлінгового срібла з криваво-червоним емалевим акцентом 24k, цей солідний ланцюг важко лежить на шиї, привертаючи увагу, не вимагаючи її.",
-  "details": [
-    "Оксидоване срібло 925 проби",
-    "Криваво-червона емаль 24k",
-    "Застібка-лобстер",
-    "Поліровані вручну ланки",
-    "Вага: 85 г (20\")"
-  ],
-  "care": [
-    "Зберігати в антиоксидному мішечку",
-    "Уникати контакту з водою",
-    "Полірувати срібною тканиною"
-  ],
-  "reviews": []
+    "id":  "5",
+    "name":  "BLOOD MOON CHAIN",
+    "slug":  "blood-moon-chain",
+    "price":  149,
+    "category":  "accessories",
+    "images":  [
+                   {
+                       "url":  "https://images.pexels.com/photos/11229341/pexels-photo-11229341.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   },
+                   {
+                       "url":  "https://images.pexels.com/photos/12982896/pexels-photo-12982896.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   },
+                   {
+                       "url":  "https://images.pexels.com/photos/723509/pexels-photo-723509.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   }
+               ],
+    "sizes":  [
+                  {
+                      "name":  "18\"",
+                      "available":  true
+                  },
+                  {
+                      "name":  "20\"",
+                      "available":  true
+                  },
+                  {
+                      "name":  "22\"",
+                      "available":  true
+                  },
+                  {
+                      "name":  "24\"",
+                      "available":  false
+                  }
+              ],
+    "inStock":  true,
+    "isFeatured":  true,
+    "rating":  4.9,
+    "shortDescription":  "РћРєСЃРёРґРѕРІР°РЅРµ СЃС‚РµСЂР»С–РЅРіРѕРІРµ СЃСЂС–Р±Р»Рѕ Р· РєСЂРёРІР°РІРѕ-С‡РµСЂРІРѕРЅРѕСЋ РµРјР°Р»Р»СЋ 24k",
+    "description":  "Blood Moon Chain вЂ” С†Рµ Р°РєС†РµРЅС‚РЅРёР№ РІРёСЂС–Р±, С‰Рѕ РїРѕС”РґРЅСѓС” СЃС‚СЂС–С‚РІС–СЂ С– С‚РѕРЅРєСѓ СЋРІРµР»С–СЂРЅСѓ РјР°Р№СЃС‚РµСЂРЅС–СЃС‚СЊ. Р’РёРіРѕС‚РѕРІР»РµРЅРёР№ РІСЂСѓС‡РЅСѓ Р· РѕРєСЃРёРґРѕРІР°РЅРѕРіРѕ СЃС‚РµСЂР»С–РЅРіРѕРІРѕРіРѕ СЃСЂС–Р±Р»Р° Р· РєСЂРёРІР°РІРѕ-С‡РµСЂРІРѕРЅРёРј РµРјР°Р»РµРІРёРј Р°РєС†РµРЅС‚РѕРј 24k, С†РµР№ СЃРѕР»С–РґРЅРёР№ Р»Р°РЅС†СЋРі РІР°Р¶РєРѕ Р»РµР¶РёС‚СЊ РЅР° С€РёС—, РїСЂРёРІРµСЂС‚Р°СЋС‡Рё СѓРІР°РіСѓ, РЅРµ РІРёРјР°РіР°СЋС‡Рё С—С—.",
+    "details":  [
+                    "РћРєСЃРёРґРѕРІР°РЅРµ СЃСЂС–Р±Р»Рѕ 925 РїСЂРѕР±Рё",
+                    "РљСЂРёРІР°РІРѕ-С‡РµСЂРІРѕРЅР° РµРјР°Р»СЊ 24k",
+                    "Р—Р°СЃС‚С–Р±РєР°-Р»РѕР±СЃС‚РµСЂ",
+                    "РџРѕР»С–СЂРѕРІР°РЅС– РІСЂСѓС‡РЅСѓ Р»Р°РЅРєРё",
+                    "Р’Р°РіР°: 85 Рі (20\")"
+                ],
+    "care":  [
+                 "Р—Р±РµСЂС–РіР°С‚Рё РІ Р°РЅС‚РёРѕРєСЃРёРґРЅРѕРјСѓ РјС–С€РµС‡РєСѓ",
+                 "РЈРЅРёРєР°С‚Рё РєРѕРЅС‚Р°РєС‚Сѓ Р· РІРѕРґРѕСЋ",
+                 "РџРѕР»С–СЂСѓРІР°С‚Рё СЃСЂС–Р±РЅРѕСЋ С‚РєР°РЅРёРЅРѕСЋ"
+             ],
+    "reviews":  [
+
+                ]
 }

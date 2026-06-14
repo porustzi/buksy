@@ -11,8 +11,14 @@ const outPath = join(root, 'src', 'data', 'products.ts');
 const files = readdirSync(prodDir).filter(f => f.endsWith('.json'));
 
 const products = files.map(f => {
-  const raw = readFileSync(join(prodDir, f), 'utf-8');
-  return JSON.parse(raw);
+  let raw = readFileSync(join(prodDir, f), 'utf-8');
+  if (raw.charCodeAt(0) === 0xFEFF) raw = raw.slice(1);
+  const p = JSON.parse(raw);
+  // normalize images: [{url: "..."}] -> ["..."]
+  if (p.images && p.images[0] && typeof p.images[0] === 'object') {
+    p.images = p.images.map(img => img.url || img.image || '');
+  }
+  return p;
 });
 
 const getCatName = (cat) => {

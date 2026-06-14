@@ -1,32 +1,55 @@
 {
-  "id": "4",
-  "name": "ABYSS CARGO PANTS",
-  "slug": "abyss-cargo-pants",
-  "price": 209,
-  "category": "pants",
-  "images": [
-    "https://images.pexels.com/photos/12982896/pexels-photo-12982896.jpeg?auto=compress&cs=tinysrgb&w=800",
-    "https://images.pexels.com/photos/1598503/pexels-photo-1598503.jpeg?auto=compress&cs=tinysrgb&w=800",
-    "https://images.pexels.com/photos/1082529/pexels-photo-1082529.jpeg?auto=compress&cs=tinysrgb&w=800"
-  ],
-  "sizes": [
-    { "name": "28", "available": true },
-    { "name": "30", "available": true },
-    { "name": "32", "available": true },
-    { "name": "34", "available": true },
-    { "name": "36", "available": false }
-  ],
-  "inStock": true,
-  "isNew": true,
-  "rating": 4.7,
-  "shortDescription": "Технічна японська тканина з перебільшеними карго-кишенями",
-  "description": "Abyss Cargo Pants переосмислюють утилітарну розкіш. Виготовлені з технічної японської тканини з легким блиском, ці штани мають перебільшені карго-кишені, регульовані ремені та вільний крій у стегнах, що звужується до щиколотки.",
-  "details": [
-    "Технічна японська тканина",
-    "Вільний крій, звужені штанини",
-    "Шість карго-кишень",
-    "Регульовані ремені на щиколотках",
-    "Внутрішній регульований пояс"
-  ],
-  "reviews": []
+    "id":  "4",
+    "name":  "ABYSS CARGO PANTS",
+    "slug":  "abyss-cargo-pants",
+    "price":  209,
+    "category":  "pants",
+    "images":  [
+                   {
+                       "url":  "https://images.pexels.com/photos/12982896/pexels-photo-12982896.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   },
+                   {
+                       "url":  "https://images.pexels.com/photos/1598503/pexels-photo-1598503.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   },
+                   {
+                       "url":  "https://images.pexels.com/photos/1082529/pexels-photo-1082529.jpeg?auto=compress\u0026cs=tinysrgb\u0026w=800"
+                   }
+               ],
+    "sizes":  [
+                  {
+                      "name":  "28",
+                      "available":  true
+                  },
+                  {
+                      "name":  "30",
+                      "available":  true
+                  },
+                  {
+                      "name":  "32",
+                      "available":  true
+                  },
+                  {
+                      "name":  "34",
+                      "available":  true
+                  },
+                  {
+                      "name":  "36",
+                      "available":  false
+                  }
+              ],
+    "inStock":  true,
+    "isNew":  true,
+    "rating":  4.7,
+    "shortDescription":  "РўРµС…РЅС–С‡РЅР° СЏРїРѕРЅСЃСЊРєР° С‚РєР°РЅРёРЅР° Р· РїРµСЂРµР±С–Р»СЊС€РµРЅРёРјРё РєР°СЂРіРѕ-РєРёС€РµРЅСЏРјРё",
+    "description":  "Abyss Cargo Pants РїРµСЂРµРѕСЃРјРёСЃР»СЋСЋС‚СЊ СѓС‚РёР»С–С‚Р°СЂРЅСѓ СЂРѕР·РєС–С€. Р’РёРіРѕС‚РѕРІР»РµРЅС– Р· С‚РµС…РЅС–С‡РЅРѕС— СЏРїРѕРЅСЃСЊРєРѕС— С‚РєР°РЅРёРЅРё Р· Р»РµРіРєРёРј Р±Р»РёСЃРєРѕРј, С†С– С€С‚Р°РЅРё РјР°СЋС‚СЊ РїРµСЂРµР±С–Р»СЊС€РµРЅС– РєР°СЂРіРѕ-РєРёС€РµРЅС–, СЂРµРіСѓР»СЊРѕРІР°РЅС– СЂРµРјРµРЅС– С‚Р° РІС–Р»СЊРЅРёР№ РєСЂС–Р№ Сѓ СЃС‚РµРіРЅР°С…, С‰Рѕ Р·РІСѓР¶СѓС”С‚СЊСЃСЏ РґРѕ С‰РёРєРѕР»РѕС‚РєРё.",
+    "details":  [
+                    "РўРµС…РЅС–С‡РЅР° СЏРїРѕРЅСЃСЊРєР° С‚РєР°РЅРёРЅР°",
+                    "Р’С–Р»СЊРЅРёР№ РєСЂС–Р№, Р·РІСѓР¶РµРЅС– С€С‚Р°РЅРёРЅРё",
+                    "РЁС–СЃС‚СЊ РєР°СЂРіРѕ-РєРёС€РµРЅСЊ",
+                    "Р РµРіСѓР»СЊРѕРІР°РЅС– СЂРµРјРµРЅС– РЅР° С‰РёРєРѕР»РѕС‚РєР°С…",
+                    "Р’РЅСѓС‚СЂС–С€РЅС–Р№ СЂРµРіСѓР»СЊРѕРІР°РЅРёР№ РїРѕСЏСЃ"
+                ],
+    "reviews":  [
+
+                ]
 }
