@@ -50,20 +50,10 @@ export function Header() {
                 className="flex items-center gap-2"
               >
                 <div className="w-10 h-10 relative">
-                  <svg viewBox="0 0 40 40" className="w-full h-full">
-                    <circle cx="20" cy="20" r="18" fill="none" stroke="#B10006" strokeWidth="1" />
-                    <path
-                      d="M12 20 L16 14 L20 24 L24 14 L28 20"
-                      fill="none"
-                      stroke="#B10006"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                  <img src="/logo.png" alt="BUKSY" className="w-full h-full object-contain" />
                 </div>
                 <span className="font-heading text-2xl tracking-[0.2em] text-white">
-                  CIPHER
+                  BUKSY
                 </span>
               </motion.div>
             </Link>

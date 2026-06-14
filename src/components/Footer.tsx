@@ -93,19 +93,9 @@ export function Footer() {
           <div className="lg:col-span-1">
             <Link to="/" className="flex items-center gap-2 mb-6">
               <div className="w-10 h-10">
-                <svg viewBox="0 0 40 40" className="w-full h-full">
-                  <circle cx="20" cy="20" r="18" fill="none" stroke="#B10006" strokeWidth="1" />
-                  <path
-                    d="M12 20 L16 14 L20 24 L24 14 L28 20"
-                    fill="none"
-                    stroke="#B10006"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <img src="/logo.png" alt="BUKSY" className="w-full h-full object-contain" />
               </div>
-              <span className="font-heading text-xl tracking-[0.2em]">CIPHER</span>
+              <span className="font-heading text-xl tracking-[0.2em]">BUKSY</span>
             </Link>
             <p className="text-white/60 font-body text-sm leading-relaxed mb-6">
               Premium dark streetwear for those who embrace the shadows.
@@ -205,7 +195,7 @@ export function Footer() {
       <div className="border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/40 font-body">
-            <p>&copy; 2024 CIPHER. All rights reserved.</p>
+            <p>&copy; 2024 BUKSY. All rights reserved.</p>
             <p className="flex items-center gap-2">
               Designed for the <span className="text-blood">dark</span>
             </p>

@@ -84,7 +84,7 @@ export function CheckoutPage() {
               Thank you for your purchase. We've sent a confirmation email with your
               order details and tracking information will follow once your order ships.
             </p>
-            <p className="text-white/40 font-mono text-sm">Order #CIP-{Date.now().toString().slice(-6)}</p>
+            <p className="text-white/40 font-mono text-sm">Order #BUK-{Date.now().toString().slice(-6)}</p>
             <div className="pt-8">
               <Link
                 to="/shop"
@@ -119,7 +119,7 @@ export function CheckoutPage() {
             <span className="font-body text-sm">Return to cart</span>
           </Link>
           <Link to="/" className="font-heading text-2xl tracking-[0.2em] text-blood">
-            CIPHER
+            BUKSY
           </Link>
           <div className="flex items-center gap-2 text-white/40">
             <Lock size={14} />

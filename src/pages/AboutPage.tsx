@@ -32,7 +32,7 @@ const timeline = [
   { year: '2020', event: 'First collection launches' },
   { year: '2021', event: 'International expansion' },
   { year: '2022', event: '100K+ community members' },
-  { year: '2023', event: 'CIPHER Studio opens' },
+  { year: '2023', event: 'BUKSY Studio opens' },
   { year: '2024', event: 'New chapter begins' },
 ];
 
@@ -44,7 +44,7 @@ export function AboutPage() {
         <div className="absolute inset-0">
           <img
             src={editorialImages[0]}
-            alt="CIPHER Editorial"
+            alt="BUKSY Editorial"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-noir via-noir/60 to-transparent" />
@@ -80,7 +80,7 @@ export function AboutPage() {
               </p>
               <blockquote className="relative">
                 <p className="font-display text-2xl md:text-3xl font-light text-white leading-relaxed mb-6">
-                  CIPHER exists at the intersection of luxury and rebellion.
+                  BUKSY exists at the intersection of luxury and rebellion.
                   We believe that true style doesn't demand attention—it commands
                   it through subtlety, quality, and intention.
                 </p>
@@ -160,7 +160,7 @@ export function AboutPage() {
               <div className="aspect-[16/9] overflow-hidden">
                 <img
                   src={editorialImages[2]}
-                  alt="CIPHER Studio"
+                  alt="BUKSY Studio"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -173,7 +173,7 @@ export function AboutPage() {
               className="flex flex-col justify-center space-y-6"
             >
               <h3 className="font-heading text-2xl tracking-wider">
-                The CIPHER Atelier
+                The BUKSY Atelier
               </h3>
               <p className="text-white/70 font-body leading-relaxed">
                 Located in the heart of Berlin's creative district, our atelier

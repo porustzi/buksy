@@ -100,7 +100,7 @@ function App() {
 
   // Check if we've already shown the intro this session
   useEffect(() => {
-    const hasSeenIntro = sessionStorage.getItem('cipher_intro_seen');
+    const hasSeenIntro = sessionStorage.getItem('buksy_intro_seen');
     if (hasSeenIntro) {
       setShowIntro(false);
       setIntroComplete(true);
@@ -108,7 +108,7 @@ function App() {
   }, []);
 
   const handleIntroComplete = () => {
-    sessionStorage.setItem('cipher_intro_seen', 'true');
+    sessionStorage.setItem('buksy_intro_seen', 'true');
     setShowIntro(false);
     setIntroComplete(true);
   };

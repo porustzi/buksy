@@ -28,7 +28,7 @@ interface CartContextType extends CartState {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'cipher_cart';
+const STORAGE_KEY = 'buksy_cart';
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {

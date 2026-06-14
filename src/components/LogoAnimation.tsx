@@ -47,7 +47,7 @@ export function LogoAnimation({ onComplete }: LogoAnimationProps) {
               </>
             )}
 
-            {/* Logo SVG */}
+            {/* Logo */}
             <motion.div
               initial={{ scale: 0.8, rotateY: 90, opacity: 0 }}
               animate={{
@@ -61,45 +61,16 @@ export function LogoAnimation({ onComplete }: LogoAnimationProps) {
               }}
               className="relative"
             >
-              <svg viewBox="0 0 120 120" className="w-[120px] h-[120px]">
-                {/* Outer circle */}
-                <motion.circle
-                  cx="60"
-                  cy="60"
-                  r="50"
-                  fill="none"
-                  stroke="#B10006"
-                  strokeWidth="1"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 0.8, ease: 'easeInOut' }}
-                />
-                {/* Inner glow circle */}
-                <motion.circle
-                  cx="60"
-                  cy="60"
-                  r="45"
-                  fill="none"
-                  stroke="#B10006"
-                  strokeWidth="0.5"
-                  strokeDasharray="4 4"
+              <div className="w-[120px] h-[120px] overflow-hidden">
+                <motion.img
+                  src="/logo.png"
+                  alt="BUKSY"
+                  className="w-full h-full object-contain"
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.5 }}
-                  transition={{ delay: 0.4, duration: 0.4 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
                 />
-                {/* Cipher symbol */}
-                <motion.path
-                  d="M36 60 L48 42 L60 72 L72 42 L84 60"
-                  fill="none"
-                  stroke="#B10006"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  initial={{ pathLength: 0 }}
-                  animate={{ pathLength: 1 }}
-                  transition={{ duration: 0.6, delay: 0.3, ease: 'easeInOut' }}
-                />
-              </svg>
+              </div>
 
               {/* Glow effect */}
               <motion.div
@@ -121,7 +92,7 @@ export function LogoAnimation({ onComplete }: LogoAnimationProps) {
                 className="font-heading text-2xl tracking-[0.4em] text-blood"
                 style={{ textShadow: '0 0 20px rgba(177, 0, 6, 0.5)' }}
               >
-                CIPHER
+                BUKSY
               </span>
             </motion.div>
           </div>

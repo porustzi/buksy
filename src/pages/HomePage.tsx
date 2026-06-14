@@ -131,7 +131,7 @@ export function HomePage() {
             <div className="aspect-[4/5] overflow-hidden">
               <img
                 src={editorialImage}
-                alt="CIPHER Editorial"
+                alt="BUKSY Editorial"
                 className="w-full h-full object-cover"
               />
             </div>
@@ -152,7 +152,7 @@ export function HomePage() {
             </h2>
             <div className="space-y-6 text-white/70 font-body leading-relaxed">
               <p>
-                CIPHER exists at the intersection of luxury and rebellion. We believe that
+                BUKSY exists at the intersection of luxury and rebellion. We believe that
                 true style doesn't demand attention—it commands it through subtlety,
                 quality, and intention.
               </p>
@@ -264,7 +264,7 @@ export function HomePage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <p className="section-subtitle mb-3">@CIPHER.OFFICIAL</p>
+            <p className="section-subtitle mb-3">@BUKSY.OFFICIAL</p>
             <h2 className="section-title">
               Follow the <span className="text-blood">Movement</span>
             </h2>

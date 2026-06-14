@@ -16,7 +16,7 @@ const faqItems = [
     answer: 'Our pieces are designed with a modern, relaxed fit. We recommend sizing true for a relaxed silhouette, or sizing down for a more fitted look. Check our detailed size guide on each product page for specific measurements.',
   },
   {
-    question: 'How should I care for my CIPHER pieces?',
+    question: 'How should I care for my BUKSY pieces?',
     answer: 'Each piece comes with specific care instructions on the label. Generally, we recommend washing inside out in cold water and hanging to dry. For leather items, use a leather conditioner quarterly and avoid direct sunlight.',
   },
   {
@@ -180,10 +180,10 @@ export function ContactPage() {
                   <div>
                     <h3 className="font-heading text-sm tracking-wider mb-1">EMAIL</h3>
                     <a
-                      href="mailto:info@cipher.studio"
+                      href="mailto:info@buksy.studio"
                       className="text-white/70 font-body hover:text-blood transition-colors duration-300"
                     >
-                      info@cipher.studio
+                      info@buksy.studio
                     </a>
                   </div>
                 </div>
@@ -203,7 +203,7 @@ export function ContactPage() {
                   <div>
                     <h3 className="font-heading text-sm tracking-wider mb-1">STUDIO</h3>
                     <p className="text-white/70 font-body">
-                      CIPHER Atelier<br />
+                      BUKSY Atelier<br />
                       Kreuzbergstr. 42<br />
                       10997 Berlin, Germany
                     </p>
