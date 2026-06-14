@@ -2,15 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone, Send, Instagram, Twitter, Youtube } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-const faqItemKeys = [
-  { qKey: 'faq.q1', aKey: 'faq.a1' },
-  { qKey: 'faq.q2', aKey: 'faq.a2' },
-  { qKey: 'faq.q3', aKey: 'faq.a3' },
-  { qKey: 'faq.q4', aKey: 'faq.a4' },
-  { qKey: 'faq.q5', aKey: 'faq.a5' },
-  { qKey: 'faq.q6', aKey: 'faq.a6' },
-];
+import { contactInfo } from '../data/content';
 
 export function ContactPage() {
   const { t } = useTranslation();
@@ -263,7 +255,7 @@ export function ContactPage() {
           </motion.div>
 
           <div className="space-y-4">
-            {faqItemKeys.map((item, index) => (
+            {contactInfo.faq.items.map((item, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
@@ -277,7 +269,7 @@ export function ContactPage() {
                   className="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition-colors duration-300"
                 >
                   <span className="font-heading text-sm tracking-wider pr-8">
-                    {t(item.qKey)}
+                    {item.question}
                   </span>
                   <motion.span
                     animate={{ rotate: expandedFaq === index ? 45 : 0 }}
@@ -297,7 +289,7 @@ export function ContactPage() {
                 >
                   <div className="px-6 pb-6 pt-0">
                     <p className="text-white/60 font-body text-sm leading-relaxed">
-                      {t(item.aKey)}
+                      {item.answer}
                     </p>
                   </div>
                 </motion.div>

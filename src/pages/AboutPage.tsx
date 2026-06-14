@@ -2,28 +2,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-
-const editorialImages = [
-  'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=800',
-  'https://images.pexels.com/photos/1126964/pexels-photo-1126964.jpeg?auto=compress&cs=tinysrgb&w=800',
-];
-
-const valueKeys = [
-  { titleKey: 'about.valueIntentionality', descKey: 'about.valueIntentionalityDesc' },
-  { titleKey: 'about.valueQuality', descKey: 'about.valueQualityDesc' },
-  { titleKey: 'about.valueRebellion', descKey: 'about.valueRebellionDesc' },
-  { titleKey: 'about.valueSustainable', descKey: 'about.valueSustainableDesc' },
-];
-
-const timelineEvents = [
-  { year: '2019', eventKey: 'about.event2019' },
-  { year: '2020', eventKey: 'about.event2020' },
-  { year: '2021', eventKey: 'about.event2021' },
-  { year: '2022', eventKey: 'about.event2022' },
-  { year: '2023', eventKey: 'about.event2023' },
-  { year: '2024', eventKey: 'about.event2024' },
-];
+import { aboutPage } from '../data/content';
 
 export function AboutPage() {
   const { t } = useTranslation();
@@ -32,9 +11,9 @@ export function AboutPage() {
       {/* Hero */}
       <section className="relative h-[70vh] overflow-hidden">
         <div className="absolute inset-0">
-          <img
-            src={editorialImages[0]}
-            alt="BUKSY Editorial"
+            <img
+              src={aboutPage.hero.image}
+              alt="BUKSY Editorial"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-noir via-noir/60 to-transparent" />
@@ -86,7 +65,7 @@ export function AboutPage() {
             >
               <div className="aspect-[3/4] overflow-hidden">
                 <img
-                  src={editorialImages[1]}
+                  src={aboutPage.philosophy.image}
                   alt="Atelier craftsmanship"
                   className="w-full h-full object-cover"
                 />
@@ -113,9 +92,9 @@ export function AboutPage() {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {valueKeys.map((v, index) => (
+            {aboutPage.values.items.map((v, index) => (
               <motion.div
-                key={v.titleKey}
+                key={v.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -124,10 +103,10 @@ export function AboutPage() {
               >
                 <span className="font-mono text-blood text-sm mb-4 block">0{index + 1}</span>
                 <h3 className="font-heading text-lg tracking-wider mb-3 group-hover:text-blood transition-colors duration-300">
-                  {t(v.titleKey)}
+                  {v.title}
                 </h3>
                 <p className="text-white/60 font-body text-sm leading-relaxed">
-                  {t(v.descKey)}
+                  {v.description}
                 </p>
               </motion.div>
             ))}
@@ -147,7 +126,7 @@ export function AboutPage() {
             >
               <div className="aspect-[16/9] overflow-hidden">
                 <img
-                  src={editorialImages[2]}
+                  src={aboutPage.atelier.image}
                   alt="BUKSY Studio"
                   className="w-full h-full object-cover"
                 />
@@ -194,7 +173,7 @@ export function AboutPage() {
             <div className="absolute left-1/2 top-0 bottom-0 w-px bg-blood/20 hidden md:block" />
 
             <div className="space-y-12">
-              {timelineEvents.map((item, index) => (
+              {aboutPage.timeline.events.map((item, index) => (
                 <motion.div
                   key={item.year}
                   initial={{ opacity: 0, y: 20 }}
@@ -207,7 +186,7 @@ export function AboutPage() {
                     {index % 2 === 0 ? (
                       <>
                         <span className="font-mono text-blood text-3xl">{item.year}</span>
-                        <h4 className="font-heading text-lg mt-2">{t(item.eventKey)}</h4>
+                        <h4 className="font-heading text-lg mt-2">{item.event}</h4>
                       </>
                     ) : (
                       <div className="hidden md:block" />
@@ -218,7 +197,7 @@ export function AboutPage() {
                     {index % 2 === 1 ? (
                       <>
                         <span className="font-mono text-blood text-3xl">{item.year}</span>
-                        <h4 className="font-heading text-lg mt-2">{t(item.eventKey)}</h4>
+                        <h4 className="font-heading text-lg mt-2">{item.event}</h4>
                       </>
                     ) : (
                       <div className="hidden md:block" />
@@ -227,7 +206,7 @@ export function AboutPage() {
                   {/* Mobile view */}
                   <div className="flex items-center gap-4 md:hidden">
                     <span className="font-mono text-blood text-2xl">{item.year}</span>
-                    <h4 className="font-heading text-base">{t(item.eventKey)}</h4>
+                    <h4 className="font-heading text-base">{item.event}</h4>
                   </div>
                 </motion.div>
               ))}
