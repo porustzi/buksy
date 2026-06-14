@@ -1,0 +1,160 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-noir text-white font-body;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  ::selection {
+    @apply bg-blood/30 text-white;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-noir;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-blood/50 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-blood/70;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply relative overflow-hidden px-8 py-4 bg-blood text-white font-heading tracking-wider uppercase text-sm
+           transition-all duration-500 hover:shadow-blood-lg hover:scale-105;
+  }
+
+  .btn-primary::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent
+           -translate-x-full transition-transform duration-700;
+  }
+
+  .btn-primary:hover::before {
+    @apply translate-x-full;
+  }
+
+  .btn-secondary {
+    @apply px-8 py-4 border border-white/20 text-white font-heading tracking-wider uppercase text-sm
+           transition-all duration-300 hover:border-blood hover:text-blood hover:shadow-blood;
+  }
+
+  .section-title {
+    @apply font-display text-4xl md:text-5xl lg:text-6xl font-light tracking-wide;
+  }
+
+  .section-subtitle {
+    @apply font-heading text-lg tracking-[0.3em] uppercase text-white/60;
+  }
+
+  .glass-effect {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+  }
+
+  .text-gradient {
+    @apply bg-gradient-blood bg-clip-text text-transparent;
+  }
+
+  .hover-glow {
+    @apply transition-shadow duration-300 hover:shadow-blood;
+  }
+
+  .image-overlay {
+    @apply after:absolute after:inset-0 after:bg-gradient-to-t after:from-noir after:via-noir/50 after:to-transparent;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+    background-size: 200% 100%;
+  }
+}
+
+/* Page transition animations */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+}
+
+.page-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease-in, transform 0.3s ease-in;
+}
+
+/* Blood glow animation for buttons */
+@keyframes blood-pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(177, 0, 6, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(177, 0, 6, 0);
+  }
+}
+
+.blood-pulse {
+  animation: blood-pulse 2s infinite;
+}
+
+/* Checkout input styles */
+.checkout-input {
+  @apply px-4 py-4 bg-ash border border-white/10 text-white placeholder:text-white/30
+         focus:outline-none focus:border-blood/50 transition-colors duration-300 font-body text-sm;
+}
+
+/* Custom checkbox styles */
+input[type="radio"] {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input[type="radio"]:checked {
+  border-color: #B10006;
+  background: radial-gradient(circle, #B10006 40%, transparent 40%);
+}
+
+/* Custom select arrow */
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
