@@ -1,0 +1,46 @@
+{
+  "hero": {
+    "tagline": "ЗВ'ЯЖІТЬСЯ З НАМИ",
+    "title": "Контакти"
+  },
+  "form": {
+    "title": "Надіслати повідомлення",
+    "nameLabel": "ІМ'Я",
+    "namePlaceholder": "Ваше ім'я",
+    "emailLabel": "EMAIL",
+    "emailPlaceholder": "your@email.com",
+    "subjectLabel": "ТЕМА",
+    "subjectPlaceholder": "Оберіть тему",
+    "subjectOptions": [
+      { "value": "order", "label": "Запит щодо замовлення" },
+      { "value": "product", "label": "Питання про товар" },
+      { "value": "returns", "label": "Повернення та обмін" },
+      { "value": "wholesale", "label": "Оптовий запит" },
+      { "value": "other", "label": "Інше" }
+    ],
+    "messageLabel": "ПОВІДОМЛЕННЯ",
+    "messagePlaceholder": "Як ми можемо допомогти?",
+    "submitButton": "НАДІСЛАТИ",
+    "successTitle": "Повідомлення надіслано",
+    "successText": "Ми зв'яжемось з вами протягом 24-48 годин."
+  },
+  "info": {
+    "title": "Наші контакти",
+    "email": "info@buksy.studio",
+    "phone": "+49 30 123 4567",
+    "studio": "BUKSY Atelier\nKreuzbergstr. 42\n10997 Berlin, Germany",
+    "emailLabel": "EMAIL",
+    "phoneLabel": "ТЕЛЕФОН",
+    "studioLabel": "СТУДІЯ"
+  },
+  "social": {
+    "title": "МИ В СОЦМЕРЕЖАХ",
+    "instagram": "https://instagram.com",
+    "twitter": "https://twitter.com",
+    "youtube": "https://youtube.com"
+  },
+  "faq": {
+    "tagline": "ВІДПОВІДІ",
+    "title": "FAQ"
+  }
+}

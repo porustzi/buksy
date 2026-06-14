@@ -1,0 +1,26 @@
+{
+  "hero": {
+    "subtitle": "ЛУКБУК",
+    "title": "Редакція",
+    "description": "Де темрява зустрічається з дизайном. Кожен кадр розповідає історію бунту, майстерності та безкомпромісного бачення.",
+    "image": "https://images.pexels.com/photos/2062587/pexels-photo-2062587.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    "button": "Дослідити колекцію",
+    "scroll": "ГОРТАЙ"
+  },
+  "lookbook": [
+    { "image": "https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200", "caption": "Визначаючи силует сучасного бунту" },
+    { "image": "https://images.pexels.com/photos/1126964/pexels-photo-1126964.jpeg?auto=compress&cs=tinysrgb&w=1200", "caption": "Текстура, тон і мистецтво темряви" },
+    { "image": "https://images.pexels.com/photos/6311387/pexels-photo-6311387.jpeg?auto=compress&cs=tinysrgb&w=1200", "caption": "Народжені з порожнечі, створені для безстрашних" }
+  ],
+  "behindScenes": {
+    "title": "За кадром",
+    "description": "Наша остання редакція знімалась у закинутих індустріальних районах Берліна, передаючи сиру енергію та безкомпромісну естетику, що визначає BUKSY.",
+    "image": "https://images.pexels.com/photos/10409446/pexels-photo-10409446.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    "button": "Дивитись повний лукбук"
+  },
+  "finale": {
+    "title": "Представлені в",
+    "image": "https://images.pexels.com/photos/16196537/pexels-photo-16196537.jpeg?auto=compress&cs=tinysrgb&w=1200",
+    "button": "Дослідити колекцію"
+  }
+}

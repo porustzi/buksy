@@ -1,0 +1,40 @@
+{
+  "id": "3",
+  "name": "OBSCURA LEATHER JACKET",
+  "slug": "obscura-leather-jacket",
+  "price": 549,
+  "originalPrice": 699,
+  "category": "jackets",
+  "images": [
+    "https://images.pexels.com/photos/1126964/pexels-photo-1126964.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/10409446/pexels-photo-10409446.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/16196537/pexels-photo-16196537.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "sizes": [
+    { "name": "S", "available": true },
+    { "name": "M", "available": true },
+    { "name": "L", "available": true },
+    { "name": "XL", "available": false }
+  ],
+  "inStock": true,
+  "isFeatured": true,
+  "isBestseller": true,
+  "rating": 5.0,
+  "shortDescription": "Італійська шкіра повного зерна з матовим покриттям",
+  "description": "Куртка Obscura Leather Jacket — свідчення витонченої майстерності. Виготовлена з італійської шкіри повного зерна з матовим покриттям, має асиметричні блискавки, приховану внутрішню кишеню та фірмову криваво-червону підкладку. Кожна куртка набуває унікальної патини з часом, стаючи по-справжньому вашою.",
+  "details": [
+    "Італійська шкіра повного зерна",
+    "Криваво-червона шовкова підкладка",
+    "Асиметричні блискавки YKK",
+    "Чотири зовнішні кишені",
+    "Одна прихована внутрішня кишеня"
+  ],
+  "care": [
+    "Тільки професійне чищення шкіри",
+    "Зберігати на м'яких плічках",
+    "Кондиціонувати шкіряним бальзамом щоквартально"
+  ],
+  "reviews": [
+    { "id": "3", "author": "Dante R.", "rating": 4, "title": "Чудова річ", "content": "Приголомшливий дизайн і відмінна якість. Зняв зірку через затримку доставки, але сам виріб перевершує всі очікування.", "date": "2024-01-05", "verified": true }
+  ]
+}

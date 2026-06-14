@@ -1,0 +1,36 @@
+{
+  "id": "2",
+  "name": "SACRIFICE TEE",
+  "slug": "sacrifice-tee",
+  "price": 89,
+  "category": "t-shirts",
+  "images": [
+    "https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/7691143/pexels-photo-7691143.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/1043473/pexels-photo-1043473.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "sizes": [
+    { "name": "XS", "available": true },
+    { "name": "S", "available": true },
+    { "name": "M", "available": true },
+    { "name": "L", "available": true },
+    { "name": "XL", "available": true },
+    { "name": "XXL", "available": true }
+  ],
+  "inStock": true,
+  "isFeatured": true,
+  "isBestseller": true,
+  "rating": 4.8,
+  "shortDescription": "Футболка з японської бавовни з графічним принтом ручної роботи",
+  "description": "Sacrifice Tee представляє наш культовий принт на преміальній японській бавовні. Кожен виріб проходить унікальний процес прання, що дає ледь помітні варіації та робить кожну футболку єдиною у своєму роді. Вільний крій та посилена горловина забезпечують тривалий комфорт і міцність.",
+  "details": [
+    "Японська бавовна 180 г/м²",
+    "Унікальна обробка stone-wash",
+    "Вільний крій",
+    "Посилена горловина",
+    "Шовкографічний принт"
+  ],
+  "reviews": [
+    { "id": "2", "author": "Elena K.", "rating": 5, "title": "Вартує кожної копійки", "content": "Сумнівалася щодо ціни, але в момент, коли одягла, все зрозуміла. Майстерність виконання на іншому рівні. Дуже рекомендую.", "date": "2024-01-10", "verified": true }
+  ]
+}

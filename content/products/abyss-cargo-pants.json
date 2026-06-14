@@ -1,0 +1,32 @@
+{
+  "id": "4",
+  "name": "ABYSS CARGO PANTS",
+  "slug": "abyss-cargo-pants",
+  "price": 209,
+  "category": "pants",
+  "images": [
+    "https://images.pexels.com/photos/52519/jeans-pants-pocket-fashion-52519.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/1598503/pexels-photo-1598503.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/1082529/pexels-photo-1082529.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "sizes": [
+    { "name": "28", "available": true },
+    { "name": "30", "available": true },
+    { "name": "32", "available": true },
+    { "name": "34", "available": true },
+    { "name": "36", "available": false }
+  ],
+  "inStock": true,
+  "isNew": true,
+  "rating": 4.7,
+  "shortDescription": "Технічна японська тканина з перебільшеними карго-кишенями",
+  "description": "Abyss Cargo Pants переосмислюють утилітарну розкіш. Виготовлені з технічної японської тканини з легким блиском, ці штани мають перебільшені карго-кишені, регульовані ремені та вільний крій у стегнах, що звужується до щиколотки.",
+  "details": [
+    "Технічна японська тканина",
+    "Вільний крій, звужені штанини",
+    "Шість карго-кишень",
+    "Регульовані ремені на щиколотках",
+    "Внутрішній регульований пояс"
+  ],
+  "reviews": []
+}

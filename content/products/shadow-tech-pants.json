@@ -1,0 +1,31 @@
+{
+  "id": "8",
+  "name": "SHADOW TECH PANTS",
+  "slug": "shadow-tech-pants",
+  "price": 179,
+  "category": "pants",
+  "images": [
+    "https://images.pexels.com/photos/1598503/pexels-photo-1598503.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/52519/jeans-pants-pocket-fashion-52519.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/1082529/pexels-photo-1082529.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "sizes": [
+    { "name": "28", "available": false },
+    { "name": "30", "available": true },
+    { "name": "32", "available": true },
+    { "name": "34", "available": true },
+    { "name": "36", "available": true }
+  ],
+  "inStock": true,
+  "rating": 4.5,
+  "shortDescription": "Запатентована тканина shadow-tech з артикульованими колінами",
+  "description": "Shadow Tech Pants використовують нашу запатентовану тканину shadow-tech, яка виглядає повністю чорною на прямому світлі, але виявляє тонкий візерунок у тіні. Розроблені для руху з артикульованими колінами та дихаючими панелями.",
+  "details": [
+    "Запатентована тканина shadow-tech",
+    "Водовідштовхувальне покриття",
+    "Артикульовані коліна",
+    "Приховані кишені на блискавці",
+    "Еластичний манжет"
+  ],
+  "reviews": []
+}

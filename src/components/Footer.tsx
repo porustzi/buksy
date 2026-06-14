@@ -29,28 +29,29 @@ export function Footer() {
       {/* Newsletter Section */}
       <div className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-blood/10 to-transparent" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
-            <div className="text-center lg:text-left">
-              <div className="flex items-center gap-4">
-                <a href="https://t.me/+OQrO3Aya1NQ4YmZi" target="_blank" rel="noopener noreferrer" className="inline-block">
-                  <h3 className="font-heading text-2xl tracking-wider hover:text-blood transition-colors duration-300">
-                    {t('footer.joinDarkSide')}
-                  </h3>
-                </a>
-                <a
-                  href="https://t.me/+OQrO3Aya1NQ4YmZi"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-primary inline-flex items-center gap-2"
-                >
-                  <Send size={20} />
-                  {t('footer.tg')}
-                </a>
-              </div>
-              <p className="text-white/60 font-body">
-                {t('footer.joinTelegram')}
-              </p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+            <p className="text-white/50 font-body text-sm text-center sm:text-left max-w-md">
+              {t('footer.joinTelegram')}
+            </p>
+            <div className="flex items-center gap-4">
+              <a
+                href="https://t.me/+OQrO3Aya1NQ4YmZi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-heading text-xl sm:text-2xl tracking-wider hover:text-blood transition-colors duration-300"
+              >
+                {t('footer.joinDarkSide')}
+              </a>
+              <a
+                href="https://t.me/+OQrO3Aya1NQ4YmZi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-primary inline-flex items-center gap-2 text-xs"
+              >
+                <Send size={18} />
+                {t('footer.tg')}
+              </a>
             </div>
           </div>
         </div>

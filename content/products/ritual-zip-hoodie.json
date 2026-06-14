@@ -1,0 +1,30 @@
+{
+  "id": "7",
+  "name": "RITUAL ZIP HOODIE",
+  "slug": "ritual-zip-hoodie",
+  "price": 219,
+  "category": "hoodies",
+  "images": [
+    "https://images.pexels.com/photos/6311390/pexels-photo-6311390.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/6311387/pexels-photo-6311387.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/17854971/pexels-photo-17854971.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "sizes": [
+    { "name": "S", "available": true },
+    { "name": "M", "available": true },
+    { "name": "L", "available": false },
+    { "name": "XL", "available": true }
+  ],
+  "inStock": true,
+  "rating": 4.6,
+  "shortDescription": "Подвійний трикотаж з важкої бавовни з матовою чорною фурнітурою",
+  "description": "Ritual Zip Hoodie виготовлений з подвійного трикотажу важкої бавовни зі структурованим капюшоном та матовою чорною фурнітурою. Подовжений силует і отвори для пальців створюють безперервний потік від плеча до руки.",
+  "details": [
+    "Подвійний трикотаж 400 г/м²",
+    "Подовжена довжина з боковими розрізами",
+    "Матова чорна блискавка",
+    "Структурований подвійний капюшон",
+    "Отвори для пальців на манжетах"
+  ],
+  "reviews": []
+}

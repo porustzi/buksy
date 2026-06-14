@@ -1,0 +1,43 @@
+{
+  "id": "1",
+  "name": "VOID OVERSIZED HOODIE",
+  "slug": "void-oversized-hoodie",
+  "price": 189,
+  "category": "hoodies",
+  "images": [
+    "https://images.pexels.com/photos/6311387/pexels-photo-6311387.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/6311390/pexels-photo-6311390.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/17854971/pexels-photo-17854971.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "sizes": [
+    { "name": "XS", "available": true },
+    { "name": "S", "available": true },
+    { "name": "M", "available": true },
+    { "name": "L", "available": true },
+    { "name": "XL", "available": true },
+    { "name": "XXL", "available": false }
+  ],
+  "inStock": true,
+  "isNew": true,
+  "isFeatured": true,
+  "isBestseller": false,
+  "rating": 4.9,
+  "shortDescription": "Преміальний оверсайз худі з важкої бавовни з вишитим логотипом",
+  "description": "Виготовлений з преміальної важкої бавовни, Void Oversized Hoodie втілює суть мінімалістичної темряви. Перебільшений силует, посилені шви та наша фірмова вишита емблема — цей виріб є вершиною розкішного стрітвіру. Спущені плечі та подовжена довжина створюють драматичний, текучий силует.",
+  "details": [
+    "100% преміальна важка бавовна (400 г/м²)",
+    "Оверсайз крій зі спущеними плечима",
+    "Ребристі манжети та низ",
+    "Кишеня-кенгуру",
+    "Вишитий логотип на грудях"
+  ],
+  "care": [
+    "Прати в машині на холодному режимі, вивернувши навиворіт",
+    "Не відбілювати",
+    "Сушити в машині на низькому режимі",
+    "Прасувати з вивороту за потреби"
+  ],
+  "reviews": [
+    { "id": "1", "author": "Marcus V.", "rating": 5, "title": "Виняткова якість", "content": "Увага до деталей неймовірна. Вага тканини ідеальна, крій саме такий, як описано. Це тепер мій основний вибір для якісного стрітвіру.", "date": "2024-01-15", "verified": true }
+  ]
+}

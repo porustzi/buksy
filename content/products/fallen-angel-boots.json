@@ -1,0 +1,42 @@
+{
+  "id": "6",
+  "name": "FALLEN ANGEL BOOTS",
+  "slug": "fallen-angel-boots",
+  "price": 389,
+  "category": "footwear",
+  "images": [
+    "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/19090/pexels-photo-19090.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/267301/pexels-photo-267301.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "sizes": [
+    { "name": "39", "available": true },
+    { "name": "40", "available": true },
+    { "name": "41", "available": true },
+    { "name": "42", "available": true },
+    { "name": "43", "available": false },
+    { "name": "44", "available": true }
+  ],
+  "inStock": true,
+  "isNew": true,
+  "isBestseller": true,
+  "rating": 4.8,
+  "shortDescription": "Італійська теляча шкіра з масивною підошвою lug",
+  "description": "Черевики Fallen Angel Boots пошиті вручну італійськими майстрами з преміальної телячої шкіри. Мають масивну підошву lug, приховану платформу та швидку шнурівку — поєднують естетику архівної моди з сучасними технологіями комфорту.",
+  "details": [
+    "Італійська теляча шкіра повного зерна",
+    "Прихована платформа 3 см",
+    "Швидка шнурівка",
+    "Шкіряна внутрішня підкладка",
+    "Гумова підошва lug"
+  ],
+  "care": [
+    "Використовувати захист для шкіри перед першим носінням",
+    "Чистити вологою тканиною",
+    "Кондиціонувати щомісяця",
+    "Зберігати зі вставками для взуття"
+  ],
+  "reviews": [
+    { "id": "4", "author": "Sarah M.", "rating": 5, "title": "Ідеальна посадка", "content": "Нарешті бренд, який розуміє, як одяг має сидіти. Силует чистий, матеріали преміальні, отримую компліменти щоразу.", "date": "2023-12-28", "verified": true }
+  ]
+}

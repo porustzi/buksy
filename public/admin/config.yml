@@ -6,48 +6,405 @@ media_folder: public/uploads
 public_folder: /uploads
 
 collections:
-  - name: "translations"
-    label: "Translations"
+  - name: "homepage"
+    label: "🏠 Головна"
     delete: false
-    editor:
-      preview: false
+    editor: { preview: false }
     files:
-      - name: "ukrainian"
-        label: "Ukrainian (base)"
-        file: "src/i18n/uk.json"
+      - name: "homepage"
+        label: "Налаштування головної"
+        file: "content/pages/homepage.json"
         fields:
-          - label: "All Translation Strings (UA)"
-            name: "uk"
+          - label: "Hero секція"
+            name: "hero"
             widget: "object"
-            collapsed: true
-            summary: "{{common.buksy}}"
             fields:
-              - { label: "Common", name: "common", widget: "object", collapsed: true, fields: [ { label: "BUKSY", name: "buksy", widget: "string" }, { label: "Shop", name: "shop", widget: "string" }, { label: "Home", name: "home", widget: "string" }, { label: "About", name: "about", widget: "string" }, { label: "Contact", name: "contact", widget: "string" }, { label: "Editorial", name: "editorial", widget: "string" }, { label: "Search", name: "search", widget: "string" }, { label: "Cart", name: "cart", widget: "string" }, { label: "Checkout", name: "checkout", widget: "string" }, { label: "Continue Shopping", name: "continueShopping", widget: "string" }, { label: "View All", name: "viewAll", widget: "string" }, { label: "New", name: "new", widget: "string" }, { label: "Sale", name: "sale", widget: "string" }, { label: "Free", name: "free", widget: "string" } ] }
-              - { label: "Header", name: "header", widget: "object", collapsed: true, fields: [ { label: "Home", name: "home", widget: "string" }, { label: "Shop", name: "shop", widget: "string" }, { label: "About", name: "about", widget: "string" }, { label: "Contact", name: "contact", widget: "string" }, { label: "Editorial", name: "editorial", widget: "string" }, { label: "Search Products", name: "searchProducts", widget: "string" }, { label: "Press Enter", name: "pressEnter", widget: "string" } ] }
-              - { label: "Footer", name: "footer", widget: "object", collapsed: true, fields: [ { label: "Join Dark Side", name: "joinDarkSide", widget: "string" }, { label: "TG", name: "tg", widget: "string" }, { label: "Description", name: "premiumStreetwear", widget: "text" }, { label: "Navigation", name: "navigation", widget: "string" }, { label: "Support", name: "support", widget: "string" }, { label: "Legal", name: "legal", widget: "string" } ] }
-              - { label: "Home", name: "home", widget: "object", collapsed: true, fields: [ { label: "Hero Tagline", name: "heroTagline", widget: "string" }, { label: "Hero Title 1", name: "heroTitle1", widget: "string" }, { label: "Hero Title 2", name: "heroTitle2", widget: "string" }, { label: "Hero Description", name: "heroDesc", widget: "text" }, { label: "Shop Now", name: "shopNow", widget: "string" }, { label: "Our Story", name: "ourStory", widget: "string" }, { label: "Selected For You", name: "selectedForYou", widget: "string" }, { label: "Featured", name: "featured", widget: "string" }, { label: "Our Philosophy", name: "ourPhilosophy", widget: "string" }, { label: "Born From", name: "bornFrom", widget: "string" }, { label: "Darkness", name: "darkness", widget: "string" }, { label: "Explore Story", name: "exploreStory", widget: "string" }, { label: "Most Wanted", name: "mostWanted", widget: "string" }, { label: "Bestsellers", name: "bestsellers", widget: "string" }, { label: "Shop By Category", name: "shopByCategory", widget: "string" }, { label: "Collections", name: "collections", widget: "string" } ] }
-              - { label: "Shop", name: "shop", widget: "object", collapsed: true, fields: [ { label: "The Collection", name: "theCollection", widget: "string" }, { label: "The Shop", name: "theShop", widget: "string" }, { label: "Filters", name: "filters", widget: "string" }, { label: "Sort Featured", name: "sortFeatured", widget: "string" }, { label: "Sort Newest", name: "sortNewest", widget: "string" }, { label: "Sort Price Low", name: "sortPriceLow", widget: "string" }, { label: "Sort Price High", name: "sortPriceHigh", widget: "string" }, { label: "Sort Rating", name: "sortRating", widget: "string" } ] }
-              - { label: "Contact", name: "contact", widget: "object", collapsed: true, fields: [ { label: "Get In Touch", name: "getInTouch", widget: "string" }, { label: "Contact Us", name: "contactUs", widget: "string" }, { label: "Send Message", name: "sendMessage", widget: "string" }, { label: "Message Sent", name: "messageSent", widget: "string" }, { label: "Name", name: "name", widget: "string" }, { label: "Email", name: "email", widget: "string" }, { label: "Subject", name: "subject", widget: "string" }, { label: "Message", name: "message", widget: "string" }, { label: "Send Message Btn", name: "sendMessageBtn", widget: "string" }, { label: "Connect With Us", name: "connectWithUs", widget: "string" } ] }
+              - { label: "Теглайн", name: "tagline", widget: "string" }
+              - { label: "Заголовок 1", name: "title1", widget: "string" }
+              - { label: "Заголовок 2", name: "title2", widget: "string" }
+              - { label: "Опис", name: "description", widget: "text" }
+              - { label: "Кнопка 1", name: "shopNow", widget: "string" }
+              - { label: "Кнопка 2", name: "ourStory", widget: "string" }
+              - { label: "Фонове зображення (URL)", name: "image", widget: "string" }
+              - { label: "Текст SCROLL", name: "scroll", widget: "string" }
+          - label: "Featured секція"
+            name: "featured"
+            widget: "object"
+            fields:
+              - { label: "Теглайн", name: "tagline", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - { label: "Кнопка", name: "viewAll", widget: "string" }
+          - label: "Філософія"
+            name: "philosophy"
+            widget: "object"
+            fields:
+              - { label: "Теглайн", name: "tagline", widget: "string" }
+              - { label: "Заголовок 1", name: "title1", widget: "string" }
+              - { label: "Заголовок 2", name: "title2", widget: "string" }
+              - { label: "Текст 1", name: "text1", widget: "text" }
+              - { label: "Текст 2", name: "text2", widget: "text" }
+              - { label: "Текст 3", name: "text3", widget: "text" }
+              - { label: "Кнопка", name: "button", widget: "string" }
+              - { label: "Зображення (URL)", name: "image", widget: "string" }
+          - label: "Бестселери"
+            name: "bestsellers"
+            widget: "object"
+            fields:
+              - { label: "Теглайн", name: "tagline", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
+          - label: "Колекції"
+            name: "collections"
+            widget: "object"
+            fields:
+              - { label: "Теглайн", name: "tagline", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
 
   - name: "products"
-    label: "Products"
+    label: "🛒 Магазин"
     folder: "content/products"
     create: true
     slug: "{{slug}}"
+    editor: { preview: false }
     fields:
-      - { label: "Product ID", name: "id", widget: "string" }
-      - { label: "Name", name: "name", widget: "string" }
-      - { label: "Slug", name: "slug", widget: "string" }
-      - { label: "Price", name: "price", widget: "number", value_type: "float" }
-      - { label: "Original Price", name: "originalPrice", widget: "number", value_type: "float", required: false }
-      - { label: "Description", name: "description", widget: "text" }
-      - { label: "Short Description", name: "shortDescription", widget: "text" }
-      - { label: "Category", name: "category", widget: "select", options: ["hoodies", "t-shirts", "jackets", "pants", "accessories", "footwear"] }
-      - { label: "Images", name: "images", widget: "list", field: { label: "Image URL", name: "url", widget: "string" } }
-      - { label: "In Stock", name: "inStock", widget: "boolean", default: true }
-      - { label: "Is New", name: "isNew", widget: "boolean", default: false, required: false }
-      - { label: "Is Featured", name: "isFeatured", widget: "boolean", default: false, required: false }
-      - { label: "Is Bestseller", name: "isBestseller", widget: "boolean", default: false, required: false }
-      - { label: "Rating", name: "rating", widget: "number", value_type: "float", default: 0 }
-      - { label: "Details", name: "details", widget: "list", field: { label: "Detail", name: "detail", widget: "string" }, required: false }
-      - { label: "Care Instructions", name: "care", widget: "list", field: { label: "Instruction", name: "instruction", widget: "string" }, required: false }
+      - { label: "ID", name: "id", widget: "string" }
+      - { label: "Назва", name: "name", widget: "string" }
+      - { label: "Slug (URL)", name: "slug", widget: "string" }
+      - { label: "Ціна ($)", name: "price", widget: "number", value_type: "float" }
+      - { label: "Ціна без знижки", name: "originalPrice", widget: "number", value_type: "float", required: false }
+      - { label: "Категорія", name: "category", widget: "select", options: ["hoodies", "t-shirts", "jackets", "pants", "accessories", "footwear"] }
+      - label: "Зображення"
+        name: "images"
+        widget: "list"
+        field: { label: "URL або завантажити", name: "image", widget: "image", allow_multiple: false }
+      - label: "Розміри"
+        name: "sizes"
+        widget: "list"
+        fields:
+          - { label: "Розмір", name: "name", widget: "string" }
+          - { label: "В наявності", name: "available", widget: "boolean", default: true }
+      - { label: "В наявності", name: "inStock", widget: "boolean", default: true }
+      - { label: "Новинка", name: "isNew", widget: "boolean", default: false, required: false }
+      - { label: "В обраному", name: "isFeatured", widget: "boolean", default: false, required: false }
+      - { label: "Бестселер", name: "isBestseller", widget: "boolean", default: false, required: false }
+      - { label: "Рейтинг", name: "rating", widget: "number", value_type: "float", default: 0, min: 0, max: 5, step: 0.1 }
+      - { label: "Короткий опис", name: "shortDescription", widget: "text" }
+      - { label: "Повний опис", name: "description", widget: "text" }
+      - label: "Деталі"
+        name: "details"
+        widget: "list"
+        required: false
+        field: { label: "Деталь", name: "detail", widget: "string" }
+      - label: "Догляд"
+        name: "care"
+        widget: "list"
+        required: false
+        field: { label: "Інструкція", name: "instruction", widget: "string" }
+      - label: "Відгуки"
+        name: "reviews"
+        widget: "list"
+        required: false
+        fields:
+          - { label: "ID", name: "id", widget: "string" }
+          - { label: "Автор", name: "author", widget: "string" }
+          - { label: "Рейтинг", name: "rating", widget: "number", value_type: "float", min: 1, max: 5, step: 1, default: 5 }
+          - { label: "Заголовок", name: "title", widget: "string" }
+          - { label: "Текст", name: "content", widget: "text" }
+          - { label: "Дата", name: "date", widget: "date" }
+          - { label: "Перевірений покупець", name: "verified", widget: "boolean", default: true }
+
+  - name: "about"
+    label: "ℹ️ Про нас"
+    delete: false
+    editor: { preview: false }
+    files:
+      - name: "about"
+        label: "Налаштування сторінки"
+        file: "content/pages/about.json"
+        fields:
+          - label: "Hero"
+            name: "hero"
+            widget: "object"
+            fields:
+              - { label: "Теглайн", name: "tagline", widget: "string" }
+              - { label: "Заголовок 1", name: "title1", widget: "string" }
+              - { label: "Заголовок 2", name: "title2", widget: "string" }
+              - { label: "Зображення (URL)", name: "image", widget: "string" }
+          - label: "Цитата"
+            name: "philosophy"
+            widget: "object"
+            fields:
+              - { label: "Цитата", name: "quote", widget: "text" }
+              - { label: "Автор", name: "author", widget: "string" }
+              - { label: "Зображення (URL)", name: "image", widget: "string" }
+          - label: "Цінності (заголовок)"
+            name: "values"
+            widget: "object"
+            fields:
+              - { label: "Теглайн", name: "tagline", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
+          - label: "Ательє"
+            name: "atelier"
+            widget: "object"
+            fields:
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - { label: "Опис 1", name: "description1", widget: "text" }
+              - { label: "Опис 2", name: "description2", widget: "text" }
+              - { label: "Зображення (URL)", name: "image", widget: "string" }
+          - label: "Таймлайн (заголовок)"
+            name: "timeline"
+            widget: "object"
+            fields:
+              - { label: "Теглайн", name: "tagline", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
+          - label: "CTA"
+            name: "cta"
+            widget: "object"
+            fields:
+              - { label: "Заголовок 1", name: "title1", widget: "string" }
+              - { label: "Заголовок 2", name: "title2", widget: "string" }
+              - { label: "Опис", name: "description", widget: "text" }
+              - { label: "Кнопка", name: "button", widget: "string" }
+
+  - name: "timeline"
+    label: "⏳ Таймлайн"
+    folder: "content/timeline"
+    create: true
+    slug: "{{year}}"
+    identifier_field: "year"
+    editor: { preview: false }
+    fields:
+      - { label: "Рік", name: "year", widget: "string" }
+      - { label: "Подія", name: "event", widget: "string" }
+
+  - name: "values"
+    label: "💎 Цінності"
+    folder: "content/values"
+    create: true
+    slug: "{{slug}}"
+    identifier_field: "title"
+    editor: { preview: false }
+    fields:
+      - { label: "Заголовок", name: "title", widget: "string" }
+      - { label: "Опис", name: "description", widget: "text" }
+
+  - name: "editorial"
+    label: "📸 Редакція"
+    delete: false
+    editor: { preview: false }
+    files:
+      - name: "editorial"
+        label: "Налаштування сторінки"
+        file: "content/pages/editorial.json"
+        fields:
+          - label: "Hero"
+            name: "hero"
+            widget: "object"
+            fields:
+              - { label: "Підзаголовок", name: "subtitle", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - { label: "Опис", name: "description", widget: "text" }
+              - { label: "Зображення (URL)", name: "image", widget: "string" }
+              - { label: "Кнопка", name: "button", widget: "string" }
+              - { label: "Текст SCROLL", name: "scroll", widget: "string" }
+          - label: "Лукбук (3 кадри)"
+            name: "lookbook"
+            widget: "list"
+            fields:
+              - { label: "Зображення (URL)", name: "image", widget: "string" }
+              - { label: "Підпис", name: "caption", widget: "string" }
+          - label: "Behind the Scenes"
+            name: "behindScenes"
+            widget: "object"
+            fields:
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - { label: "Опис", name: "description", widget: "text" }
+              - { label: "Зображення (URL)", name: "image", widget: "string" }
+              - { label: "Кнопка", name: "button", widget: "string" }
+          - label: "Фінальна секція"
+            name: "finale"
+            widget: "object"
+            fields:
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - { label: "Зображення (URL)", name: "image", widget: "string" }
+              - { label: "Кнопка", name: "button", widget: "string" }
+
+  - name: "contact"
+    label: "✉️ Контакти"
+    delete: false
+    editor: { preview: false }
+    files:
+      - name: "contact"
+        label: "Налаштування сторінки"
+        file: "content/pages/contact.json"
+        fields:
+          - label: "Hero"
+            name: "hero"
+            widget: "object"
+            fields:
+              - { label: "Теглайн", name: "tagline", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
+          - label: "Форма"
+            name: "form"
+            widget: "object"
+            fields:
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - { label: "Ім'я — лейбл", name: "nameLabel", widget: "string" }
+              - { label: "Ім'я — placeholder", name: "namePlaceholder", widget: "string" }
+              - { label: "Email — лейбл", name: "emailLabel", widget: "string" }
+              - { label: "Email — placeholder", name: "emailPlaceholder", widget: "string" }
+              - { label: "Тема — лейбл", name: "subjectLabel", widget: "string" }
+              - { label: "Тема — placeholder", name: "subjectPlaceholder", widget: "string" }
+              - { label: "Повідомлення — лейбл", name: "messageLabel", widget: "string" }
+              - { label: "Повідомлення — placeholder", name: "messagePlaceholder", widget: "string" }
+              - { label: "Кнопка", name: "submitButton", widget: "string" }
+              - { label: "Успіх — заголовок", name: "successTitle", widget: "string" }
+              - { label: "Успіх — текст", name: "successText", widget: "string" }
+          - label: "Контактна інформація"
+            name: "info"
+            widget: "object"
+            fields:
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - { label: "Email", name: "email", widget: "string" }
+              - { label: "Телефон", name: "phone", widget: "string" }
+              - { label: "Адреса", name: "studio", widget: "text" }
+              - { label: "Email — лейбл", name: "emailLabel", widget: "string" }
+              - { label: "Телефон — лейбл", name: "phoneLabel", widget: "string" }
+              - { label: "Студія — лейбл", name: "studioLabel", widget: "string" }
+          - label: "Соцмережі"
+            name: "social"
+            widget: "object"
+            fields:
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - { label: "Instagram URL", name: "instagram", widget: "string" }
+              - { label: "Twitter URL", name: "twitter", widget: "string" }
+              - { label: "YouTube URL", name: "youtube", widget: "string" }
+          - label: "FAQ (заголовок)"
+            name: "faq"
+            widget: "object"
+            fields:
+              - { label: "Теглайн", name: "tagline", widget: "string" }
+              - { label: "Заголовок", name: "title", widget: "string" }
+
+  - name: "faq"
+    label: "❓ FAQ"
+    folder: "content/faq"
+    create: true
+    slug: "{{slug}}"
+    identifier_field: "question"
+    editor: { preview: false }
+    fields:
+      - { label: "Питання", name: "question", widget: "string" }
+      - { label: "Відповідь", name: "answer", widget: "text" }
+
+  - name: "footer"
+    label: "⬇️ Футер"
+    delete: false
+    editor: { preview: false }
+    files:
+      - name: "footer"
+        label: "Налаштування футера"
+        file: "content/pages/footer.json"
+        fields:
+          - label: "Розсилка"
+            name: "newsletter"
+            widget: "object"
+            fields:
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - { label: "Кнопка TG", name: "tg", widget: "string" }
+              - { label: "Опис", name: "description", widget: "text" }
+              - { label: "Telegram URL", name: "telegramUrl", widget: "string" }
+          - label: "Бренд"
+            name: "brand"
+            widget: "object"
+            fields:
+              - { label: "Опис", name: "description", widget: "text" }
+          - label: "Соцмережі"
+            name: "social"
+            widget: "object"
+            fields:
+              - { label: "Instagram", name: "instagram", widget: "string" }
+              - { label: "Twitter", name: "twitter", widget: "string" }
+              - { label: "YouTube", name: "youtube", widget: "string" }
+          - label: "Навігація"
+            name: "navigation"
+            widget: "object"
+            fields:
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - label: "Посилання"
+                name: "links"
+                widget: "list"
+                fields:
+                  - { label: "Назва", name: "name", widget: "string" }
+                  - { label: "URL", name: "href", widget: "string" }
+          - label: "Підтримка"
+            name: "support"
+            widget: "object"
+            fields:
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - label: "Посилання"
+                name: "links"
+                widget: "list"
+                fields:
+                  - { label: "Назва", name: "name", widget: "string" }
+                  - { label: "URL", name: "href", widget: "string" }
+          - label: "Правова"
+            name: "legal"
+            widget: "object"
+            fields:
+              - { label: "Заголовок", name: "title", widget: "string" }
+              - label: "Посилання"
+                name: "links"
+                widget: "list"
+                fields:
+                  - { label: "Назва", name: "name", widget: "string" }
+                  - { label: "URL", name: "href", widget: "string" }
+          - label: "Копірайт"
+            name: "copyright"
+            widget: "object"
+            fields:
+              - { label: "Текст прав", name: "allRights", widget: "string" }
+              - { label: "Створено для", name: "designedFor", widget: "string" }
+              - { label: "Слово 'темрява'", name: "dark", widget: "string" }
+
+  - name: "translations"
+    label: "🌐 Переклади (UK)"
+    delete: false
+    editor: { preview: false }
+    files:
+      - name: "translations"
+        label: "Український (основний)"
+        file: "src/i18n/uk.json"
+        fields:
+          - label: "Загальне"
+            name: "common"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "BUKSY", name: "buksy", widget: "string" }
+              - { label: "Магазин", name: "shop", widget: "string" }
+              - { label: "Головна", name: "home", widget: "string" }
+              - { label: "Про нас", name: "about", widget: "string" }
+              - { label: "Контакти", name: "contact", widget: "string" }
+              - { label: "Редакція", name: "editorial", widget: "string" }
+              - { label: "Пошук", name: "search", widget: "string" }
+              - { label: "Кошик", name: "cart", widget: "string" }
+              - { label: "Оформлення", name: "checkout", widget: "string" }
+              - { label: "Продовжити", name: "continueShopping", widget: "string" }
+              - { label: "Все", name: "viewAll", widget: "string" }
+              - { label: "Новинка", name: "new", widget: "string" }
+              - { label: "Розпродаж", name: "sale", widget: "string" }
+              - { label: "Безкоштовно", name: "free", widget: "string" }
+              - { label: "Назад", name: "backToHome", widget: "string" }
+              - { label: "Не знайдено", name: "pageNotFound", widget: "string" }
+          - label: "Хедер"
+            name: "header"
+            widget: "object"
+            collapsed: true
+            fields:
+              - { label: "Головна", name: "home", widget: "string" }
+              - { label: "Магазин", name: "shop", widget: "string" }
+              - { label: "Про нас", name: "about", widget: "string" }
+              - { label: "Контакти", name: "contact", widget: "string" }
+              - { label: "Редакція", name: "editorial", widget: "string" }
+              - { label: "Пошук товарів", name: "searchProducts", widget: "string" }
+              - { label: "Натисніть Enter", name: "pressEnter", widget: "string" }

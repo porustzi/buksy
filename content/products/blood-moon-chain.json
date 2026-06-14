@@ -1,0 +1,36 @@
+{
+  "id": "5",
+  "name": "BLOOD MOON CHAIN",
+  "slug": "blood-moon-chain",
+  "price": 149,
+  "category": "accessories",
+  "images": [
+    "https://images.pexels.com/photos/11229341/pexels-photo-11229341.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/12982896/pexels-photo-12982896.jpeg?auto=compress&cs=tinysrgb&w=800",
+    "https://images.pexels.com/photos/723509/pexels-photo-723509.jpeg?auto=compress&cs=tinysrgb&w=800"
+  ],
+  "sizes": [
+    { "name": "18\"", "available": true },
+    { "name": "20\"", "available": true },
+    { "name": "22\"", "available": true },
+    { "name": "24\"", "available": false }
+  ],
+  "inStock": true,
+  "isFeatured": true,
+  "rating": 4.9,
+  "shortDescription": "Оксидоване стерлінгове срібло з криваво-червоною емаллю 24k",
+  "description": "Blood Moon Chain — це акцентний виріб, що поєднує стрітвір і тонку ювелірну майстерність. Виготовлений вручну з оксидованого стерлінгового срібла з криваво-червоним емалевим акцентом 24k, цей солідний ланцюг важко лежить на шиї, привертаючи увагу, не вимагаючи її.",
+  "details": [
+    "Оксидоване срібло 925 проби",
+    "Криваво-червона емаль 24k",
+    "Застібка-лобстер",
+    "Поліровані вручну ланки",
+    "Вага: 85 г (20\")"
+  ],
+  "care": [
+    "Зберігати в антиоксидному мішечку",
+    "Уникати контакту з водою",
+    "Полірувати срібною тканиною"
+  ],
+  "reviews": []
+}

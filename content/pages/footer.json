@@ -1,0 +1,47 @@
+{
+  "newsletter": {
+    "title": "ПРИЄДНУЙСЯ ДО ТЕМНОЇ СТОРОНИ",
+    "tg": "TG",
+    "description": "Приєднуйся до нашого Telegram для ексклюзивних дропів, раннього доступу та спільноти.",
+    "telegramUrl": "https://t.me/+OQrO3Aya1NQ4YmZi"
+  },
+  "brand": {
+    "description": "Преміальний темний стрітвір для тих, хто приймає тінь. Створений з наміром, розроблений для нестандартних."
+  },
+  "navigation": {
+    "title": "НАВІГАЦІЯ",
+    "links": [
+      { "name": "Головна", "href": "/" },
+      { "name": "Магазин", "href": "/shop" },
+      { "name": "Про нас", "href": "/about" },
+      { "name": "Контакти", "href": "/contact" }
+    ]
+  },
+  "support": {
+    "title": "ПІДТРИМКА",
+    "links": [
+      { "name": "Доставка та повернення", "href": "/shipping" },
+      { "name": "Таблиця розмірів", "href": "/size-guide" },
+      { "name": "FAQ", "href": "/faq" },
+      { "name": "Відстежити замовлення", "href": "/track" }
+    ]
+  },
+  "legal": {
+    "title": "ПРАВОВА",
+    "links": [
+      { "name": "Політика конфіденційності", "href": "/privacy" },
+      { "name": "Умови використання", "href": "/terms" },
+      { "name": "Cookie політика", "href": "/cookies" }
+    ]
+  },
+  "copyright": {
+    "allRights": "Всі права захищено.",
+    "designedFor": "Створено для",
+    "dark": "темряви"
+  },
+  "social": {
+    "instagram": "https://instagram.com",
+    "twitter": "https://twitter.com",
+    "youtube": "https://youtube.com"
+  }
+}
