@@ -8,6 +8,9 @@ export interface Product {
   shortDescription: string;
   category: ProductCategory;
   images: string[];
+  image1?: string;
+  image2?: string;
+  image3?: string;
   sizes: Size[];
   colors?: string[];
   inStock: boolean;
@@ -18,6 +21,7 @@ export interface Product {
   reviewCount: number;
   details?: string[];
   care?: string[];
+  reviews?: Review[];
 }
 
 export type ProductCategory =

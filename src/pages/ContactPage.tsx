@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone, Send, Instagram, Twitter, Youtube } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { contactInfo } from '../data/content';
 
 export function ContactPage() {
   const { t } = useTranslation();
@@ -118,12 +119,16 @@ export function ContactPage() {
                       required
                       className="w-full px-4 py-3 bg-ash border border-white/10 text-white focus:outline-none focus:border-blood/50 transition-colors duration-300 appearance-none"
                     >
-                      <option value="" className="bg-noir">{t('contact.selectSubject')}</option>
-                      <option value="order" className="bg-noir">{t('contact.orderInquiry')}</option>
-                      <option value="product" className="bg-noir">{t('contact.productQuestion')}</option>
-                      <option value="returns" className="bg-noir">{t('contact.returnsExchanges')}</option>
-                      <option value="wholesale" className="bg-noir">{t('contact.wholesaleInquiry')}</option>
-                      <option value="other" className="bg-noir">{t('contact.other')}</option>
+                      <option value="" className="bg-noir">{contactInfo.form.subjectPlaceholder || t('contact.selectSubject')}</option>
+                      {(contactInfo.form.subjectOptions || [
+                        { value: 'order', label: t('contact.orderInquiry') },
+                        { value: 'product', label: t('contact.productQuestion') },
+                        { value: 'returns', label: t('contact.returnsExchanges') },
+                        { value: 'wholesale', label: t('contact.wholesaleInquiry') },
+                        { value: 'other', label: t('contact.other') },
+                      ]).map((opt: { value: string; label: string }) => (
+                        <option key={opt.value} value={opt.value} className="bg-noir">{opt.label}</option>
+                      ))}
                     </select>
                   </div>
                   <div>

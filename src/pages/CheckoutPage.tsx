@@ -41,18 +41,59 @@ export function CheckoutPage() {
   });
 
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState('');
 
   const shippingCost = totalPrice >= 150 ? 0 : shippingMethod === 'express' ? 25 : 15;
   const tax = totalPrice * 0.08;
   const total = totalPrice + shippingCost + tax;
 
+  const validateInformation = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    if (!shippingInfo.email.trim()) newErrors.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(shippingInfo.email)) newErrors.email = 'Invalid email format';
+    if (!shippingInfo.firstName.trim()) newErrors.firstName = 'First name is required';
+    if (!shippingInfo.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!shippingInfo.address.trim()) newErrors.address = 'Address is required';
+    if (!shippingInfo.city.trim()) newErrors.city = 'City is required';
+    if (!shippingInfo.country.trim()) newErrors.country = 'Country is required';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validatePayment = (): boolean => {
+    const newErrors: Record<string, string> = {};
+    if (!paymentInfo.cardNumber.trim()) newErrors.cardNumber = 'Card number is required';
+    else if (!/^\d{13,19}$/.test(paymentInfo.cardNumber.replace(/\s/g, ''))) newErrors.cardNumber = 'Invalid card number';
+    if (!paymentInfo.cardHolder.trim()) newErrors.cardHolder = 'Card holder name is required';
+    if (!paymentInfo.expiry.trim()) newErrors.expiry = 'Expiry date is required';
+    else if (!/^\d{2}\/\d{2}$/.test(paymentInfo.expiry)) newErrors.expiry = 'Use MM/YY format';
+    if (!paymentInfo.cvv.trim()) newErrors.cvv = 'CVV is required';
+    else if (!/^\d{3,4}$/.test(paymentInfo.cvv)) newErrors.cvv = 'Invalid CVV';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handlePlaceOrder = async () => {
+    if (!validatePayment()) return;
     setIsProcessing(true);
-    // Simulate processing — replace with real payment API
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsProcessing(false);
-    setIsComplete(true);
-    clearCart();
+    setSubmitError('');
+    try {
+      const response = await fetch('/.netlify/functions/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items, shippingInfo, total }),
+      });
+      if (!response.ok) throw new Error('Order failed');
+      const data = await response.json();
+      console.log('Order placed:', data.orderId);
+      setIsComplete(true);
+      clearCart();
+    } catch {
+      setSubmitError(t('checkout.orderError') || 'Failed to place order. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (items.length === 0 && !isComplete) {
@@ -182,6 +223,11 @@ export function CheckoutPage() {
                   <h2 className="font-heading text-xl tracking-wider mb-6">
                     {t('checkout.contactInfo')}
                   </h2>
+                  {Object.keys(errors).length > 0 && (
+                    <div className="p-3 border border-red-500/30 bg-red-500/5">
+                      <p className="text-red-400 font-body text-sm">{t('checkout.fixErrors') || 'Please fix the errors below.'}</p>
+                    </div>
+                  )}
                   <div className="grid sm:grid-cols-2 gap-4">
                     <input
                       type="text"
@@ -273,7 +319,9 @@ export function CheckoutPage() {
                   </div>
 
                   <button
-                    onClick={() => setStep('shipping')}
+                    onClick={() => {
+                      if (validateInformation()) setStep('shipping');
+                    }}
                     className="btn-primary w-full mt-8"
                   >
                     {t('checkout.continueToShipping')}
@@ -374,6 +422,11 @@ export function CheckoutPage() {
                   <h2 className="font-heading text-xl tracking-wider mb-6">
                     {t('checkout.payment')}
                   </h2>
+                  {Object.keys(errors).length > 0 && (
+                    <div className="p-3 border border-red-500/30 bg-red-500/5">
+                      <p className="text-red-400 font-body text-sm">{t('checkout.fixErrors') || 'Please fix the errors below.'}</p>
+                    </div>
+                  )}
                   <div className="p-6 border border-white/10 bg-ash">
                     <div className="flex items-center gap-3 mb-6">
                       <CreditCard className="text-blood" size={24} />
@@ -457,6 +510,10 @@ export function CheckoutPage() {
                       )}
                     </button>
                   </div>
+
+                  {submitError && (
+                    <p className="text-red-400 text-sm font-body text-center mt-2">{submitError}</p>
+                  )}
 
                   <div className="flex items-center justify-center gap-6 text-white/40 text-xs font-body mt-6">
                     <span className="flex items-center gap-1">

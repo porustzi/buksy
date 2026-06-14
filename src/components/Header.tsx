@@ -178,7 +178,7 @@ export function Header() {
               >
                 <LanguageSwitcher />
                 <div className="flex gap-6">
-                  <button onClick={() => setIsSearchOpen(true)} className="p-3 text-white/70">
+                  <button onClick={() => { setIsSearchOpen(true); setIsMobileMenuOpen(false); }} className="p-3 text-white/70">
                     <Search size={24} />
                   </button>
                   <Link to="/contact" className="p-3 text-white/70">

@@ -71,7 +71,7 @@ export function ShopPage() {
     }
 
     return result;
-  }, [selectedCategory, sortBy]);
+  }, [selectedCategory, sortBy, searchQuery]);
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);

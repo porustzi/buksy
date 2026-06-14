@@ -16,7 +16,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { products, reviews } from '../data/products';
+import { products } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
 import { useCart } from '../store/CartContext';
 
@@ -55,6 +55,8 @@ export function ProductPage() {
   const relatedProducts = products
     .filter((p) => p.category === product.category && p.id !== product.id)
     .slice(0, 4);
+
+  const productReviews = product.reviews || [];
 
   const handleAddToCart = () => {
     const size = selectedSize || product.sizes.find((s) => s.available)?.name;
@@ -371,7 +373,7 @@ export function ProductPage() {
             </button>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
-            {reviews.map((review) => (
+            {productReviews.map((review) => (
               <motion.div
                 key={review.id}
                 initial={{ opacity: 0, y: 20 }}
