@@ -178,6 +178,7 @@ export function Header() {
                   <User size={24} />
                 </Link>
               </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
