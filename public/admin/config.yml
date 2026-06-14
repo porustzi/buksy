@@ -5,6 +5,7 @@ backend:
 media_folder: public/uploads
 public_folder: /uploads
 
+# v27 — simple image fields, no list
 collections:
   - name: "homepage"
     label: "🏠 Головна"
