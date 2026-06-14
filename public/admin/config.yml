@@ -75,7 +75,10 @@ collections:
       - label: "Зображення (3)"
         name: images
         widget: list
-        field: { label: "URL зображення", name: url, widget: string }
+        field:
+          label: "URL зображення"
+          name: image
+          widget: string
       - label: "Розміри"
         name: sizes
         widget: list
