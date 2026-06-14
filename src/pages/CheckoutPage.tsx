@@ -472,145 +472,132 @@ export function CheckoutPage() {
               )}
 
               {step === 'payment' && (
-                <div className="space-y-6">
-                  <h2 className="font-heading text-xl tracking-wider mb-6">
-                    {t('checkout.payment')}
-                  </h2>
+                <div className="space-y-5">
+                  <h2 className="font-heading text-xl tracking-wider">{t('checkout.payment')}</h2>
+
                   {Object.keys(errors).length > 0 && (
                     <div className="p-3 border border-red-500/30 bg-red-500/5">
                       <p className="text-red-400 font-body text-sm">{t('checkout.fixErrors') || 'Please fix the errors below.'}</p>
                     </div>
                   )}
-                  <div className="p-6 border border-white/10 bg-ash">
-                    <div className="flex items-center gap-3 mb-6">
-                      <CreditCard className="text-blood" size={24} />
-                      <span className="font-heading tracking-wider">{t('checkout.creditCard')}</span>
-                      <div className="ml-auto flex gap-2">
-                        <img
-                          src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.6.6/flags/4x3/us.svg"
-                          alt="Visa"
-                          className="w-8 h-5 object-contain opacity-60"
-                        />
-                        <img
-                          src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.6.6/flags/4x3/gb.svg"
-                          alt="Mastercard"
-                          className="w-8 h-5 object-contain opacity-60"
-                        />
-                        <img
-                          src="https://cdn.jsdelivr.net/gh/lipis/flag-icons@6.6.6/flags/4x3/de.svg"
-                          alt="Amex"
-                          className="w-8 h-5 object-contain opacity-60"
-                        />
+
+                  <div className="p-5 border border-white/10 bg-gradient-to-br from-ash to-noir">
+                    <div className="flex items-center justify-between mb-5">
+                      <CreditCard className="text-blood" size={22} />
+                      <div className="flex gap-1.5">
+                        <div className="w-8 h-5 bg-white/10 rounded" />
+                        <div className="w-8 h-5 bg-white/10 rounded" />
                       </div>
                     </div>
-                    <div className="space-y-4">
-                      <input
-                        type="text"
-                        placeholder={t('checkout.cardNumber')}
-                        value={paymentInfo.cardNumber}
-                        onChange={(e) =>
-                          setPaymentInfo({ ...paymentInfo, cardNumber: e.target.value })
-                        }
-                        className="checkout-input w-full"
-                      />
-                      <input
-                        type="text"
-                        placeholder={t('checkout.cardHolder')}
-                        value={paymentInfo.cardHolder}
-                        onChange={(e) =>
-                          setPaymentInfo({ ...paymentInfo, cardHolder: e.target.value })
-                        }
-                        className="checkout-input w-full"
-                      />
-                      <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-3.5">
+                      <div>
+                        <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">Номер картки</label>
                         <input
                           type="text"
-                          placeholder={t('checkout.expiry')}
-                          value={paymentInfo.expiry}
-                          onChange={(e) =>
-                            setPaymentInfo({ ...paymentInfo, expiry: e.target.value })
-                          }
-                          className="checkout-input"
+                          inputMode="numeric"
+                          maxLength={19}
+                          placeholder="0000 0000 0000 0000"
+                          value={paymentInfo.cardNumber}
+                          onChange={(e) => {
+                            let v = e.target.value.replace(/\D/g, '').slice(0, 16);
+                            v = v.replace(/(\d{4})(?=\d)/g, '$1 ');
+                            setPaymentInfo({ ...paymentInfo, cardNumber: v });
+                          }}
+                          className="w-full px-4 py-3 bg-noir/50 border border-white/10 text-white font-mono text-base tracking-[0.15em] placeholder:text-white/15 focus:outline-none focus:border-blood/50 transition-colors"
                         />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">Термін дії</label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={5}
+                            placeholder="ММ/РР"
+                            value={paymentInfo.expiry}
+                            onChange={(e) => {
+                              let v = e.target.value.replace(/\D/g, '').slice(0, 4);
+                              if (v.length >= 2) v = v.slice(0, 2) + '/' + v.slice(2);
+                              setPaymentInfo({ ...paymentInfo, expiry: v });
+                            }}
+                            className="w-full px-4 py-3 bg-noir/50 border border-white/10 text-white font-mono text-base tracking-[0.15em] placeholder:text-white/15 focus:outline-none focus:border-blood/50 transition-colors"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">CVV</label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            maxLength={3}
+                            placeholder="•••"
+                            value={paymentInfo.cvv}
+                            onChange={(e) => {
+                              const v = e.target.value.replace(/\D/g, '').slice(0, 3);
+                              setPaymentInfo({ ...paymentInfo, cvv: v });
+                            }}
+                            className="w-full px-4 py-3 bg-noir/50 border border-white/10 text-white font-mono text-base tracking-[0.3em] placeholder:text-white/15 focus:outline-none focus:border-blood/50 transition-colors"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">Власник картки</label>
                         <input
                           type="text"
-                          placeholder={t('checkout.cvv')}
-                          value={paymentInfo.cvv}
+                          placeholder="TARAS SHEVCHENKO"
+                          value={paymentInfo.cardHolder}
                           onChange={(e) =>
-                            setPaymentInfo({ ...paymentInfo, cvv: e.target.value })
+                            setPaymentInfo({ ...paymentInfo, cardHolder: e.target.value.toUpperCase() })
                           }
-                          className="checkout-input"
+                          className="w-full px-4 py-3 bg-noir/50 border border-white/10 text-white font-mono text-sm tracking-[0.1em] placeholder:text-white/15 focus:outline-none focus:border-blood/50 transition-colors"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex gap-4 mt-8">
-                    <button onClick={() => setStep('shipping')} className="btn-secondary flex-1">
-                      {t('checkout.back2')}
+                  {submitError && (
+                    <p className="text-red-400 text-sm font-body text-center">{submitError}</p>
+                  )}
+
+                  <div className="space-y-2.5">
+                    <button
+                      onClick={handleLiqPay}
+                      disabled={isProcessing}
+                      className="w-full py-4 bg-blood text-white font-heading text-sm tracking-wider hover:bg-blood/80 transition-colors duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
+                    >
+                      {isProcessing ? '...' : <><CreditCard size={18} /> ОПЛАТИТИ ЧЕРЕЗ LiqPay</>}
                     </button>
                     <button
                       onClick={handlePlaceOrder}
                       disabled={isProcessing}
-                      className="btn-primary flex-1 flex items-center justify-center gap-2"
+                      className="w-full py-3 border border-white/20 text-white/70 font-heading text-sm tracking-wider hover:border-white/50 hover:text-white transition-colors duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                      {isProcessing ? (
-                        <span className="animate-spin">{t('checkout.processing')}</span>
-                      ) : (
-                        <>
-                          <Lock size={16} />
-                          {t('checkout.placeOrder')}
-                        </>
-                      )}
-                    </button>
-                  </div>
-
-                  {/* Test: skip card & place order instantly */}
-                  <div className="mt-4 pt-4 border-t border-dashed border-amber-500/30 space-y-3">
-                    <button
-                      onClick={handleLiqPay}
-                      disabled={isProcessing}
-                      className="w-full py-4 bg-blood text-white font-heading text-sm tracking-wider hover:bg-blood/80 transition-colors duration-300 disabled:opacity-50"
-                    >
-                      {isProcessing ? '...' : '💳 ОПЛАТИТИ ЧЕРЕЗ LiqPay'}
+                      {isProcessing ? '...' : <><Lock size={16} /> Оформити замовлення</>}
                     </button>
                     <button
                       onClick={async () => {
-                        setIsProcessing(true);
-                        setSubmitError('');
+                        setIsProcessing(true); setSubmitError('');
                         try {
-                          const response = await fetch('/.netlify/functions/order', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ items, shippingInfo, total }),
-                          });
-                          if (!response.ok) throw new Error('Order failed');
-                          setIsComplete(true);
-                          clearCart();
-                        } catch {
-                          setSubmitError(t('checkout.orderError') || 'Failed. Try again.');
-                        } finally {
-                          setIsProcessing(false);
-                        }
+                          const r = await fetch('/.netlify/functions/order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items, shippingInfo, total }) });
+                          if (!r.ok) throw new Error('Order failed');
+                          setIsComplete(true); clearCart();
+                        } catch { setSubmitError('Помилка. Спробуй ще раз.'); }
+                        finally { setIsProcessing(false); }
                       }}
                       disabled={isProcessing}
-                      className="w-full py-3 border border-amber-500/50 text-amber-400 font-heading text-sm tracking-wider hover:bg-amber-500/10 transition-colors duration-300 disabled:opacity-50"
+                      className="w-full py-2 text-amber-400/60 font-body text-xs hover:text-amber-400 transition-colors disabled:opacity-30"
                     >
-                      {isProcessing ? '...' : '🧪 ПРОПУСТИТИ ОПЛАТУ (ТЕСТ)'}
+                      {isProcessing ? '...' : '🧪 Пропустити оплату (тест)'}
                     </button>
                   </div>
 
-                  {submitError && (
-                    <p className="text-red-400 text-sm font-body text-center mt-2">{submitError}</p>
-                  )}
-
-                  <div className="flex items-center justify-center gap-6 text-white/40 text-xs font-body mt-6">
-                    <span className="flex items-center gap-1">
-                      <Shield size={14} />
-                      {t('checkout.secureSSL')}
-                    </span>
-                    <span>{t('checkout.protectedStripe')}</span>
+                  <div className="flex items-center justify-center gap-4 text-white/30 text-xs font-body">
+                    <span className="flex items-center gap-1"><Shield size={12} /> SSL</span>
+                    <span>LiqPay</span>
                   </div>
+
+                  <button onClick={() => setStep('shipping')} className="btn-secondary w-full">
+                    {t('checkout.back2')}
+                  </button>
                 </div>
               )}
             </motion.div>
