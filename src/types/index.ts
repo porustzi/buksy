@@ -49,7 +49,7 @@ export interface Review {
   rating: number;
   title: string;
   content: string;
-  date: string;
+  date?: string;
   verified: boolean;
 }
 

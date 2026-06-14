@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -6,7 +6,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 
 function readJson(dir, file) {
-  return JSON.parse(readFileSync(join(root, dir, file), 'utf-8'));
+  const p = join(root, dir, file);
+  if (!existsSync(p)) return {};
+  return JSON.parse(readFileSync(p, 'utf-8'));
 }
 
 const homepage = readJson('content/pages', 'homepage.json');

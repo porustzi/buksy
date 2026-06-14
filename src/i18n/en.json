@@ -138,7 +138,12 @@
     "total": "Total",
     "shippingTaxes": "Shipping and taxes calculated at checkout",
     "size": "Size",
-    "continueShopping": "Continue Shopping"
+    "continueShopping": "Continue Shopping",
+    "freeShippingHint": "Add ${{amount}} more for free shipping",
+    "promoCode": "Promo Code",
+    "promoPlaceholder": "Enter promo code",
+    "promoInvalid": "Invalid promo code",
+    "apply": "Apply"
   },
   "checkout": {
     "yourCartEmpty": "Your cart is empty",
@@ -186,7 +191,18 @@
     "information": "Information",
     "shippingStep": "Shipping",
     "paymentStep": "Payment",
-    "continueShopping2": "CONTINUE SHOPPING"
+    "continueShopping2": "CONTINUE SHOPPING",
+    "orderError": "Error. Please try again.",
+    "fixErrors": "Please fix the errors below.",
+    "testModeTitle": "TEST MODE — NO PAYMENT CHARGED",
+    "testModeDesc": "Any card data is accepted • Order processed without real payment",
+    "cardNumberLabel": "Card Number",
+    "expiryLabel": "Expiry",
+    "cvvLabel": "CVV",
+    "cardHolderLabel": "Card Holder",
+    "liqPayButton": "PAY WITH LiqPay",
+    "submitOrder": "Place Order",
+    "skipPaymentTest": "Skip Payment (Test)"
   },
   "contact": {
     "getInTouch": "GET IN TOUCH",

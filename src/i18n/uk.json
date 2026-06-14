@@ -138,7 +138,12 @@
     "total": "Разом",
     "shippingTaxes": "Доставка та податки розраховуються при оформленні",
     "size": "Розмір",
-    "continueShopping": "Продовжити покупки"
+    "continueShopping": "Продовжити покупки",
+    "freeShippingHint": "Додайте ще ${{amount}} для безкоштовної доставки",
+    "promoCode": "Промокод",
+    "promoPlaceholder": "Введіть промокод",
+    "promoInvalid": "Невірний промокод",
+    "apply": "Застосувати"
   },
   "checkout": {
     "yourCartEmpty": "Ваш кошик порожній",
@@ -186,7 +191,18 @@
     "information": "Інформація",
     "shippingStep": "Доставка",
     "paymentStep": "Оплата",
-    "continueShopping2": "ПРОДОВЖИТИ ПОКУПКИ"
+    "continueShopping2": "ПРОДОВЖИТИ ПОКУПКИ",
+    "orderError": "Помилка. Спробуйте ще раз.",
+    "fixErrors": "Будь ласка, виправте помилки нижче.",
+    "testModeTitle": "ТЕСТОВИЙ РЕЖИМ — ОПЛАТА НЕ СПИСУЄТЬСЯ",
+    "testModeDesc": "Будь-які дані картки приймаються • Замовлення обробляється без реального платежу",
+    "cardNumberLabel": "Номер картки",
+    "expiryLabel": "Термін дії",
+    "cvvLabel": "CVV",
+    "cardHolderLabel": "Власник картки",
+    "liqPayButton": "ОПЛАТИТИ ЧЕРЕЗ LiqPay",
+    "submitOrder": "Оформити замовлення",
+    "skipPaymentTest": "Пропустити оплату (тест)"
   },
   "contact": {
     "getInTouch": "ЗВ'ЯЖІТЬСЯ З НАМИ",

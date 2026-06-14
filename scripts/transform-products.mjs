@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import matter from 'gray-matter';
@@ -9,7 +9,7 @@ const root = join(__dirname, '..');
 const prodDir = join(root, 'content', 'products');
 const outPath = join(root, 'src', 'data', 'products.ts');
 
-const entries = readdirSync(prodDir);
+const entries = existsSync(prodDir) ? readdirSync(prodDir) : [];
 const jsonFiles = entries.filter(f => f.endsWith('.json'));
 const mdFiles = entries.filter(f => f.endsWith('.md'));
 
@@ -47,9 +47,14 @@ const getCatName = (cat) => {
 const categories = [{ id: 'all', name: 'All' }, ...[...new Set(products.map(p => p.category))].map(id => ({ id, name: getCatName(id) }))];
 
 const homepagePath = join(root, 'content', 'pages', 'homepage.json');
-const homepage = JSON.parse(readFileSync(homepagePath, 'utf-8'));
-const heroImage = homepage.hero?.image || 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200';
-const editorialImage = homepage.philosophy?.image || 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=800';
+let heroImage = 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200';
+let editorialImage = 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=800';
+
+if (existsSync(homepagePath)) {
+  const homepage = JSON.parse(readFileSync(homepagePath, 'utf-8'));
+  heroImage = homepage.hero?.image || heroImage;
+  editorialImage = homepage.philosophy?.image || editorialImage;
+}
 
 const content = `import { Product, Review } from '../types';
 

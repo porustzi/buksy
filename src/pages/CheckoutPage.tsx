@@ -82,7 +82,7 @@ export function CheckoutPage() {
       const response = await fetch('/.netlify/functions/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, shippingInfo, total }),
+        body: JSON.stringify({ items, shippingInfo, total, paymentMethod: 'cod' }),
       });
       if (!response.ok) throw new Error('Order failed');
       const data = await response.json();
@@ -113,7 +113,7 @@ export function CheckoutPage() {
         const orderRes = await fetch('/.netlify/functions/order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items, shippingInfo, total }),
+          body: JSON.stringify({ items, shippingInfo, total, paymentMethod: 'cod' }),
         });
         if (!orderRes.ok) throw new Error('Order failed');
         setIsComplete(true);
@@ -169,7 +169,6 @@ export function CheckoutPage() {
             <p className="text-white/60 font-body max-w-md mx-auto">
               {t('checkout.orderConfirmedDesc')}
             </p>
-            <p className="text-white/40 font-mono text-sm">{t('checkout.orderPrefix')}{Date.now().toString().slice(-6)}</p>
             <div className="pt-8">
               <Link
                 to="/shop"
@@ -215,10 +214,10 @@ export function CheckoutPage() {
         {/* Test Mode Banner */}
         <div className="mb-8 p-4 border border-amber-500/30 bg-amber-500/5 text-center">
           <p className="text-amber-400 font-heading text-sm tracking-wider">
-            🧪 ТЕСТОВИЙ РЕЖИМ — ОПЛАТА НЕ СПИСУЄТЬСЯ
+            🧪 {t('checkout.testModeTitle')}
           </p>
           <p className="text-amber-400/60 font-body text-xs mt-1">
-            Будь-які дані картки приймаються • Замовлення обробляється без реального платежу
+            {t('checkout.testModeDesc')}
           </p>
         </div>
 
@@ -491,7 +490,7 @@ export function CheckoutPage() {
                     </div>
                     <div className="space-y-3.5">
                       <div>
-                        <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">Номер картки</label>
+                        <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">{t('checkout.cardNumberLabel')}</label>
                         <input
                           type="text"
                           inputMode="numeric"
@@ -508,7 +507,7 @@ export function CheckoutPage() {
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         <div>
-                          <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">Термін дії</label>
+                          <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">{t('checkout.expiryLabel')}</label>
                           <input
                             type="text"
                             inputMode="numeric"
@@ -524,7 +523,7 @@ export function CheckoutPage() {
                           />
                         </div>
                         <div>
-                          <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">CVV</label>
+                          <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">{t('checkout.cvvLabel')}</label>
                           <input
                             type="text"
                             inputMode="numeric"
@@ -540,7 +539,7 @@ export function CheckoutPage() {
                         </div>
                       </div>
                       <div>
-                        <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">Власник картки</label>
+                        <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">{t('checkout.cardHolderLabel')}</label>
                         <input
                           type="text"
                           placeholder="TARAS SHEVCHENKO"
@@ -564,20 +563,20 @@ export function CheckoutPage() {
                       disabled={isProcessing}
                       className="w-full py-4 bg-blood text-white font-heading text-sm tracking-wider hover:bg-blood/80 transition-colors duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                      {isProcessing ? '...' : <><CreditCard size={18} /> ОПЛАТИТИ ЧЕРЕЗ LiqPay</>}
+                      {isProcessing ? '...' : <><CreditCard size={18} /> {t('checkout.liqPayButton')}</>}
                     </button>
                     <button
                       onClick={handlePlaceOrder}
                       disabled={isProcessing}
                       className="w-full py-3 border border-white/20 text-white/70 font-heading text-sm tracking-wider hover:border-white/50 hover:text-white transition-colors duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                      {isProcessing ? '...' : <><Lock size={16} /> Оформити замовлення</>}
+                      {isProcessing ? '...' : <><Lock size={16} /> {t('checkout.submitOrder')}</>}
                     </button>
                     <button
                       onClick={async () => {
                         setIsProcessing(true); setSubmitError('');
                         try {
-                          const r = await fetch('/.netlify/functions/order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items, shippingInfo, total }) });
+                          const r = await fetch('/.netlify/functions/order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items, shippingInfo, total, paymentMethod: 'cod' }) });
                           if (!r.ok) throw new Error('Order failed');
                           setIsComplete(true); clearCart();
                         } catch { setSubmitError('Помилка. Спробуй ще раз.'); }
@@ -586,7 +585,7 @@ export function CheckoutPage() {
                       disabled={isProcessing}
                       className="w-full py-2 text-amber-400/60 font-body text-xs hover:text-amber-400 transition-colors disabled:opacity-30"
                     >
-                      {isProcessing ? '...' : '🧪 Пропустити оплату (тест)'}
+                      {isProcessing ? '...' : '🧪 ' + t('checkout.skipPaymentTest')}
                     </button>
                   </div>
 

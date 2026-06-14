@@ -46,7 +46,7 @@ export function EditorialPage() {
               </div>
               <div className="lg:w-1/3">
                 <p className="font-display text-2xl font-light text-white/80 leading-relaxed italic">
-                  "{t(`editorial.caption${i + 1}`)}"
+                  "{item.caption}"
                 </p>
               </div>
             </motion.div>

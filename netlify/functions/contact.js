@@ -1,3 +1,8 @@
+function esc(s) {
+  if (typeof s !== 'string') return '';
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -17,21 +22,17 @@ exports.handler = async (event) => {
       const msg = [
         '✉️ <b>НОВА ЗАЯВКА</b>',
         '',
-        name ? `👤 <b>${name}</b>` : '👤 <b>—</b>',
-        `📧 ${email}`,
-        subject ? `📝 ${subject}` : '',
+        name ? `👤 <b>${esc(name)}</b>` : '👤 <b>—</b>',
+        `📧 ${esc(email)}`,
+        subject ? `📝 ${esc(subject)}` : '',
         '',
-        message ? `💬 ${message}` : '',
+        message ? `💬 ${esc(message)}` : '',
       ].filter(Boolean).join('\n');
 
       await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: CHAT_ID,
-          text: msg,
-          parse_mode: 'HTML',
-        }),
+        body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'HTML' }),
       });
     }
 

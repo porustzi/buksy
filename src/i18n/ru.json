@@ -138,7 +138,12 @@
     "total": "Итого",
     "shippingTaxes": "Доставка и налоги рассчитываются при оформлении",
     "size": "Размер",
-    "continueShopping": "Продолжить покупки"
+    "continueShopping": "Продолжить покупки",
+    "freeShippingHint": "Добавьте ещё ${{amount}} для бесплатной доставки",
+    "promoCode": "Промокод",
+    "promoPlaceholder": "Введите промокод",
+    "promoInvalid": "Неверный промокод",
+    "apply": "Применить"
   },
   "checkout": {
     "yourCartEmpty": "Ваша корзина пуста",
@@ -186,7 +191,18 @@
     "information": "Информация",
     "shippingStep": "Доставка",
     "paymentStep": "Оплата",
-    "continueShopping2": "ПРОДОЛЖИТЬ ПОКУПКИ"
+    "continueShopping2": "ПРОДОЛЖИТЬ ПОКУПКИ",
+    "orderError": "Ошибка. Попробуйте ещё раз.",
+    "fixErrors": "Пожалуйста, исправьте ошибки ниже.",
+    "testModeTitle": "ТЕСТОВЫЙ РЕЖИМ — ОПЛАТА НЕ СПИСЫВАЕТСЯ",
+    "testModeDesc": "Любые данные карты принимаются • Заказ обрабатывается без реального платежа",
+    "cardNumberLabel": "Номер карты",
+    "expiryLabel": "Срок действия",
+    "cvvLabel": "CVV",
+    "cardHolderLabel": "Владелец карты",
+    "liqPayButton": "ОПЛАТИТЬ ЧЕРЕЗ LiqPay",
+    "submitOrder": "Оформить заказ",
+    "skipPaymentTest": "Пропустить оплату (тест)"
   },
   "contact": {
     "getInTouch": "СВЯЖИТЕСЬ С НАМИ",

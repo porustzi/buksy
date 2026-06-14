@@ -178,14 +178,7 @@ export function AboutPage() {
             <div className="absolute left-1/2 top-0 bottom-0 w-px bg-blood/20 hidden md:block" />
 
             <div className="space-y-12">
-              {[
-                { year: '2019', eventKey: 'about.event2019' },
-                { year: '2020', eventKey: 'about.event2020' },
-                { year: '2021', eventKey: 'about.event2021' },
-                { year: '2022', eventKey: 'about.event2022' },
-                { year: '2023', eventKey: 'about.event2023' },
-                { year: '2024', eventKey: 'about.event2024' },
-              ].map((item, index) => (
+              {(aboutPage.timeline?.events || []).map((item, index) => (
                 <motion.div
                   key={item.year}
                   initial={{ opacity: 0, y: 20 }}
@@ -198,7 +191,7 @@ export function AboutPage() {
                     {index % 2 === 0 ? (
                       <>
                         <span className="font-mono text-blood text-3xl">{item.year}</span>
-                        <h4 className="font-heading text-lg mt-2">{t(item.eventKey)}</h4>
+                        <h4 className="font-heading text-lg mt-2">{item.event}</h4>
                       </>
                     ) : (
                       <div className="hidden md:block" />
@@ -209,7 +202,7 @@ export function AboutPage() {
                     {index % 2 === 1 ? (
                       <>
                         <span className="font-mono text-blood text-3xl">{item.year}</span>
-                        <h4 className="font-heading text-lg mt-2">{t(item.eventKey)}</h4>
+                        <h4 className="font-heading text-lg mt-2">{item.event}</h4>
                       </>
                     ) : (
                       <div className="hidden md:block" />
@@ -218,7 +211,7 @@ export function AboutPage() {
                   {/* Mobile view */}
                   <div className="flex items-center gap-4 md:hidden">
                     <span className="font-mono text-blood text-2xl">{item.year}</span>
-                    <h4 className="font-heading text-base">{t(item.eventKey)}</h4>
+                    <h4 className="font-heading text-base">{item.event}</h4>
                   </div>
                 </motion.div>
               ))}
