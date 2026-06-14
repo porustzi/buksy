@@ -2,12 +2,11 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { aboutPage } from '../data/content';
-import { usePageTranslation } from '../i18n/usePageTranslation';
+import { useTranslated } from '../i18n/TranslationContext';
 
 export function AboutPage() {
   const { t } = useTranslation();
-  const a = usePageTranslation(aboutPage, 'uk');
+  const { aboutPage: a } = useTranslated();
 
   return (
     <div className="min-h-screen bg-noir pt-24">

@@ -2,12 +2,11 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone, Send, Instagram, Twitter, Youtube } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { contactInfo } from '../data/content';
-import { usePageTranslation } from '../i18n/usePageTranslation';
+import { useTranslated } from '../i18n/TranslationContext';
 
 export function ContactPage() {
   const { t } = useTranslation();
-  const ci = usePageTranslation(contactInfo, 'uk');
+  const { contactInfo: ci } = useTranslated();
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);

@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Instagram, Twitter, Youtube, Send } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { footerData } from '../data/content';
-import { usePageTranslation } from '../i18n/usePageTranslation';
+import { useTranslated } from '../i18n/TranslationContext';
 
 export function Footer() {
   const { t } = useTranslation();
-  const f = usePageTranslation(footerData, 'uk');
+  const { footerData: f } = useTranslated();
 
   return (
     <footer className="bg-ash border-t border-white/5">

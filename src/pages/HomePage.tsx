@@ -3,13 +3,12 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { products } from '../data/products';
-import { homepage } from '../data/content';
-import { usePageTranslation } from '../i18n/usePageTranslation';
+import { useTranslated } from '../i18n/TranslationContext';
 import { ProductCard } from '../components/ProductCard';
 
 export function HomePage() {
   const { t } = useTranslation();
-  const h = usePageTranslation(homepage, 'uk');
+  const { homepage: h } = useTranslated();
   const featuredProducts = products.filter((p) => p.isFeatured);
   const bestsellers = products.filter((p) => p.isBestseller);
   const heroImg = h.hero?.image || 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200';
