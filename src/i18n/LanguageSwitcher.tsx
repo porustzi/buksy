@@ -22,7 +22,7 @@ export function LanguageSwitcher() {
 
     if (code !== 'uk' && !i18n.hasResourceBundle(code, 'translation')) {
       setLoading(code);
-      const translated = await loadTranslations(code, uk, 'ui');
+      const translated = await loadTranslations(code, uk);
       i18n.addResourceBundle(code, 'translation', translated, true, true);
       setLoading(null);
     }
