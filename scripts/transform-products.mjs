@@ -1,6 +1,7 @@
 import { readFileSync, readdirSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import matter from 'gray-matter';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
@@ -8,18 +9,35 @@ const root = join(__dirname, '..');
 const prodDir = join(root, 'content', 'products');
 const outPath = join(root, 'src', 'data', 'products.ts');
 
-const files = readdirSync(prodDir).filter(f => f.endsWith('.json'));
+const entries = readdirSync(prodDir);
+const jsonFiles = entries.filter(f => f.endsWith('.json'));
+const mdFiles = entries.filter(f => f.endsWith('.md'));
 
-const products = files.map(f => {
-  let raw = readFileSync(join(prodDir, f), 'utf-8');
-  if (raw.charCodeAt(0) === 0xFEFF) raw = raw.slice(1);
-  const p = JSON.parse(raw);
+function processEntry(rawData) {
+  const p = rawData;
   if (!p.images) p.images = [p.image1, p.image2, p.image3].filter(Boolean);
   else if (p.images[0] && typeof p.images[0] === 'object') p.images = p.images.map(img => img.src || img.url || img.image || '');
   if (Array.isArray(p.details)) p.details = p.details.map(d => typeof d === 'object' ? (d.detail || '') : d);
   if (Array.isArray(p.care)) p.care = p.care.map(c => typeof c === 'object' ? (c.instruction || '') : c);
+  p.reviewCount = (p.reviews || []).length;
   return p;
-});
+}
+
+const products = [];
+
+for (const f of jsonFiles) {
+  let raw = readFileSync(join(prodDir, f), 'utf-8');
+  if (raw.charCodeAt(0) === 0xFEFF) raw = raw.slice(1);
+  products.push(processEntry(JSON.parse(raw)));
+}
+
+for (const f of mdFiles) {
+  const raw = readFileSync(join(prodDir, f), 'utf-8');
+  const { data } = matter(raw);
+  if (data && data.name) {
+    products.push(processEntry(data));
+  }
+}
 
 const getCatName = (cat) => {
   const m = { hoodies: 'Hoodies', 't-shirts': 'T-Shirts', jackets: 'Jackets', pants: 'Pants', accessories: 'Accessories', footwear: 'Footwear' };
@@ -51,4 +69,4 @@ export const editorialImage = '${editorialImage}';
 `;
 
 writeFileSync(outPath, content, 'utf-8');
-console.log(`✅ Generated products.ts from ${files.length} products`);
+console.log(`✅ Generated products.ts — ${jsonFiles.length} JSON + ${mdFiles.length} Markdown = ${products.length} products`);
