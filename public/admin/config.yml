@@ -69,6 +69,8 @@ collections:
     label: "🛒 Магазин"
     folder: "content/products"
     create: true
+    extension: json
+    format: json
     slug: "{{slug}}"
     summary: "{{name}} — ${{price}}"
     identifier_field: "slug"
