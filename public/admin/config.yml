@@ -72,11 +72,9 @@ collections:
       - { label: "Ціна $", name: price, widget: number, value_type: float }
       - { label: "Ціна без знижки", name: originalPrice, widget: number, value_type: float, required: false }
       - { label: "Категорія", name: category, widget: select, options: ["hoodies", "t-shirts", "jackets", "pants", "accessories", "footwear"] }
-      - label: "Зображення"
-        name: images
-        widget: list
-        fields:
-          - { label: "URL", name: src, widget: string }
+      - { label: "Зображення 1", name: image1, widget: string }
+      - { label: "Зображення 2", name: image2, widget: string }
+      - { label: "Зображення 3", name: image3, widget: string }
       - label: "Розміри"
         name: sizes
         widget: list
