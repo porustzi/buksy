@@ -31,11 +31,21 @@ export function Footer() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-8">
             <div className="text-center lg:text-left">
-              <a href="https://t.me/+OQrO3Aya1NQ4YmZi" target="_blank" rel="noopener noreferrer" className="inline-block">
-                <h3 className="font-heading text-2xl tracking-wider mb-2 hover:text-blood transition-colors duration-300">
-                  JOIN THE DARK SIDE
-                </h3>
-              </a>
+              <div className="flex items-center gap-4">
+                <a href="https://t.me/+OQrO3Aya1NQ4YmZi" target="_blank" rel="noopener noreferrer" className="inline-block">
+                  <h3 className="font-heading text-2xl tracking-wider hover:text-blood transition-colors duration-300">
+                    JOIN THE DARK SIDE
+                  </h3>
+                </a>
+                <a
+                  href="https://t.me/+OQrO3Aya1NQ4YmZi"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 border border-white/20 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300 rounded-full"
+                >
+                  <Send size={18} />
+                </a>
+              </div>
               <p className="text-white/60 font-body">
                 Subscribe for exclusive drops, early access, and 10% off your first order.
               </p>
@@ -87,15 +97,7 @@ export function Footer() {
               >
                 <Youtube size={18} />
               </a>
-              <a
-                href="https://t.me/+OQrO3Aya1NQ4YmZi"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60
-                         hover:border-blood hover:text-blood transition-all duration-300"
-              >
-                <Send size={18} />
-              </a>
+
             </div>
           </div>
 
