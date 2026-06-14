@@ -22,8 +22,10 @@ const getCatName = (cat) => {
 
 const categories = [{ id: 'all', name: 'All' }, ...[...new Set(products.map(p => p.category))].map(id => ({ id, name: getCatName(id) }))];
 
-const heroImage = 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200';
-const editorialImage = 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=800';
+const homepagePath = join(root, 'content', 'pages', 'homepage.json');
+const homepage = JSON.parse(readFileSync(homepagePath, 'utf-8'));
+const heroImage = homepage.hero?.image || 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200';
+const editorialImage = homepage.philosophy?.image || 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=800';
 
 const content = `import { Product, Review } from '../types';
 
