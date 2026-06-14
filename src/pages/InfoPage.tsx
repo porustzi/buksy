@@ -42,6 +42,7 @@ export function InfoPage() {
       <div className="min-h-screen bg-noir pt-24 flex items-center justify-center">
         <div className="text-center">
           <h1 className="font-display text-4xl font-light mb-4">Page Not Found</h1>
+          <p className="text-white/60 font-body mb-6">"{slug}" — this page doesn't exist.</p>
           <Link to="/" className="text-blood hover:underline">Return Home</Link>
         </div>
       </div>

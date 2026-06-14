@@ -104,7 +104,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
                   : 'bg-white/10 text-white hover:bg-white/20'
               }`}
             >
-              <Heart size={16} className={wishlisted ? 'fill-current' : ''} />
+              <Heart size={16} fill={wishlisted ? 'currentColor' : 'none'} />
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}

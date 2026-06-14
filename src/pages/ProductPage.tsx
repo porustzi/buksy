@@ -272,14 +272,24 @@ export function ProductPage() {
                     : 'border-white/10 text-white/60 hover:border-blood hover:text-blood'
                 }`}
               >
-                <Heart size={20} className={isWishlisted(product.id) ? 'fill-current' : ''} />
+                <Heart size={20} fill={isWishlisted(product.id) ? 'currentColor' : 'none'} />
               </button>
               <button
-                onClick={() => {
+                onClick={async () => {
+                  const url = window.location.href;
                   if (navigator.share) {
-                    navigator.share({ title: product.name, url: window.location.href });
+                    try { await navigator.share({ title: product.name, url }); } catch {}
                   } else {
-                    navigator.clipboard.writeText(window.location.href);
+                    try {
+                      await navigator.clipboard.writeText(url);
+                    } catch {
+                      const input = document.createElement('input');
+                      input.value = url;
+                      document.body.appendChild(input);
+                      input.select();
+                      document.execCommand('copy');
+                      document.body.removeChild(input);
+                    }
                   }
                 }}
                 className="p-4 border border-white/10 text-white/60 hover:border-blood hover:text-blood transition-all duration-300"
