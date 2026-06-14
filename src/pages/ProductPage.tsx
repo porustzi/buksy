@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useWishlist } from '../store/WishlistContext';
 import {
   ChevronLeft,
   ChevronRight,
@@ -22,6 +23,7 @@ export function ProductPage() {
   const { slug } = useParams();
   const product = products.find((p) => p.slug === slug);
   const { addItem } = useCart();
+  const { isWishlisted, toggleWishlist } = useWishlist();
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
@@ -262,10 +264,26 @@ export function ProductPage() {
                   'ADD TO CART'
                 )}
               </motion.button>
-              <button className="p-4 border border-white/10 text-white/60 hover:border-blood hover:text-blood transition-all duration-300">
-                <Heart size={20} />
+              <button
+                onClick={() => toggleWishlist(product)}
+                className={`p-4 border transition-all duration-300 ${
+                  isWishlisted(product.id)
+                    ? 'border-blood text-blood bg-blood/10'
+                    : 'border-white/10 text-white/60 hover:border-blood hover:text-blood'
+                }`}
+              >
+                <Heart size={20} className={isWishlisted(product.id) ? 'fill-current' : ''} />
               </button>
-              <button className="p-4 border border-white/10 text-white/60 hover:border-blood hover:text-blood transition-all duration-300">
+              <button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({ title: product.name, url: window.location.href });
+                  } else {
+                    navigator.clipboard.writeText(window.location.href);
+                  }
+                }}
+                className="p-4 border border-white/10 text-white/60 hover:border-blood hover:text-blood transition-all duration-300"
+              >
                 <Share2 size={20} />
               </button>
             </div>

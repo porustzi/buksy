@@ -1,8 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, ShoppingBag, Heart } from 'lucide-react';
 import { Product } from '../types';
 import { useCart } from '../store/CartContext';
+import { useWishlist } from '../store/WishlistContext';
 
 interface ProductCardProps {
   product: Product;
@@ -11,12 +12,27 @@ interface ProductCardProps {
 
 export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { addItem } = useCart();
+  const { isWishlisted, toggleWishlist } = useWishlist();
+  const navigate = useNavigate();
   const firstAvailableSize = product.sizes.find((s) => s.available)?.name || 'M';
+  const wishlisted = isWishlisted(product.id);
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     addItem(product, firstAvailableSize);
+  };
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(product);
+  };
+
+  const handleQuickView = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(`/product/${product.slug}`);
   };
 
   return (
@@ -81,13 +97,19 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="p-3 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors duration-300"
+              onClick={handleToggleWishlist}
+              className={`p-3 backdrop-blur-sm transition-colors duration-300 ${
+                wishlisted
+                  ? 'bg-blood/20 text-blood'
+                  : 'bg-white/10 text-white hover:bg-white/20'
+              }`}
             >
-              <Heart size={16} />
+              <Heart size={16} className={wishlisted ? 'fill-current' : ''} />
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={handleQuickView}
               className="p-3 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors duration-300"
             >
               <Eye size={16} />

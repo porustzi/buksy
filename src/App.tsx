@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { CartProvider } from './store/CartContext';
+import { WishlistProvider } from './store/WishlistContext';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
@@ -127,16 +128,18 @@ function App() {
   }
 
   return (
-    <CartProvider>
-      <div className="flex flex-col min-h-screen bg-noir">
-        <Header />
-        <main className="flex-1">
-          <AppRoutes />
-        </main>
-        <Footer />
-        <CartDrawer />
-      </div>
-    </CartProvider>
+    <WishlistProvider>
+      <CartProvider>
+        <div className="flex flex-col min-h-screen bg-noir">
+          <Header />
+          <main className="flex-1">
+            <AppRoutes />
+          </main>
+          <Footer />
+          <CartDrawer />
+        </div>
+      </CartProvider>
+    </WishlistProvider>
   );
 }
 
