@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { CartProvider } from './store/CartContext';
-import { TranslationProvider } from './i18n/TranslationContext';
 import './i18n/i18n';
 
 import { Header } from './components/Header';
@@ -139,8 +138,7 @@ function App() {
   }
 
   return (
-    <TranslationProvider>
-      <CartProvider>
+    <CartProvider>
         <div className="flex flex-col min-h-screen bg-noir">
           <Header />
           <main className="flex-1">
@@ -150,7 +148,6 @@ function App() {
           <CartDrawer />
         </div>
       </CartProvider>
-    </TranslationProvider>
   );
 }
 

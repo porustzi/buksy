@@ -3,16 +3,21 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { products } from '../data/products';
-import { useTranslated } from '../i18n/TranslationContext';
+import { homepage } from '../data/content';
+import { useLang } from '../i18n/LanguageContext';
 import { ProductCard } from '../components/ProductCard';
 
 export function HomePage() {
-  const { t } = useTranslation();
-  const { homepage: h } = useTranslated();
+  const { t, loc } = useLang();
   const featuredProducts = products.filter((p) => p.isFeatured);
   const bestsellers = products.filter((p) => p.isBestseller);
-  const heroImg = h.hero?.image || 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200';
-  const philImg = h.philosophy?.image || 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=800';
+  const hero = homepage.hero || {};
+  const feat = homepage.featured || {};
+  const phil = homepage.philosophy || {};
+  const best = homepage.bestsellers || {};
+  const coll = homepage.collections || {};
+  const heroImg = hero.image || 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200';
+  const philImg = phil.image || 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=800';
 
   return (
     <div className="overflow-hidden">
@@ -24,19 +29,19 @@ export function HomePage() {
         </div>
         <div className="relative z-10 h-full flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.2 }} className="max-w-2xl">
-            <p className="font-heading text-sm tracking-[0.4em] text-blood mb-4">{h.hero?.tagline}</p>
+            <p className="font-heading text-sm tracking-[0.4em] text-blood mb-4">{loc(hero, 'tagline')}</p>
             <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-light text-white leading-tight mb-6">
-              {h.hero?.title1}<br /><span className="text-blood">{h.hero?.title2}</span>
+              {loc(hero, 'title1')}<br /><span className="text-blood">{loc(hero, 'title2')}</span>
             </h1>
-            <p className="text-lg text-white/70 leading-relaxed mb-10 max-w-lg">{h.hero?.description}</p>
+            <p className="text-lg text-white/70 leading-relaxed mb-10 max-w-lg">{loc(hero, 'description')}</p>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="flex flex-wrap gap-4">
-              <Link to="/shop" className="btn-primary flex items-center gap-3">{h.hero?.shopNow}<ArrowRight size={18} /></Link>
-              <Link to="/about" className="btn-secondary">{h.hero?.ourStory}</Link>
+              <Link to="/shop" className="btn-primary flex items-center gap-3">{loc(hero, 'shopNow')}<ArrowRight size={18} /></Link>
+              <Link to="/about" className="btn-secondary">{loc(hero, 'ourStory')}</Link>
             </motion.div>
           </motion.div>
         </div>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-          <span className="text-white/40 text-xs tracking-[0.2em] font-body">{h.hero?.scroll}</span>
+          <span className="text-white/40 text-xs tracking-[0.2em] font-body">{loc(hero, 'scroll')}</span>
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}><ChevronDown size={20} className="text-blood" /></motion.div>
         </motion.div>
         <div className="absolute top-1/4 right-8 lg:right-16 opacity-10">
@@ -48,11 +53,11 @@ export function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-12">
             <div>
-              <p className="section-subtitle mb-3">{h.featured?.tagline}</p>
-              <h2 className="section-title">{h.featured?.title} <span className="text-blood">.</span></h2>
+              <p className="section-subtitle mb-3">{loc(feat, 'tagline')}</p>
+              <h2 className="section-title">{loc(feat, 'title')} <span className="text-blood">.</span></h2>
             </div>
             <Link to="/shop" className="group flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300">
-              <span className="font-body text-sm tracking-wider">{h.featured?.viewAll}</span>
+              <span className="font-body text-sm tracking-wider">{loc(feat, 'viewAll')}</span>
               <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
           </motion.div>
@@ -69,12 +74,12 @@ export function HomePage() {
             <div className="absolute -bottom-6 -right-6 w-48 h-48 border border-blood/30 hidden lg:block" />
           </motion.div>
           <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.2 }} className="lg:pl-8">
-            <p className="section-subtitle mb-3">{h.philosophy?.tagline}</p>
-            <h2 className="section-title mb-8">{h.philosophy?.title1} <br />{h.philosophy?.title2}</h2>
+            <p className="section-subtitle mb-3">{loc(phil, 'tagline')}</p>
+            <h2 className="section-title mb-8">{loc(phil, 'title1')} <br />{loc(phil, 'title2')}</h2>
             <div className="space-y-6 text-white/70 font-body leading-relaxed">
-              <p>{h.philosophy?.text1}</p><p>{h.philosophy?.text2}</p><p>{h.philosophy?.text3}</p>
+              <p>{loc(phil, 'text1')}</p><p>{loc(phil, 'text2')}</p><p>{loc(phil, 'text3')}</p>
             </div>
-            <Link to="/about" className="btn-primary inline-flex items-center gap-3 mt-10">{h.philosophy?.button}<ArrowRight size={18} /></Link>
+            <Link to="/about" className="btn-primary inline-flex items-center gap-3 mt-10">{loc(phil, 'button')}<ArrowRight size={18} /></Link>
           </motion.div>
         </div>
         <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-blood/5 to-transparent pointer-events-none" />
@@ -83,8 +88,8 @@ export function HomePage() {
       <section className="py-24 bg-noir">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-            <p className="section-subtitle mb-3">{h.bestsellers?.tagline}</p>
-            <h2 className="section-title">{h.bestsellers?.title} <span className="text-blood">.</span></h2>
+            <p className="section-subtitle mb-3">{loc(best, 'tagline')}</p>
+            <h2 className="section-title">{loc(best, 'title')} <span className="text-blood">.</span></h2>
           </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {bestsellers.map((product, index) => (<ProductCard key={product.id} product={product} index={index} />))}
@@ -95,8 +100,8 @@ export function HomePage() {
       <section className="py-24 bg-ash">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
-            <p className="section-subtitle mb-3">{h.collections?.tagline}</p>
-            <h2 className="section-title">{h.collections?.title} <span className="text-blood">.</span></h2>
+            <p className="section-subtitle mb-3">{loc(coll, 'tagline')}</p>
+            <h2 className="section-title">{loc(coll, 'title')} <span className="text-blood">.</span></h2>
           </motion.div>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
             {[
