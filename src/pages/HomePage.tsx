@@ -255,48 +255,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Instagram Feed / Lookbook */}
-      <section className="py-24 bg-noir">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12"
-          >
-            <p className="section-subtitle mb-3">@BUKSY.OFFICIAL</p>
-            <h2 className="section-title">
-              Follow the <span className="text-blood">Movement</span>
-            </h2>
-          </motion.div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2">
-            {[
-              'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=400',
-              'https://images.pexels.com/photos/2062587/pexels-photo-2062587.jpeg?auto=compress&cs=tinysrgb&w=400',
-              'https://images.pexels.com/photos/6311387/pexels-photo-6311387.jpeg?auto=compress&cs=tinysrgb&w=400',
-              'https://images.pexels.com/photos/1126964/pexels-photo-1126964.jpeg?auto=compress&cs=tinysrgb&w=400',
-              'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
-              'https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg?auto=compress&cs=tinysrgb&w=400',
-            ].map((img, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.05 }}
-                className="aspect-square overflow-hidden"
-              >
-                <img
-                  src={img}
-                  alt={`Instagram post ${index + 1}`}
-                  className="w-full h-full object-cover filter grayscale hover:grayscale-0 transition-filter duration-500"
-                />
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
