@@ -114,29 +114,26 @@ export function Footer() {
 
       <div className="border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/40 font-body">
-            <p>&copy; {new Date().getFullYear()} BUKSY. {t('footer.allRightsReserved')}</p>
-            <p className="flex items-center gap-2">{t('footer.designedFor')} <span className="text-blood">{t('footer.dark')}</span></p>
-          </div>
-        </div>
-      </div>
-
-      <div className="border-t border-white/5 bg-noir">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-center">
-          <div className="relative overflow-hidden rounded-full w-full md:w-auto max-w-xs md:max-w-none mx-auto px-5 py-3 md:py-2.5 bg-white shadow-lg">
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute -top-4 -right-3 w-16 h-16 bg-rose-300/50 rounded-full blur-xl" />
-              <div className="absolute -bottom-4 -left-3 w-12 h-12 bg-rose-400/40 rounded-full blur-lg" />
-              <div className="absolute top-1/4 left-1/3 w-8 h-8 bg-rose-200/30 rounded-full blur-md" />
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative overflow-hidden rounded-full w-full md:w-auto max-w-xs mx-auto px-5 py-3 md:py-2.5 bg-white shadow-lg">
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute -top-4 -right-3 w-16 h-16 bg-rose-300/50 rounded-full blur-xl" />
+                <div className="absolute -bottom-4 -left-3 w-12 h-12 bg-rose-400/40 rounded-full blur-lg" />
+                <div className="absolute top-1/4 left-1/3 w-8 h-8 bg-rose-200/30 rounded-full blur-md" />
+              </div>
+              <a
+                href="https://krvtsv.netlify.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative block text-center text-rose-600 font-bold text-[11px] md:text-[10px] uppercase tracking-widest whitespace-nowrap hover:text-rose-500 transition-colors"
+              >
+                {t('footer.made_by')}
+              </a>
             </div>
-            <a
-              href="https://krvtsv.netlify.app"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative block text-center text-rose-600 font-bold text-[11px] md:text-[10px] uppercase tracking-widest whitespace-nowrap hover:text-rose-500 transition-colors"
-            >
-              {t('footer.made_by')}
-            </a>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 w-full text-sm text-white/40 font-body">
+              <p>&copy; {new Date().getFullYear()} BUKSY. {t('footer.allRightsReserved')}</p>
+              <p className="flex items-center gap-2">{t('footer.designedFor')} <span className="text-blood">{t('footer.dark')}</span></p>
+            </div>
           </div>
         </div>
       </div>
