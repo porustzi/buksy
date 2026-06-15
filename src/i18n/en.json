@@ -194,15 +194,8 @@
     "continueShopping2": "CONTINUE SHOPPING",
     "orderError": "Error. Please try again.",
     "fixErrors": "Please fix the errors below.",
-    "testModeTitle": "TEST MODE — NO PAYMENT CHARGED",
-    "testModeDesc": "Any card data is accepted • Order processed without real payment",
-    "cardNumberLabel": "Card Number",
-    "expiryLabel": "Expiry",
-    "cvvLabel": "CVV",
-    "cardHolderLabel": "Card Holder",
     "liqPayButton": "PAY WITH LiqPay",
-    "submitOrder": "Place Order",
-    "skipPaymentTest": "Skip Payment (Test)"
+    "submitOrder": "Cash on Delivery"
   },
   "contact": {
     "getInTouch": "GET IN TOUCH",

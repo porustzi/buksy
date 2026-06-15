@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   Truck,
   Shield,
+  Banknote,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '../store/CartContext';
@@ -259,7 +260,7 @@ export function CheckoutPage() {
                   <div className="grid sm:grid-cols-2 gap-4">
                     <input
                       type="text"
-                      placeholder={t('checkout.firstName')}
+                      placeholder="Олександр"
                       value={shippingInfo.firstName}
                       onChange={(e) =>
                         setShippingInfo({ ...shippingInfo, firstName: e.target.value })
@@ -268,7 +269,7 @@ export function CheckoutPage() {
                     />
                     <input
                       type="text"
-                      placeholder={t('checkout.lastName')}
+                      placeholder="Коваленко"
                       value={shippingInfo.lastName}
                       onChange={(e) =>
                         setShippingInfo({ ...shippingInfo, lastName: e.target.value })
@@ -278,7 +279,7 @@ export function CheckoutPage() {
                   </div>
                   <input
                     type="email"
-                    placeholder={t('checkout.email')}
+                    placeholder="example@email.com"
                     value={shippingInfo.email}
                     onChange={(e) =>
                       setShippingInfo({ ...shippingInfo, email: e.target.value })
@@ -287,7 +288,7 @@ export function CheckoutPage() {
                   />
                   <input
                     type="tel"
-                    placeholder={t('checkout.phone')}
+                    placeholder="+38 095 599 0719"
                     value={shippingInfo.phone}
                     onChange={(e) =>
                       setShippingInfo({ ...shippingInfo, phone: e.target.value })
@@ -300,7 +301,7 @@ export function CheckoutPage() {
                   </h3>
                   <input
                     type="text"
-                    placeholder={t('checkout.address')}
+                    placeholder="вул. Хрещатик, 1"
                     value={shippingInfo.address}
                     onChange={(e) =>
                       setShippingInfo({ ...shippingInfo, address: e.target.value })
@@ -309,7 +310,7 @@ export function CheckoutPage() {
                   />
                   <input
                     type="text"
-                    placeholder={t('checkout.apartment')}
+                    placeholder="Кв. 42"
                     value={shippingInfo.apartment}
                     onChange={(e) =>
                       setShippingInfo({ ...shippingInfo, apartment: e.target.value })
@@ -319,7 +320,7 @@ export function CheckoutPage() {
                   <div className="grid sm:grid-cols-3 gap-4">
                     <input
                       type="text"
-                      placeholder={t('checkout.city')}
+                      placeholder="Київ"
                       value={shippingInfo.city}
                       onChange={(e) =>
                         setShippingInfo({ ...shippingInfo, city: e.target.value })
@@ -328,7 +329,7 @@ export function CheckoutPage() {
                     />
                     <input
                       type="text"
-                      placeholder={t('checkout.country')}
+                      placeholder="Україна"
                       value={shippingInfo.country}
                       onChange={(e) =>
                         setShippingInfo({ ...shippingInfo, country: e.target.value })
@@ -337,7 +338,7 @@ export function CheckoutPage() {
                     />
                     <input
                       type="text"
-                      placeholder={t('checkout.postalCode')}
+                      placeholder="01001"
                       value={shippingInfo.postalCode}
                       onChange={(e) =>
                         setShippingInfo({ ...shippingInfo, postalCode: e.target.value })
@@ -473,7 +474,7 @@ export function CheckoutPage() {
                       disabled={isProcessing}
                       className="w-full py-3.5 border border-white/20 text-white/70 font-heading text-sm tracking-wider hover:border-white/50 hover:text-white transition-colors duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                      {isProcessing ? '...' : <><Lock size={16} /> {t('checkout.submitOrder')}</>}
+                      {isProcessing ? '...' : <><Banknote size={16} /> {t('checkout.submitOrder')}</>}
                     </button>
                   </div>
 

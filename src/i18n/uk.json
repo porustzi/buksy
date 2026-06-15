@@ -194,15 +194,8 @@
     "continueShopping2": "ПРОДОВЖИТИ ПОКУПКИ",
     "orderError": "Помилка. Спробуйте ще раз.",
     "fixErrors": "Будь ласка, виправте помилки нижче.",
-    "testModeTitle": "ТЕСТОВИЙ РЕЖИМ — ОПЛАТА НЕ СПИСУЄТЬСЯ",
-    "testModeDesc": "Будь-які дані картки приймаються • Замовлення обробляється без реального платежу",
-    "cardNumberLabel": "Номер картки",
-    "expiryLabel": "Термін дії",
-    "cvvLabel": "CVV",
-    "cardHolderLabel": "Власник картки",
     "liqPayButton": "ОПЛАТИТИ ЧЕРЕЗ LiqPay",
-    "submitOrder": "Оформити замовлення",
-    "skipPaymentTest": "Пропустити оплату (тест)"
+    "submitOrder": "Оплата при отриманні"
   },
   "contact": {
     "getInTouch": "ЗВ'ЯЖІТЬСЯ З НАМИ",
