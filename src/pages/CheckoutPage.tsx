@@ -442,7 +442,7 @@ export function CheckoutPage() {
                   )}
 
                   <div className="space-y-3">
-                    {/* Primary: LiqPay */}
+                    {/* Primary: Card Payment */}
                     <button
                       onClick={handleCardPayment}
                       disabled={isProcessing}
