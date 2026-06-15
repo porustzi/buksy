@@ -41,8 +41,8 @@ export function CheckoutPage() {
   const [submitError, setSubmitError] = useState('');
 
   const shippingCost = totalPrice >= 150 ? 0 : shippingMethod === 'express' ? 25 : 15;
-  const tax = totalPrice * 0.08;
-  const total = totalPrice + shippingCost + tax;
+  const tax = Math.round(totalPrice * 0.08 * 100) / 100;
+  const total = Math.round((totalPrice + shippingCost + tax) * 100) / 100;
 
   const validateInformation = (): boolean => {
     const newErrors: Record<string, string> = {};

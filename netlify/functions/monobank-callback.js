@@ -49,15 +49,15 @@ exports.handler = async (event) => {
   const rawBody = event.body || '';
   const xSign = event.headers['x-sign'] || '';
 
-  // Verify Monobank signature
+  // Verify Monobank signature (required in production)
   const pubKey = await getPubKey();
-  if (pubKey && xSign) {
-    if (!verifySignature(rawBody, xSign, pubKey)) {
-      console.error('Monobank callback: invalid X-Sign');
-      return { statusCode: 403, body: 'Invalid signature' };
-    }
-  } else if (xSign) {
-    console.warn('Monobank callback: cannot verify signature (no public key)');
+  if (!pubKey) {
+    console.error('Monobank callback: cannot verify signature (public key unavailable)');
+    return { statusCode: 500, body: 'Server misconfigured — cannot verify Monobank signature' };
+  }
+  if (!xSign || !verifySignature(rawBody, xSign, pubKey)) {
+    console.error('Monobank callback: invalid X-Sign');
+    return { statusCode: 403, body: 'Invalid signature' };
   }
 
   try {

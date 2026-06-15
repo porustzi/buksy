@@ -1,6 +1,6 @@
 function esc(s) {
   if (typeof s !== 'string') return '';
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 const rateMap = new Map();
@@ -15,7 +15,8 @@ function cleanupRateMap() {
   }
 }
 
-function rateLimit(ip, maxPerMin = 10) {
+function rateLimit(ip, maxPerMin) {
+  if (!maxPerMin) maxPerMin = 10;
   cleanupRateMap();
   const now = Date.now();
   const entry = rateMap.get(ip);
@@ -31,10 +32,10 @@ function rateLimit(ip, maxPerMin = 10) {
 function isSameOrigin(event) {
   const origin = event.headers.origin || event.headers.referer || '';
   const host = event.headers.host || '';
-  if (!origin) return true;
+  if (!origin) return false; // block requests without Origin header
   try {
     const originHost = new URL(origin).host;
-    return originHost === host || originHost.endsWith('.netlify.app');
+    return originHost === host;
   } catch { return false; }
 }
 
@@ -42,8 +43,10 @@ function validateEmail(email) {
   return typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-function guard(event, maxPerMin = 10) {
-  const ip = event.headers['client-ip'] || event.headers['x-forwarded-for'] || 'unknown';
+function guard(event, maxPerMin) {
+  if (!maxPerMin) maxPerMin = 10;
+  // Only use client-ip (set by Netlify edge, not spoofable)
+  const ip = event.headers['client-ip'] || 'unknown';
   if (!rateLimit(ip, maxPerMin)) {
     return { statusCode: 429, body: JSON.stringify({ error: 'Too many requests' }) };
   }

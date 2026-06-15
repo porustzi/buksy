@@ -54,5 +54,5 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE inventory ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY service_orders ON orders FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY service_inventory ON inventory FOR ALL USING (true) WITH CHECK (true);
+-- Service role bypasses RLS entirely.
+-- No policies for anon — public access denied.

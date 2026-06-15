@@ -17,7 +17,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { t } = useTranslation();
   const { addItem } = useCart();
   const navigate = useNavigate();
-  const firstAvailableSize = product.sizes.find((s) => s.available)?.name || 'M';
+  const firstAvailableSize = product.sizes.find((s) => s.available)?.name || product.sizes[0]?.name || '';
 
   const handleQuickAdd = (e: React.MouseEvent) => {
     e.preventDefault();

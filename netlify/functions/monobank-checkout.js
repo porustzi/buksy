@@ -116,7 +116,7 @@ exports.handler = async (event) => {
       if (monoRes.status === 403) msg = msg + 'невірний токен (403)';
       else if (monoRes.status === 400) msg = msg + 'помилка в даних (400)';
       else msg = msg + 'помилка ' + monoRes.status;
-      return { statusCode: 502, body: JSON.stringify({ error: msg, monoError: errText.slice(0, 200) }) };
+      return { statusCode: 502, body: JSON.stringify({ error: msg }) };
     }
 
     const monoData = await monoRes.json();
