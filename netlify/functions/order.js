@@ -64,7 +64,7 @@ exports.handler = async (event) => {
       .map((i) => `   ${i.quantity}× ${esc(i.product.name)} (${esc(i.size)}) — $${(i.pricePerUnit * i.quantity).toFixed(2)}`)
       .join('\n');
 
-    const paymentLabel = paymentMethod === 'liqpay' ? '💳 LiqPay (очікує підтвердження)' : '💳 Оплата при отриманні';
+    const paymentLabel = paymentMethod === 'monobank' ? '💳 Monobank (очікує підтвердження)' : '💳 Оплата при отриманні';
 
     const firstName = esc(String(info.firstName || ''));
     const lastName = esc(String(info.lastName || ''));
@@ -114,7 +114,7 @@ exports.handler = async (event) => {
     // Save to Supabase
     saveOrder({
       order_id: orderId,
-      status: paymentMethod === 'liqpay' ? 'awaiting_payment' : 'new',
+      status: paymentMethod === 'monobank' ? 'awaiting_payment' : 'new',
       payment_method: paymentMethod || 'cod',
       shipping_method: shippingMethod || 'standard',
       customer: { firstName: info.firstName, lastName: info.lastName, email, phone: info.phone },

@@ -11,7 +11,7 @@ exports.handler = async (event) => {
   if (blocked) return blocked;
 
   try {
-    const { orderId, trackingNumber } = JSON.parse(event.body);
+    const { orderId, trackingNumber, customerEmail } = JSON.parse(event.body);
 
     if (!orderId || !trackingNumber) {
       return { statusCode: 400, body: JSON.stringify({ error: 'orderId and trackingNumber are required' }) };
@@ -52,9 +52,7 @@ exports.handler = async (event) => {
       }
     }
 
-    // Email the customer — requires email to be stored in order
-    // For now, we send it if customer email was passed
-    const customerEmail = JSON.parse(event.body).customerEmail;
+    // Email the customer
     if (customerEmail) {
       sendEmail({
         to: customerEmail,

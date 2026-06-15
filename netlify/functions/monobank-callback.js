@@ -1,14 +1,67 @@
-const { esc } = require('./_utils');
+const { esc, rateLimit } = require('./_utils');
 const { markOrderPaid, decreaseStock } = require('./_supabase');
 const { sendEmail, paymentConfirmedHtml } = require('./_email');
+const crypto = require('crypto');
+
+let cachedPubKey = null;
+let pubKeyFetchedAt = 0;
+
+async function getPubKey() {
+  if (cachedPubKey && Date.now() - pubKeyFetchedAt < 3600000) return cachedPubKey;
+  const TOKEN = process.env.MONOBANK_TOKEN;
+  if (!TOKEN) return null;
+  try {
+    const res = await fetch('https://api.monobank.ua/api/merchant/pubkey', {
+      headers: { 'X-Token': TOKEN },
+    });
+    if (!res.ok) return cachedPubKey;
+    const data = await res.json();
+    cachedPubKey = data.key;
+    pubKeyFetchedAt = Date.now();
+    return cachedPubKey;
+  } catch {
+    return cachedPubKey;
+  }
+}
+
+function verifySignature(rawBody, xSign, pubKey) {
+  if (!xSign || !pubKey) return false;
+  try {
+    const verifier = crypto.createVerify('SHA256');
+    verifier.update(rawBody, 'utf8');
+    return verifier.verify(pubKey, Buffer.from(xSign, 'base64'));
+  } catch {
+    return false;
+  }
+}
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
+  // Rate limit only (no origin check — callback comes from Monobank)
+  const ip = event.headers['client-ip'] || event.headers['x-forwarded-for'] || 'unknown';
+  if (!rateLimit(ip, 30)) {
+    return { statusCode: 429, body: JSON.stringify({ error: 'Too many requests' }) };
+  }
+
+  const rawBody = event.body || '';
+  const xSign = event.headers['x-sign'] || '';
+
+  // Verify Monobank signature
+  const pubKey = await getPubKey();
+  if (pubKey && xSign) {
+    if (!verifySignature(rawBody, xSign, pubKey)) {
+      console.error('Monobank callback: invalid X-Sign');
+      return { statusCode: 403, body: 'Invalid signature' };
+    }
+  } else if (xSign) {
+    console.warn('Monobank callback: cannot verify signature (no public key)');
+  }
+
   try {
-    const body = JSON.parse(event.body);
+    const body = JSON.parse(rawBody);
 
     if (!body.invoiceId || !body.status || !body.reference) {
       return { statusCode: 400, body: 'Invalid callback payload' };
@@ -35,7 +88,6 @@ exports.handler = async (event) => {
       '\u2705 Оплата підтверджена',
     ].join('\n');
 
-    // Telegram
     if (TOKEN && CHAT_ID) {
       try {
         const tgRes = await fetch('https://api.telegram.org/bot' + TOKEN + '/sendMessage', {
@@ -49,13 +101,11 @@ exports.handler = async (event) => {
       }
     }
 
-    // Mark order as paid (idempotent — skips if already paid)
     const wasPaid = await markOrderPaid(body.reference, body.invoiceId);
     if (!wasPaid) {
       return { statusCode: 200, body: 'OK' };
     }
 
-    // Decrease stock
     if (body.basketOrder && body.basketOrder.length) {
       decreaseStock(
         body.basketOrder.map(function (b) {
