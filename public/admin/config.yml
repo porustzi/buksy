@@ -225,8 +225,8 @@ collections:
         fields:
           - { label: "Заголовок", name: title, widget: string }
           - { label: "Instagram URL", name: instagram, widget: string }
-          - { label: "Twitter URL", name: twitter, widget: string }
-          - { label: "YouTube URL", name: youtube, widget: string }
+          - { label: "TikTok URL", name: tiktok, widget: string }
+          - { label: "Telegram URL", name: telegram, widget: string }
       - label: "FAQ"
         name: faq
         widget: object

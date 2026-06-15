@@ -205,8 +205,8 @@ export const contactInfo = {
   "social": {
     "title": "МИ В СОЦМЕРЕЖАХ",
     "instagram": "#",
-    "twitter": "#",
-    "youtube": "#"
+    "tiktok": "#",
+    "telegram": "#"
   },
   "faq": {
     "tagline": "ВІДПОВІДІ",
