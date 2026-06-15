@@ -1,9 +1,10 @@
 const { esc, guard } = require('./_utils');
 const { saveOrder, decreaseStock } = require('./_supabase');
 const { sendEmail, orderConfirmationHtml } = require('./_email');
+const catalog = require('./_catalog.json');
 
 function calcServerTotal(items, shippingMethod) {
-  const subtotal = items.reduce((s, i) => s + Number(i.product.price) * Number(i.quantity), 0);
+  const subtotal = items.reduce((s, i) => s + i.pricePerUnit * i.quantity, 0);
   const shipping = subtotal >= 150 ? 0 : (shippingMethod === 'express' ? 25 : 15);
   const tax = subtotal * 0.08;
   return { subtotal, shipping, tax, total: subtotal + shipping + tax };
@@ -30,21 +31,37 @@ exports.handler = async (event) => {
 
     const info = shippingInfo;
 
+    // Validate items against catalog
+    const validatedItems = [];
     for (const item of items) {
-      const price = Number(item.product?.price);
-      const qty = Number(item.quantity);
-      if (isNaN(price) || price <= 0 || isNaN(qty) || qty <= 0) {
-        return { statusCode: 400, body: JSON.stringify({ error: 'Invalid item data' }) };
+      const slug = item.product?.slug;
+      const entry = catalog[slug];
+      if (!entry) {
+        return { statusCode: 400, body: JSON.stringify({ error: `Unknown product: ${slug || 'unknown'}` }) };
       }
+      const qty = Number(item.quantity);
+      if (isNaN(qty) || qty <= 0) {
+        return { statusCode: 400, body: JSON.stringify({ error: `Invalid quantity for ${slug}` }) };
+      }
+      if (entry.stock < qty) {
+        return { statusCode: 400, body: JSON.stringify({ error: `Insufficient stock for ${entry.name}: ${entry.stock} available, ${qty} requested` }) };
+      }
+      validatedItems.push({
+        product: { slug, name: entry.name, price: entry.price, images: item.product?.images || [] },
+        size: item.size || '',
+        quantity: qty,
+        pricePerUnit: entry.price,
+      });
     }
+    const safeItems = validatedItems;
 
     const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
     const orderId = 'BUK-' + Date.now().toString().slice(-6);
-    const { total } = calcServerTotal(items, shippingMethod);
+    const { subtotal, shipping, tax, total } = calcServerTotal(safeItems, shippingMethod);
 
-    const itemsList = items
-      .map((i) => `   ${i.quantity}× ${esc(i.product.name)} (${esc(i.size)}) — $${(Number(i.product.price) * Number(i.quantity)).toFixed(2)}`)
+    const itemsList = safeItems
+      .map((i) => `   ${i.quantity}× ${esc(i.product.name)} (${esc(i.size)}) — $${(i.pricePerUnit * i.quantity).toFixed(2)}`)
       .join('\n');
 
     const paymentLabel = paymentMethod === 'liqpay' ? '💳 LiqPay (очікує підтвердження)' : '💳 Оплата при отриманні';
@@ -81,7 +98,6 @@ exports.handler = async (event) => {
       `💰 <b>$${total.toFixed(2)}</b>`,
     ].filter(Boolean).join('\n');
 
-    // Telegram
     if (TOKEN && CHAT_ID) {
       try {
         const tgRes = await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
@@ -103,23 +119,23 @@ exports.handler = async (event) => {
       shipping_method: shippingMethod || 'standard',
       customer: { firstName: info.firstName, lastName: info.lastName, email, phone: info.phone },
       shipping: { address: info.address, apartment: info.apartment, city: info.city, country: info.country, postalCode: info.postalCode },
-      items: items.map((i) => ({ slug: i.product.slug, name: i.product.name, size: i.size, price: i.product.price, qty: i.quantity })),
-      subtotal: calcServerTotal(items, shippingMethod).subtotal,
-      shipping_cost: calcServerTotal(items, shippingMethod).shipping,
-      tax: calcServerTotal(items, shippingMethod).tax,
+      items: safeItems.map((i) => ({ slug: i.product.slug, name: i.product.name, size: i.size, price: i.pricePerUnit, qty: i.quantity })),
+      subtotal,
+      shipping_cost: shipping,
+      tax,
       total,
       created_at: new Date().toISOString(),
     }).catch(() => {});
 
     // Decrease stock
-    decreaseStock(items).catch(() => {});
+    decreaseStock(safeItems.map((i) => ({ product: { slug: i.product.slug }, quantity: i.quantity }))).catch(() => {});
 
     // Email
     if (email) {
       sendEmail({
         to: email,
         subject: `Замовлення #${orderId} підтверджено — BUKSY`,
-        html: orderConfirmationHtml({ orderId, items, total, shippingInfo: info }),
+        html: orderConfirmationHtml({ orderId, items: safeItems, total, shippingInfo: info }),
       }).catch(() => {});
     }
 

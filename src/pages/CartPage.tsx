@@ -82,11 +82,11 @@ export function CartPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="flex gap-6 p-6 border border-white/5 bg-ash"
+                className="flex gap-4 sm:gap-6 p-4 sm:p-6 border border-white/5 bg-ash"
               >
                 <Link
                   to={`/product/${item.product.slug}`}
-                  className="w-32 h-40 flex-shrink-0 overflow-hidden"
+                  className="w-24 h-32 sm:w-32 sm:h-40 flex-shrink-0 overflow-hidden"
                 >
                   <img
                     src={item.product.images[0]}
@@ -98,7 +98,7 @@ export function CartPage() {
                   <div>
                     <Link
                       to={`/product/${item.product.slug}`}
-                      className="font-heading text-lg tracking-wider hover:text-blood transition-colors duration-300"
+                      className="font-heading text-base sm:text-lg tracking-wider hover:text-blood transition-colors duration-300"
                     >
                       {item.product.name}
                     </Link>
@@ -120,7 +120,7 @@ export function CartPage() {
                         <Plus size={16} />
                       </button>
                     </div>
-                    <p className="font-mono text-xl text-white">
+                    <p className="font-mono text-lg sm:text-xl text-white">
                       {formatPrice(item.product.price * item.quantity)}
                     </p>
                   </div>

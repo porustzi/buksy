@@ -1,5 +1,7 @@
 const crypto = require('crypto');
 const { guard } = require('./_utils');
+const { saveOrder } = require('./_supabase');
+const catalog = require('./_catalog.json');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -19,23 +21,54 @@ exports.handler = async (event) => {
     const PUBLIC_KEY = process.env.LIQPAY_PUBLIC_KEY;
     const PRIVATE_KEY = process.env.LIQPAY_PRIVATE_KEY;
 
+    // Validate items against catalog
+    const validatedItems = [];
+    for (const item of items) {
+      const slug = item.product?.slug;
+      const entry = catalog[slug];
+      if (!entry) {
+        return { statusCode: 400, body: JSON.stringify({ error: `Unknown product: ${slug || 'unknown'}` }) };
+      }
+      const qty = Number(item.quantity);
+      if (isNaN(qty) || qty <= 0) {
+        return { statusCode: 400, body: JSON.stringify({ error: `Invalid quantity for ${slug}` }) };
+      }
+      if (entry.stock < qty) {
+        return { statusCode: 400, body: JSON.stringify({ error: `Insufficient stock for ${entry.name}` }) };
+      }
+      validatedItems.push({
+        slug,
+        name: entry.name,
+        size: item.size || '',
+        qty,
+        price: entry.price,
+      });
+    }
+
     if (!PUBLIC_KEY || !PRIVATE_KEY) {
       return {
         statusCode: 200,
-        body: JSON.stringify({
-          success: true,
-          mode: 'test',
-          message: 'LiqPay not configured — test mode',
-        }),
+        body: JSON.stringify({ success: true, mode: 'test', message: 'LiqPay not configured — test mode' }),
       };
     }
 
-    const serverTotal = items.reduce((s, i) => s + Number(i.product.price) * Number(i.quantity), 0);
+    const serverTotal = validatedItems.reduce((s, i) => s + i.price * i.qty, 0);
 
-    const description = items
-      .map((i) => `${i.product.name} ×${i.quantity}`)
+    const description = validatedItems
+      .map((i) => `${i.name} ×${i.qty}`)
       .join(', ')
       .slice(0, 255);
+
+    // Save order BEFORE redirecting to LiqPay
+    saveOrder({
+      order_id: orderId,
+      status: 'awaiting_payment',
+      payment_method: 'liqpay',
+      customer: { email: email || '' },
+      items: validatedItems.map((i) => ({ slug: i.slug, name: i.name, size: i.size, price: i.price, qty: i.qty })),
+      total: serverTotal,
+      created_at: new Date().toISOString(),
+    }).catch(() => {});
 
     const json = {
       version: 3,
@@ -50,7 +83,7 @@ exports.handler = async (event) => {
       info: JSON.stringify({
         orderId,
         email: email || '',
-        items: items.map((i) => ({ name: i.product.name, size: i.size, qty: i.quantity })),
+        items: validatedItems.map((i) => ({ slug: i.slug, name: i.name, size: i.size, qty: i.qty })),
       }),
     };
 

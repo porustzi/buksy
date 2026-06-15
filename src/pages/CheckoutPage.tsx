@@ -93,18 +93,11 @@ export function CheckoutPage() {
       });
       const lp = await res.json();
       if (lp.mode === 'test') {
-        // No LiqPay keys — fallback to test order
-        const orderRes = await fetch('/.netlify/functions/order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items, shippingInfo, total, paymentMethod: 'cod', shippingMethod }),
-        });
-        if (!orderRes.ok) throw new Error('Order failed');
-        const od = await orderRes.json();
-        setOrderId(od.orderId);
-        setIsComplete(true);
-        clearCart();
-      } else if (lp.data && lp.signature) {
+        setSubmitError('LiqPay не налаштовано. Зв яжіться з магазином.');
+        setIsProcessing(false);
+        return;
+      }
+      if (lp.data && lp.signature) {
         // Submit form to LiqPay
         const form = document.createElement('form');
         form.method = 'POST';
@@ -203,29 +196,19 @@ export function CheckoutPage() {
           </div>
         </div>
 
-        {/* Test Mode Banner */}
-        <div className="mb-8 p-4 border border-amber-500/30 bg-amber-500/5 text-center">
-          <p className="text-amber-400 font-heading text-sm tracking-wider">
-            🧪 {t('checkout.testModeTitle')}
-          </p>
-          <p className="text-amber-400/60 font-body text-xs mt-1">
-            {t('checkout.testModeDesc')}
-          </p>
-        </div>
-
         {/* Progress Steps */}
-        <div className="flex items-center justify-center mb-12">
+        <div className="flex items-center justify-center mb-8 sm:mb-12">
           {steps.map((s, index) => (
             <div key={s.id} className="flex items-center">
               <div
-                className={`flex items-center gap-2 ${
+                className={`flex items-center gap-1.5 sm:gap-2 ${
                   steps.findIndex((st) => st.id === step) >= index
                     ? 'text-blood'
                     : 'text-white/40'
                 }`}
               >
                 <div
-                  className={`w-8 h-8 rounded-full border flex items-center justify-center ${
+                  className={`w-8 h-8 rounded-full border flex items-center justify-center flex-shrink-0 ${
                     steps.findIndex((st) => st.id === step) > index
                       ? 'border-blood bg-blood text-white'
                       : step === s.id
@@ -239,11 +222,11 @@ export function CheckoutPage() {
                     <span className="font-mono text-sm">{index + 1}</span>
                   )}
                 </div>
-                <span className="font-body text-sm hidden sm:block">{t(s.nameKey)}</span>
+                <span className="font-body text-xs sm:text-sm hidden xs:inline">{t(s.nameKey)}</span>
               </div>
               {index < steps.length - 1 && (
                 <div
-                  className={`w-12 lg:w-24 h-px mx-4 ${
+                  className={`w-6 sm:w-12 lg:w-24 h-px mx-2 sm:mx-4 ${
                     steps.findIndex((st) => st.id === step) > index
                       ? 'bg-blood'
                       : 'bg-white/10'
@@ -470,48 +453,43 @@ export function CheckoutPage() {
                     <p className="text-red-400 text-sm font-body text-center">{submitError}</p>
                   )}
 
-                  <div className="space-y-2.5">
+                  <div className="space-y-3">
+                    {/* Primary: LiqPay */}
                     <button
                       onClick={handleLiqPay}
                       disabled={isProcessing}
-                      className="w-full py-4 bg-blood text-white font-heading text-sm tracking-wider hover:bg-blood/80 transition-colors duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="w-full py-4 bg-blood text-white font-heading text-sm tracking-wider hover:bg-blood/90 transition-colors duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
-                      {isProcessing ? '...' : <><CreditCard size={18} /> {t('checkout.liqPayButton')}</>}
+                      {isProcessing ? (
+                        <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <><CreditCard size={18} /> {t('checkout.liqPayButton')}</>
+                      )}
                     </button>
+
+                    {/* Secondary: COD */}
                     <button
                       onClick={handlePlaceOrder}
                       disabled={isProcessing}
-                      className="w-full py-3 border border-white/20 text-white/70 font-heading text-sm tracking-wider hover:border-white/50 hover:text-white transition-colors duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="w-full py-3.5 border border-white/20 text-white/70 font-heading text-sm tracking-wider hover:border-white/50 hover:text-white transition-colors duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
                     >
                       {isProcessing ? '...' : <><Lock size={16} /> {t('checkout.submitOrder')}</>}
                     </button>
-                      <button
-                        onClick={async () => {
-                          if (!validateInformation()) { setStep('information'); return; }
-                          setIsProcessing(true); setSubmitError('');
-                        try {
-                          const r = await fetch('/.netlify/functions/order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items, shippingInfo, total, paymentMethod: 'cod' }) });
-                          if (!r.ok) throw new Error('Order failed');
-                          const d = await r.json();
-                          setOrderId(d.orderId);
-                          setIsComplete(true); clearCart();
-                        } catch { setSubmitError(t('checkout.orderError') || 'Failed'); }
-                        finally { setIsProcessing(false); }
-                      }}
-                      disabled={isProcessing}
-                      className="w-full py-2 text-amber-400/60 font-body text-xs hover:text-amber-400 transition-colors disabled:opacity-30"
-                    >
-                      {isProcessing ? '...' : '🧪 ' + t('checkout.skipPaymentTest')}
-                    </button>
                   </div>
 
-                  <div className="flex items-center justify-center gap-4 text-white/30 text-xs font-body">
-                    <span className="flex items-center gap-1"><Shield size={12} /> SSL</span>
-                    <span>LiqPay</span>
+                  <div className="flex items-center justify-center gap-6 pt-2 text-white/20 text-xs font-body">
+                    <span className="flex items-center gap-1.5">
+                      <Shield size={14} />
+                      SSL захист
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <CreditCard size={14} />
+                      LiqPay
+                    </span>
                   </div>
 
-                  <button onClick={() => setStep('shipping')} className="btn-secondary w-full">
-                    {t('checkout.back2')}
+                  <button onClick={() => setStep('shipping')} className="w-full py-3 border border-white/5 text-white/40 font-body text-sm hover:text-white hover:border-white/20 transition-colors duration-300">
+                    ← {t('checkout.back2')}
                   </button>
                 </div>
               )}

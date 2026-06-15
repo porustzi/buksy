@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShoppingBag, Menu, X, Search, User } from 'lucide-react';
@@ -21,6 +21,13 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState('');
   const { toggleCart, totalItems } = useCart();
   const navigate = useNavigate();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isSearchOpen && searchInputRef.current) {
+      setTimeout(() => searchInputRef.current?.focus(), 100);
+    }
+  }, [isSearchOpen]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,6 +135,7 @@ export function Header() {
                 <ShoppingBag size={20} />
                 {totalItems > 0 && (
                   <motion.span
+                    key={totalItems}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     className="absolute -top-1 -right-1 w-5 h-5 bg-blood rounded-full flex items-center justify-center text-xs font-medium"
@@ -216,11 +224,11 @@ export function Header() {
                 <div className="relative">
                   <Search size={24} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" />
                   <input
+                    ref={searchInputRef}
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={t('header.searchProducts')}
-                    autoFocus
                     className="w-full px-6 py-5 pl-14 bg-ash border border-white/10 text-white text-lg placeholder:text-white/30 focus:outline-none focus:border-blood/50 transition-colors duration-300 font-body"
                   />
                 </div>

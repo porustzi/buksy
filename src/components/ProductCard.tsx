@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Product } from '../types';
 import { useCart } from '../store/CartContext';
 import { formatPrice } from '../data/settings';
+import { createToast } from './Toast';
 
 
 interface ProductCardProps {
@@ -22,6 +23,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
     e.preventDefault();
     e.stopPropagation();
     addItem(product, firstAvailableSize);
+    createToast(`${product.name} (${firstAvailableSize}) — додано в кошик`);
   };
 
   const handleQuickView = (e: React.MouseEvent) => {
@@ -45,6 +47,10 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
             src={product.images[0]}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            loading="lazy"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
           />
 
           {/* Hover Image */}

@@ -30,6 +30,24 @@ async function updateOrderStatus(orderId, updates) {
   return !error;
 }
 
+async function markOrderPaid(orderId, paymentId) {
+  const supabase = getClient();
+  if (!supabase) return false;
+  const { data, error } = await supabase
+    .from('orders')
+    .update({ status: 'paid', payment_id: paymentId, paid_at: new Date().toISOString() })
+    .eq('order_id', orderId)
+    .neq('status', 'paid')
+    .select('id')
+    .single();
+  if (error) {
+    if (error.code === 'PGRST116') return false; // no rows = already paid
+    console.error('Supabase markOrderPaid error:', error.message);
+    return false;
+  }
+  return !!data;
+}
+
 async function decreaseStock(items) {
   const supabase = getClient();
   if (!supabase) return;
@@ -42,4 +60,4 @@ async function decreaseStock(items) {
   }
 }
 
-module.exports = { saveOrder, updateOrderStatus, decreaseStock };
+module.exports = { saveOrder, updateOrderStatus, markOrderPaid, decreaseStock };

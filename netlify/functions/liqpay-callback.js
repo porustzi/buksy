@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const { esc } = require('./_utils');
-const { updateOrderStatus, decreaseStock } = require('./_supabase');
+const { markOrderPaid, decreaseStock } = require('./_supabase');
 const { sendEmail, paymentConfirmedHtml } = require('./_email');
 
 exports.handler = async (event) => {
@@ -65,20 +65,19 @@ exports.handler = async (event) => {
         }
       }
 
-      // Update order status
-      updateOrderStatus(payment.order_id, {
-        status: 'paid',
-        payment_id: payment.payment_id,
-        paid_at: new Date().toISOString(),
-      }).catch(() => {});
+      // Mark order as paid (idempotent — ignores if already paid)
+      const wasPaid = await markOrderPaid(payment.order_id, payment.payment_id);
+      if (!wasPaid) {
+        return { statusCode: 200, body: 'OK' }; // duplicate callback, skip
+      }
 
-      // Decrease stock on payment
+      // Decrease stock on payment confirmation
       if (info.items && info.items.length) {
-        decreaseStock(info.items.map((i) => ({ product: { slug: i.name?.toLowerCase().replace(/\s+/g, '-') }, quantity: i.qty }))).catch(() => {});
+        decreaseStock(info.items.map((i) => ({ product: { slug: i.slug }, quantity: i.qty }))).catch(() => {});
       }
 
       // Email customer
-      const customerEmail = info.customer?.email || info.email;
+      const customerEmail = info.email;
       if (customerEmail) {
         sendEmail({
           to: customerEmail,
@@ -92,6 +91,8 @@ exports.handler = async (event) => {
           }),
         }).catch(() => {});
       }
+
+      return { statusCode: 200, body: 'OK' };
     }
 
     return { statusCode: 200, body: 'OK' };

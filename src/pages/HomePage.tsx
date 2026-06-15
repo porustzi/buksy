@@ -29,9 +29,9 @@ export function HomePage() {
             <p className="font-heading text-sm tracking-[0.4em] text-blood mb-4">{hero.tagline}</p>
             <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-light text-white leading-tight mb-6">{hero.title1}<br /><span className="text-blood">{hero.title2}</span></h1>
             <p className="text-lg text-white/70 leading-relaxed mb-10 max-w-lg">{hero.description}</p>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="flex flex-wrap gap-4">
-              <Link to="/shop" className="btn-primary flex items-center gap-3">{hero.shopNow}<ArrowRight size={18} /></Link>
-              <Link to="/about" className="btn-secondary">{hero.ourStory}</Link>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="flex flex-col sm:flex-row gap-4">
+              <Link to="/shop" className="btn-primary flex items-center justify-center gap-3">{hero.shopNow}<ArrowRight size={18} /></Link>
+              <Link to="/about" className="btn-secondary text-center">{hero.ourStory}</Link>
             </motion.div>
           </motion.div>
         </div>

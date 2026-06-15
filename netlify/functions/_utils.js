@@ -4,8 +4,19 @@ function esc(s) {
 }
 
 const rateMap = new Map();
+let lastCleanup = Date.now();
+
+function cleanupRateMap() {
+  const now = Date.now();
+  if (now - lastCleanup < 60000) return;
+  lastCleanup = now;
+  for (const [ip, entry] of rateMap) {
+    if (now - entry.ts > 120000) rateMap.delete(ip);
+  }
+}
 
 function rateLimit(ip, maxPerMin = 10) {
+  cleanupRateMap();
   const now = Date.now();
   const entry = rateMap.get(ip);
   if (!entry || now - entry.ts > 60000) {

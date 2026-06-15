@@ -20,6 +20,7 @@ import { ProductCard } from '../components/ProductCard';
 import { useCart } from '../store/CartContext';
 import { useSeo } from '../hooks/useSeo';
 import { formatPrice } from '../data/settings';
+import { createToast } from '../components/Toast';
 
 export function ProductPage() {
   const { t } = useTranslation();
@@ -75,6 +76,7 @@ export function ProductPage() {
     if (size) {
       addItem(product, size, quantity);
       setIsAddedToCart(true);
+      createToast(`${quantity}× ${product.name} — додано в кошик`);
       if (addedTimerRef.current) clearTimeout(addedTimerRef.current);
       addedTimerRef.current = setTimeout(() => setIsAddedToCart(false), 2000);
     }
@@ -259,20 +261,35 @@ export function ProductPage() {
             </div>
 
             {/* Quantity & Add to Cart */}
-            <div className="flex gap-4 pt-4">
-              <div className="flex items-center border border-white/20">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center border border-white/20">
+                  <button
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="p-3 text-white/60 hover:text-white transition-colors"
+                  >
+                    <Minus size={18} />
+                  </button>
+                  <span className="w-12 text-center font-mono">{quantity}</span>
+                  <button
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="p-3 text-white/60 hover:text-white transition-colors"
+                  >
+                    <Plus size={18} />
+                  </button>
+                </div>
                 <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="p-3 text-white/60 hover:text-white transition-colors"
+                  onClick={() => {
+                    const url = window.location.href;
+                    if (navigator.share) {
+                      void navigator.share({ title: product.name, url });
+                    } else {
+                      void navigator.clipboard.writeText(url);
+                    }
+                  }}
+                  className="p-3 border border-white/10 text-white/60 hover:border-blood hover:text-blood transition-all duration-300 sm:hidden"
                 >
-                  <Minus size={18} />
-                </button>
-                <span className="w-12 text-center font-mono">{quantity}</span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="p-3 text-white/60 hover:text-white transition-colors"
-                >
-                  <Plus size={18} />
+                  <Share2 size={20} />
                 </button>
               </div>
               <motion.button
@@ -300,7 +317,7 @@ export function ProductPage() {
                     void navigator.clipboard.writeText(url);
                   }
                 }}
-                className="p-4 border border-white/10 text-white/60 hover:border-blood hover:text-blood transition-all duration-300"
+                className="p-4 border border-white/10 text-white/60 hover:border-blood hover:text-blood transition-all duration-300 hidden sm:block"
               >
                 <Share2 size={20} />
               </button>

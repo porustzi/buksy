@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
 import { CartItem, Product } from '../types';
+import { products as allProducts } from '../data/products';
 
 interface CartState {
   items: CartItem[];
@@ -29,6 +30,23 @@ interface CartContextType extends CartState {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'buksy_cart';
+
+interface StoredItem { slug: string; size: string; quantity: number; }
+
+function toStored(items: CartItem[]): StoredItem[] {
+  return items.map((i) => ({ slug: i.product.slug, size: i.size, quantity: i.quantity }));
+}
+
+function fromStored(stored: StoredItem[]): CartItem[] {
+  const result: CartItem[] = [];
+  for (const s of stored) {
+    const product = allProducts.find((p) => p.slug === s.slug);
+    if (product) {
+      result.push({ product, size: s.size, quantity: s.quantity });
+    }
+  }
+  return result;
+}
 
 const cartReducer = (state: CartState, action: CartAction): CartState => {
   switch (action.type) {
@@ -97,26 +115,27 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, { items: [], isOpen: false });
 
-  // Load cart from localStorage on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem(STORAGE_KEY);
-    if (savedCart) {
-      try {
-        const parsed = JSON.parse(savedCart);
-        if (Array.isArray(parsed)) {
-          dispatch({ type: 'LOAD_CART', items: parsed });
-        } else {
-          localStorage.removeItem(STORAGE_KEY);
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed: StoredItem[] = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const restored = fromStored(parsed);
+          if (restored.length > 0) {
+            dispatch({ type: 'LOAD_CART', items: restored });
+          } else {
+            localStorage.removeItem(STORAGE_KEY);
+          }
         }
-      } catch {
-        localStorage.removeItem(STORAGE_KEY);
       }
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
     }
   }, []);
 
-  // Save cart to localStorage whenever items change
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.items));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toStored(state.items)));
   }, [state.items]);
 
   const addItem = (product: Product, size: string, quantity = 1) => {
