@@ -94,7 +94,7 @@ export function CheckoutPage() {
       });
       const data = await res.json();
       if (data.error) {
-        setSubmitError(data.error);
+        setSubmitError(data.error + (data.monoError ? '\n\n' + data.monoError : ''));
         setIsProcessing(false);
         return;
       }

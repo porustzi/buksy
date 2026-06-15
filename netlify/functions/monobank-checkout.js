@@ -112,7 +112,11 @@ exports.handler = async (event) => {
     if (!monoRes.ok) {
       const errText = await monoRes.text();
       console.error('Monobank invoice failed:', monoRes.status, errText);
-      return { statusCode: 502, body: JSON.stringify({ error: 'Не вдалося створити платіж' }) };
+      let msg = 'Монобанк: ';
+      if (monoRes.status === 403) msg = msg + 'невірний токен (403)';
+      else if (monoRes.status === 400) msg = msg + 'помилка в даних (400)';
+      else msg = msg + 'помилка ' + monoRes.status;
+      return { statusCode: 502, body: JSON.stringify({ error: msg, monoError: errText.slice(0, 200) }) };
     }
 
     const monoData = await monoRes.json();
