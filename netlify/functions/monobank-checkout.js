@@ -39,6 +39,7 @@ exports.handler = async (event) => {
     }
 
     if (!MONOBANK_TOKEN) {
+      console.error('[Monobank] MONOBANK_TOKEN env var not set');
       return {
         statusCode: 200,
         body: JSON.stringify({ error: 'Monobank не налаштовано' }),
