@@ -75,15 +75,12 @@ export function Header() {
             {/* Logo */}
             <Link to="/" className="relative z-10">
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="flex items-center gap-2"
+                whileHover={{ scale: 1.1 }}
+                className="flex items-center"
               >
-                <div className="w-14 h-14 relative">
+                <div className="w-16 h-16 relative">
                   <img src="/logo.png" alt="BUKSY" className="w-full h-full object-contain brightness-0 invert" />
                 </div>
-                <span className="font-heading text-2xl tracking-[0.2em] text-white">
-                  BUKSY
-                </span>
               </motion.div>
             </Link>
 

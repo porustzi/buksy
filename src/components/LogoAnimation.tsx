@@ -12,9 +12,9 @@ export function LogoAnimation({ onComplete }: LogoAnimationProps) {
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setPhase('pulse'), 800),
-      setTimeout(() => setPhase('fade'), 1600),
-      setTimeout(() => onCompleteRef.current(), 2200),
+      setTimeout(() => setPhase('pulse'), 900),
+      setTimeout(() => setPhase('fade'), 2000),
+      setTimeout(() => onCompleteRef.current(), 2800),
     ];
     return () => timers.forEach(clearTimeout);
   }, []);
@@ -25,25 +25,34 @@ export function LogoAnimation({ onComplete }: LogoAnimationProps) {
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.6, ease: 'easeInOut' }}
+          transition={{ duration: 0.8, ease: 'easeInOut' }}
           className="fixed inset-0 z-[100] bg-noir flex items-center justify-center"
         >
           <div className="relative">
-            {/* Animated rings */}
+            {/* Glow behind logo */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 0.15, 0] }}
+              transition={{ duration: 2.5, ease: 'easeInOut' }}
+              className="absolute inset-0 rounded-full blur-3xl bg-blood"
+              style={{ width: 250, height: 250, left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
+            />
+
+            {/* Pulsing rings */}
             {phase === 'pulse' && (
               <>
-                {[...Array(3)].map((_, i) => (
+                {[...Array(4)].map((_, i) => (
                   <motion.div
                     key={i}
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 2, opacity: 0 }}
+                    initial={{ scale: 0.3, opacity: 0.6 }}
+                    animate={{ scale: 2.2, opacity: 0 }}
                     transition={{
-                      duration: 1.2,
-                      delay: i * 0.2,
+                      duration: 1.5,
+                      delay: i * 0.25,
                       ease: 'easeOut',
                     }}
-                    className="absolute inset-0 border border-blood/30 rounded-full"
-                    style={{ width: 120, height: 120 }}
+                    className="absolute border border-blood/40 rounded-full"
+                    style={{ width: 180, height: 180, left: '50%', top: '50%', transform: 'translate(-50%, -50%)' }}
                   />
                 ))}
               </>
@@ -51,53 +60,33 @@ export function LogoAnimation({ onComplete }: LogoAnimationProps) {
 
             {/* Logo */}
             <motion.div
-              initial={{ scale: 0.8, rotateY: 90, opacity: 0 }}
-              animate={{
-                scale: 1,
-                rotateY: 0,
-                opacity: 1,
-              }}
-              transition={{
-                duration: 0.8,
-                ease: [0.16, 1, 0.3, 1],
-              }}
+              initial={{ scale: 0.6, rotateY: 90, opacity: 0 }}
+              animate={{ scale: 1, rotateY: 0, opacity: 1 }}
+              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
               className="relative"
             >
-              <div className="w-[120px] h-[120px] overflow-hidden">
+              <motion.div
+                animate={{ scale: phase === 'pulse' ? [1, 1.04, 1] : 1 }}
+                transition={{ duration: 0.8, repeat: phase === 'pulse' ? 1 : 0 }}
+                className="w-[180px] h-[180px] overflow-hidden"
+              >
                 <motion.img
                   src="/logo.png"
                   alt="BUKSY"
                   className="w-full h-full object-contain brightness-0 invert"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6, delay: 0.3 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
                 />
-              </div>
-
-
-            </motion.div>
-
-            {/* Brand name */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.5 }}
-              className="absolute -bottom-12 left-1/2 -translate-x-1/2 whitespace-nowrap"
-            >
-              <span
-                className="font-heading text-2xl tracking-[0.4em] text-blood"
-                style={{ textShadow: '0 0 20px rgba(177, 0, 6, 0.5)' }}
-              >
-                BUKSY
-              </span>
+              </motion.div>
             </motion.div>
           </div>
 
           {/* Corner accents */}
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.1 }}
-            className="absolute top-8 right-8 w-32 h-32"
+            animate={{ opacity: 0.08 }}
+            className="absolute top-8 right-8 w-40 h-40"
           >
             <svg viewBox="0 0 100 100" className="w-full h-full">
               <path d="M0 0 L100 0 L100 100" fill="none" stroke="#B10006" strokeWidth="1" />
@@ -105,8 +94,8 @@ export function LogoAnimation({ onComplete }: LogoAnimationProps) {
           </motion.div>
           <motion.div
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.1 }}
-            className="absolute bottom-8 left-8 w-32 h-32"
+            animate={{ opacity: 0.08 }}
+            className="absolute bottom-8 left-8 w-40 h-40"
           >
             <svg viewBox="0 0 100 100" className="w-full h-full">
               <path d="M100 100 L0 100 L0 0" fill="none" stroke="#B10006" strokeWidth="1" />

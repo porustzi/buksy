@@ -175,8 +175,10 @@ export function CheckoutPage() {
             <ArrowLeft size={18} />
             <span className="font-body text-sm">{t('checkout.returnToCart')}</span>
           </Link>
-          <Link to="/" className="font-heading text-2xl tracking-[0.2em] text-blood">
-            BUKSY
+          <Link to="/" className="flex items-center">
+            <div className="w-12 h-12">
+              <img src="/logo.png" alt="BUKSY" className="w-full h-full object-contain brightness-0 invert" />
+            </div>
           </Link>
           <div className="flex items-center gap-2 text-white/40">
             <Lock size={14} />
