@@ -55,8 +55,12 @@ async function decreaseStock(items) {
     const slug = item.product?.slug;
     const qty = Number(item.quantity) || 0;
     if (!slug || qty <= 0) continue;
+    // Ensure product exists in inventory (insert with default stock if missing)
+    await supabase.from('inventory')
+      .upsert({ slug, name: slug, stock: 99, updated_at: new Date().toISOString() }, { onConflict: 'slug', ignoreDuplicates: true })
+      .then(function () {}, function () {});
     const { error } = await supabase.rpc('decrease_stock', { product_slug: slug, qty });
-    if (error) console.error(`Stock decrease failed for ${slug}:`, error.message);
+    if (error) console.error('Stock decrease failed for ' + slug + ':', error.message);
   }
 }
 

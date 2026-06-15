@@ -1,4 +1,5 @@
 -- Run this in your Supabase SQL Editor to set up the database.
+-- If updating an existing install, just re-run the FUNCTION part at the bottom.
 
 -- Orders table
 CREATE TABLE IF NOT EXISTS orders (
@@ -21,11 +22,10 @@ CREATE TABLE IF NOT EXISTS orders (
   shipped_at TIMESTAMPTZ
 );
 
--- Index for lookups
 CREATE INDEX IF NOT EXISTS idx_orders_order_id ON orders(order_id);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 
--- Products (inventory) table
+-- Inventory table
 CREATE TABLE IF NOT EXISTS inventory (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   slug TEXT NOT NULL UNIQUE,
@@ -36,10 +36,14 @@ CREATE TABLE IF NOT EXISTS inventory (
 
 CREATE INDEX IF NOT EXISTS idx_inventory_slug ON inventory(slug);
 
--- Decrease stock function
+-- Decrease stock (idempotent: creates product row if missing)
 CREATE OR REPLACE FUNCTION decrease_stock(product_slug TEXT, qty INTEGER)
 RETURNS VOID AS $$
 BEGIN
+  INSERT INTO inventory (slug, name, stock)
+  VALUES (product_slug, product_slug, 99)
+  ON CONFLICT (slug) DO NOTHING;
+
   UPDATE inventory
   SET stock = GREATEST(stock - qty, 0),
       updated_at = NOW()
@@ -47,13 +51,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Seed inventory from existing products
--- INSERT INTO inventory (slug, name, stock) VALUES ('test-product', 'Test Product', 99) ON CONFLICT (slug) DO NOTHING;
-
--- Enable Row Level Security (optional — keeps data safe)
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE inventory ENABLE ROW LEVEL SECURITY;
 
--- Allow service_role full access (for Netlify functions)
 CREATE POLICY service_orders ON orders FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY service_inventory ON inventory FOR ALL USING (true) WITH CHECK (true);
