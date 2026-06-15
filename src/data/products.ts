@@ -49,7 +49,8 @@ export const products: Product[] = [
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNSBVIxZdE6aOq2cDsSGp3nPgX1BTIu9CPjw&s",
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNSBVIxZdE6aOq2cDsSGp3nPgX1BTIu9CPjw&s"
     ],
-    "reviewCount": 1
+    "reviewCount": 1,
+    "stock": 99
   }
 ];
 

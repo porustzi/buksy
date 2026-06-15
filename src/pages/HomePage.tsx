@@ -5,9 +5,11 @@ import { useTranslation } from 'react-i18next';
 import { products } from '../data/products';
 import { homepage } from '../data/content';
 import { ProductCard } from '../components/ProductCard';
+import { useSeo } from '../hooks/useSeo';
 
 export function HomePage() {
   const { t } = useTranslation();
+  useSeo({ title: 'Преміальний темний стрітвір' });
   const featuredProducts = products.filter((p) => p.isFeatured);
   const bestsellers = products.filter((p) => p.isBestseller);
   const hero = homepage.hero || {};
@@ -71,7 +73,7 @@ export function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12"><p className="section-subtitle mb-3">{coll.tagline}</p><h2 className="section-title">{coll.title} <span className="text-blood">.</span></h2></motion.div>
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-            {[{ nameKey: 'shop.categoryHoodies', slug: 'hoodies', image: products.find(p => p.category === 'hoodies')?.images[0] },{ nameKey: 'shop.categoryTShirts', slug: 't-shirts', image: products.find(p => p.category === 't-shirts')?.images[0] },{ nameKey: 'shop.categoryJackets', slug: 'jackets', image: products.find(p => p.category === 'jackets')?.images[0] },{ nameKey: 'shop.categoryPants', slug: 'pants', image: products.find(p => p.category === 'pants')?.images[0] },{ nameKey: 'shop.categoryAccessories', slug: 'accessories', image: products.find(p => p.category === 'accessories')?.images[0] },{ nameKey: 'shop.categoryFootwear', slug: 'footwear', image: products.find(p => p.category === 'footwear')?.images[0] }].map((cat, i) => (
+            {[{ nameKey: 'shop.categoryHoodies', slug: 'hoodies', image: products.find(p => p.category === 'hoodies')?.images[0] || '' },{ nameKey: 'shop.categoryTShirts', slug: 't-shirts', image: products.find(p => p.category === 't-shirts')?.images[0] || '' },{ nameKey: 'shop.categoryJackets', slug: 'jackets', image: products.find(p => p.category === 'jackets')?.images[0] || '' },{ nameKey: 'shop.categoryPants', slug: 'pants', image: products.find(p => p.category === 'pants')?.images[0] || '' },{ nameKey: 'shop.categoryAccessories', slug: 'accessories', image: products.find(p => p.category === 'accessories')?.images[0] || '' },{ nameKey: 'shop.categoryFootwear', slug: 'footwear', image: products.find(p => p.category === 'footwear')?.images[0] || '' }].map((cat, i) => (
               <motion.div key={cat.slug} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
                 <Link to={`/shop?category=${cat.slug}`} className="group relative block aspect-[4/3] overflow-hidden bg-noir"><img src={cat.image} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" /><div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/40 to-transparent" /><div className="absolute bottom-4 left-4 right-4"><h3 className="font-heading text-lg tracking-[0.2em] text-white group-hover:text-blood transition-colors duration-300">{t(cat.nameKey).toUpperCase()}</h3></div></Link>
               </motion.div>))}

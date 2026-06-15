@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { aboutPage } from '../data/content';
+import { useSeo } from '../hooks/useSeo';
 
 export function AboutPage() {
-  const { t } = useTranslation();
   const hero = aboutPage.hero || {};
+  useSeo({ title: hero.tagline || 'Про нас', description: hero.title1 });
   const phil = aboutPage.philosophy || {};
   const vals = aboutPage.values || {};
   const at = aboutPage.atelier || {};
@@ -41,7 +41,7 @@ export function AboutPage() {
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
             <p className="section-subtitle mb-3">{vals.tagline}</p><h2 className="section-title">{vals.title} <span className="text-blood">.</span></h2>
           </motion.div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">{(vals.items || []).map((v: any, i: number) => (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">{(vals.items || []).map((v: { title: string; description: string }, i: number) => (
             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="group p-6 border border-white/5 hover:border-blood/30 transition-colors duration-500">
               <span className="font-mono text-blood text-sm mb-4 block">0{i + 1}</span><h3 className="font-heading text-lg tracking-wider mb-3 group-hover:text-blood transition-colors duration-300">{v.title}</h3><p className="text-white/60 font-body text-sm leading-relaxed">{v.description}</p>
             </motion.div>))}</div>
@@ -63,7 +63,7 @@ export function AboutPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16"><p className="section-subtitle mb-3">{tl.tagline}</p><h2 className="section-title">{tl.title} <span className="text-blood">.</span></h2></motion.div>
           <div className="relative"><div className="absolute left-1/2 top-0 bottom-0 w-px bg-blood/20 hidden md:block" />
-            <div className="space-y-12">{(tl.events || []).map((item: any, i: number) => (
+            <div className="space-y-12">{(tl.events || []).map((item: { year: string; event: string }, i: number) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="flex flex-col md:flex-row items-center gap-6">
                 <div className={`flex-1 text-center ${i % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>{i % 2 === 0 ? (<><span className="font-mono text-blood text-3xl">{item.year}</span><h4 className="font-heading text-lg mt-2">{item.event}</h4></>) : <div className="hidden md:block" />}</div>
                 <div className="w-4 h-4 bg-blood rounded-full relative z-10 hidden md:block flex-shrink-0" />

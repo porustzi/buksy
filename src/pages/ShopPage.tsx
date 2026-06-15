@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { products, categories } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
 import { useSearchParams } from 'react-router-dom';
+import { useSeo } from '../hooks/useSeo';
 
 const sortOptions = [
   { value: 'featured', labelKey: 'shop.sortFeatured' },
@@ -26,6 +27,7 @@ const categoryKeys: Record<string, string> = {
 
 export function ShopPage() {
   const { t } = useTranslation();
+  useSeo({ title: t('shop.theShop'), description: t('shop.theCollection') });
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || 'all';
   const searchQuery = searchParams.get('q') || '';
@@ -75,12 +77,13 @@ export function ShopPage() {
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
+    const next = new URLSearchParams(searchParams);
     if (categoryId === 'all') {
-      searchParams.delete('category');
+      next.delete('category');
     } else {
-      searchParams.set('category', categoryId);
+      next.set('category', categoryId);
     }
-    setSearchParams(searchParams);
+    setSearchParams(next);
     setIsFilterOpen(false);
   };
 
@@ -183,8 +186,9 @@ export function ShopPage() {
                 "{searchQuery}"
                 <button
                   onClick={() => {
-                    searchParams.delete('q');
-                    setSearchParams(searchParams);
+                    const next = new URLSearchParams(searchParams);
+                    next.delete('q');
+                    setSearchParams(next);
                   }}
                   className="hover:text-white transition-colors duration-200"
                 >

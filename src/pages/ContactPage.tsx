@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone, Send, Instagram, Twitter, Youtube } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { contactInfo } from '../data/content';
+import { useSeo } from '../hooks/useSeo';
 
 export function ContactPage() {
-  const { t } = useTranslation();
   const hero = contactInfo.hero || {};
+  useSeo({ title: hero.title || 'Контакти', description: hero.tagline });
   const form = contactInfo.form || {};
   const info = contactInfo.info || {};
   const soc = contactInfo.social || {};
@@ -15,14 +15,18 @@ export function ContactPage() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); setIsSubmitting(true);
+    e.preventDefault(); setIsSubmitting(true); setSubmitError('');
     try {
-      await fetch('/.netlify/functions/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) });
+      const res = await fetch('/.netlify/functions/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) });
+      if (!res.ok) throw new Error('Failed');
       setIsSubmitted(true); setFormData({ name: '', email: '', subject: '', message: '' });
-    } catch { setIsSubmitted(true); }
-    finally { setIsSubmitting(false); }
+    } catch (err) {
+      console.error('Contact form error:', err);
+      setSubmitError('Сталася помилка. Спробуйте ще раз.');
+    } finally { setIsSubmitting(false); }
   };
 
   return (
@@ -38,6 +42,8 @@ export function ContactPage() {
               <h3 className="font-heading text-xl text-center mb-2">{form.successTitle}</h3><p className="text-white/60 text-center font-body">{form.successText}</p>
             </motion.div>
           ) : (
+            <>
+            {submitError && <div className="p-3 border border-red-500/30 bg-red-500/5 text-red-400 font-body text-sm text-center">{submitError}</div>}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid sm:grid-cols-2 gap-6">
                 <div><label className="block font-body text-sm text-white/60 mb-2">{form.nameLabel}</label><input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required className="w-full px-4 py-3 bg-ash border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-blood/50 transition-colors duration-300" placeholder={form.namePlaceholder} /></div>
@@ -46,11 +52,12 @@ export function ContactPage() {
               <div><label className="block font-body text-sm text-white/60 mb-2">{form.subjectLabel}</label>
                 <select value={formData.subject} onChange={(e) => setFormData({ ...formData, subject: e.target.value })} required className="w-full px-4 py-3 bg-ash border border-white/10 text-white focus:outline-none focus:border-blood/50 transition-colors duration-300 appearance-none">
                   <option value="" className="bg-noir">{form.subjectPlaceholder}</option>
-                  {(form.subjectOptions || []).map((opt: any) => (<option key={opt.value} value={opt.value} className="bg-noir">{opt.label}</option>))}
+                  {(form.subjectOptions || []).map((opt: { value: string; label: string }) => (<option key={opt.value} value={opt.value} className="bg-noir">{opt.label}</option>))}
                 </select></div>
               <div><label className="block font-body text-sm text-white/60 mb-2">{form.messageLabel}</label><textarea value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} required rows={6} className="w-full px-4 py-3 bg-ash border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-blood/50 transition-colors duration-300 resize-none" placeholder={form.messagePlaceholder} /></div>
               <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} type="submit" disabled={isSubmitting} className="btn-primary w-full flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed">{isSubmitting ? '...' : form.submitButton}<Send size={18} /></motion.button>
             </form>
+            </>
           )}
         </motion.div>
 
@@ -67,7 +74,7 @@ export function ContactPage() {
 
       <section className="py-24 bg-ash"><div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12"><p className="section-subtitle mb-3">{faq.tagline}</p><h2 className="section-title">{faq.title} <span className="text-blood">.</span></h2></motion.div>
-        <div className="space-y-4">{(faq.items || []).map((item: any, i: number) => (
+        <div className="space-y-4">{(faq.items || []).map((item: { question: string; answer: string }, i: number) => (
           <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="border border-white/5">
             <button onClick={() => setExpandedFaq(expandedFaq === i ? null : i)} className="w-full flex items-center justify-between p-6 text-left hover:bg-white/[0.02] transition-colors duration-300"><span className="font-heading text-sm tracking-wider pr-8">{item.question}</span><motion.span animate={{ rotate: expandedFaq === i ? 45 : 0 }} className="text-blood text-2xl font-light">+</motion.span></button>
             <motion.div initial={false} animate={{ height: expandedFaq === i ? 'auto' : 0, opacity: expandedFaq === i ? 1 : 0 }} transition={{ duration: 0.3 }} className="overflow-hidden"><div className="px-6 pb-6 pt-0"><p className="text-white/60 font-body text-sm leading-relaxed">{item.answer}</p></div></motion.div>

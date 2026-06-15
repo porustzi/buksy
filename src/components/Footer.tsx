@@ -33,9 +33,9 @@ export function Footer() {
               <a href={f.social?.youtube} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Youtube size={18} /></a>
             </div>
           </div>
-          <div><h4 className="font-heading text-sm tracking-[0.3em] mb-6 text-white/40">{f.navigation?.title}</h4><ul className="space-y-3">{(f.navigation?.links || []).map((l: any) => (<li key={l.href}><Link to={l.href} className="text-white/70 hover:text-blood transition-colors duration-300 font-body">{l.name}</Link></li>))}</ul></div>
-          <div><h4 className="font-heading text-sm tracking-[0.3em] mb-6 text-white/40">{f.support?.title}</h4><ul className="space-y-3">{(f.support?.links || []).map((l: any) => (<li key={l.href}><Link to={l.href} className="text-white/70 hover:text-blood transition-colors duration-300 font-body">{l.name}</Link></li>))}</ul></div>
-          <div><h4 className="font-heading text-sm tracking-[0.3em] mb-6 text-white/40">{f.legal?.title}</h4><ul className="space-y-3">{(f.legal?.links || []).map((l: any) => (<li key={l.href}><Link to={l.href} className="text-white/70 hover:text-blood transition-colors duration-300 font-body">{l.name}</Link></li>))}</ul></div>
+          <div><h4 className="font-heading text-sm tracking-[0.3em] mb-6 text-white/40">{f.navigation?.title}</h4><ul className="space-y-3">{(f.navigation?.links || []).map((l: { name: string; href: string }) => (<li key={l.href}><Link to={l.href} className="text-white/70 hover:text-blood transition-colors duration-300 font-body">{l.name}</Link></li>))}</ul></div>
+          <div><h4 className="font-heading text-sm tracking-[0.3em] mb-6 text-white/40">{f.support?.title}</h4><ul className="space-y-3">{(f.support?.links || []).map((l: { name: string; href: string }) => (<li key={l.href}><Link to={l.href} className="text-white/70 hover:text-blood transition-colors duration-300 font-body">{l.name}</Link></li>))}</ul></div>
+          <div><h4 className="font-heading text-sm tracking-[0.3em] mb-6 text-white/40">{f.legal?.title}</h4><ul className="space-y-3">{(f.legal?.links || []).map((l: { name: string; href: string }) => (<li key={l.href}><Link to={l.href} className="text-white/70 hover:text-blood transition-colors duration-300 font-body">{l.name}</Link></li>))}</ul></div>
         </div>
       </div>
 

@@ -4,6 +4,7 @@ import { Eye, ShoppingBag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Product } from '../types';
 import { useCart } from '../store/CartContext';
+import { formatPrice } from '../data/settings';
 
 
 interface ProductCardProps {
@@ -122,11 +123,11 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           </div>
           <div className="flex items-center gap-3">
             <span className="font-mono text-lg text-white">
-              ${product.price}
+              {formatPrice(product.price)}
             </span>
             {product.originalPrice && (
               <span className="font-mono text-sm text-white/40 line-through">
-                ${product.originalPrice}
+                {formatPrice(product.originalPrice)}
               </span>
             )}
           </div>

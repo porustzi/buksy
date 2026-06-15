@@ -1,12 +1,12 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronDown } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { editorialPage } from '../data/content';
+import { useSeo } from '../hooks/useSeo';
 
 export function EditorialPage() {
-  const { t } = useTranslation();
   const hero = editorialPage.hero || {};
+  useSeo({ title: hero.title || 'Редакція', description: hero.description });
   const bs = editorialPage.behindScenes || {};
   const fn = editorialPage.finale || {};
 
@@ -30,8 +30,8 @@ export function EditorialPage() {
 
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
-          {(editorialPage.lookbook || []).map((item: any, i: number) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className={`flex flex-col ${i % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12`}>
+          {(editorialPage.lookbook || []).map((item: { image: string; caption: string }, i: number) => (
+            <motion.div key={item.image || i} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className={`flex flex-col ${i % 2 === 0 ? 'lg:flex-row' : 'lg:flex-row-reverse'} items-center gap-12`}>
               <div className="lg:w-2/3"><div className="aspect-[4/3] overflow-hidden"><img src={item.image} alt="" className="w-full h-full object-cover hover:scale-105 transition-transform duration-700" /></div></div>
               <div className="lg:w-1/3"><p className="font-display text-2xl font-light text-white/80 leading-relaxed italic">"{item.caption}"</p></div>
             </motion.div>

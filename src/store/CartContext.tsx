@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
 import { CartItem, Product } from '../types';
 
 interface CartState {
@@ -103,7 +103,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     if (savedCart) {
       try {
         const parsed = JSON.parse(savedCart);
-        dispatch({ type: 'LOAD_CART', items: parsed });
+        if (Array.isArray(parsed)) {
+          dispatch({ type: 'LOAD_CART', items: parsed });
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+        }
       } catch {
         localStorage.removeItem(STORAGE_KEY);
       }

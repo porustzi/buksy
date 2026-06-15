@@ -20,6 +20,7 @@ function processEntry(rawData) {
   if (Array.isArray(p.details)) p.details = p.details.map(d => typeof d === 'object' ? (d.detail || '') : d);
   if (Array.isArray(p.care)) p.care = p.care.map(c => typeof c === 'object' ? (c.instruction || '') : c);
   p.reviewCount = (p.reviews || []).length;
+  if (p.stock === undefined || p.stock === null) p.stock = 99;
   return p;
 }
 

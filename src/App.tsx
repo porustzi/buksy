@@ -119,14 +119,7 @@ function AppRoutes() {
 }
 
 function App() {
-  const [showIntro, setShowIntro] = useState(true);
-
-  useEffect(() => {
-    const hasSeenIntro = sessionStorage.getItem('buksy_intro_seen');
-    if (hasSeenIntro) {
-      setShowIntro(false);
-    }
-  }, []);
+  const [showIntro, setShowIntro] = useState(() => !sessionStorage.getItem('buksy_intro_seen'));
 
   const handleIntroComplete = () => {
     sessionStorage.setItem('buksy_intro_seen', 'true');

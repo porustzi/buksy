@@ -19,6 +19,7 @@ export interface Product {
   isBestseller?: boolean;
   rating: number;
   reviewCount: number;
+  stock?: number;
   details?: string[];
   care?: string[];
   reviews?: Review[];

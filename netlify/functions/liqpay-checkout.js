@@ -1,12 +1,20 @@
 const crypto = require('crypto');
+const { guard } = require('./_utils');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
+  const blocked = guard(event, 10);
+  if (blocked) return blocked;
+
   try {
-    const { items, shippingInfo, total, orderId } = JSON.parse(event.body);
+    const { items, orderId, email } = JSON.parse(event.body);
+
+    if (!items || !items.length) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'Cart is empty' }) };
+    }
 
     const PUBLIC_KEY = process.env.LIQPAY_PUBLIC_KEY;
     const PRIVATE_KEY = process.env.LIQPAY_PRIVATE_KEY;
@@ -22,6 +30,8 @@ exports.handler = async (event) => {
       };
     }
 
+    const serverTotal = items.reduce((s, i) => s + Number(i.product.price) * Number(i.quantity), 0);
+
     const description = items
       .map((i) => `${i.product.name} ×${i.quantity}`)
       .join(', ')
@@ -31,14 +41,15 @@ exports.handler = async (event) => {
       version: 3,
       public_key: PUBLIC_KEY,
       action: 'pay',
-      amount: total,
+      amount: serverTotal,
       currency: 'UAH',
       description,
       order_id: orderId,
-      result_url: process.env.URL + '/checkout?order=' + orderId,
-      server_url: process.env.URL + '/.netlify/functions/liqpay-callback',
+      result_url: (process.env.URL || '') + '/checkout?order=' + orderId,
+      server_url: (process.env.URL || '') + '/.netlify/functions/liqpay-callback',
       info: JSON.stringify({
-        shippingInfo,
+        orderId,
+        email: email || '',
         items: items.map((i) => ({ name: i.product.name, size: i.size, qty: i.quantity })),
       }),
     };

@@ -33,10 +33,17 @@ export function Header() {
   const location = useLocation();
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setIsScrolled(window.scrollY > 50);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -196,7 +203,7 @@ export function Header() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[60] bg-noir/95 backdrop-blur-xl flex items-start justify-center             pt-32 safe-area-top"
-            onClick={() => setIsSearchOpen(false)}
+            onClick={() => { setIsSearchOpen(false); setSearchQuery(''); }}
           >
             <motion.div
               initial={{ y: -20, opacity: 0 }}

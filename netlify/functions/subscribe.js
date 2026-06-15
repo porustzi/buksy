@@ -1,7 +1,12 @@
+const { guard, validateEmail } = require('./_utils');
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
+
+  const blocked = guard(event, 5);
+  if (blocked) return blocked;
 
   try {
     const { email } = JSON.parse(event.body);
@@ -10,7 +15,11 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Email is required' }) };
     }
 
-    // TODO: Add email service API key
+    if (!validateEmail(email)) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'Invalid email format' }) };
+    }
+
+    // TODO: Add email service (Mailchimp/SendGrid) integration
     // const API_KEY = process.env.MAILCHIMP_API_KEY;
     // await addSubscriber(email);
 

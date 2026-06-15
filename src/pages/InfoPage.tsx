@@ -2,11 +2,12 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { NotFoundPage } from './NotFoundPage';
 
 const pages: Record<string, { titleKey: string; contentKey: string }> = {
   faq: { titleKey: 'info.faqTitle', contentKey: 'info.faqContent' },
   shipping: { titleKey: 'info.shippingTitle', contentKey: 'info.shippingContent' },
-  'size-guide': { titleKey: 'info.sizeGuideTitle', contentKey: '' },
+  'size-guide': { titleKey: 'info.sizeGuideTitle', contentKey: 'info.sizeGuideContent' },
   track: { titleKey: 'info.trackTitle', contentKey: 'info.trackContent' },
   privacy: { titleKey: 'info.privacyTitle', contentKey: 'info.privacyContent' },
   terms: { titleKey: 'info.termsTitle', contentKey: 'info.termsContent' },
@@ -180,15 +181,7 @@ export function InfoPage() {
   }
 
   if (!page) {
-    return (
-      <div className="min-h-screen bg-noir pt-24 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="font-display text-4xl font-light mb-4">{t('common.pageNotFound')}</h1>
-          <p className="text-white/60 font-body mb-6">{`"${slug}" — this page doesn't exist.`}</p>
-          <Link to="/" className="text-blood hover:underline">{t('common.backToHome')}</Link>
-        </div>
-      </div>
-    );
+    return <NotFoundPage />;
   }
 
   return (

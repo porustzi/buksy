@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Minus, Plus, X, ShoppingBag, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '../store/CartContext';
+import { formatPrice } from '../data/settings';
 
 export function CartPage() {
   const { t } = useTranslation();
@@ -120,7 +121,7 @@ export function CartPage() {
                       </button>
                     </div>
                     <p className="font-mono text-xl text-white">
-                      ${item.product.price * item.quantity}
+                      {formatPrice(item.product.price * item.quantity)}
                     </p>
                   </div>
                 </div>
@@ -149,7 +150,7 @@ export function CartPage() {
               <div className="space-y-4 text-sm">
                 <div className="flex justify-between">
                   <span className="text-white/60 font-body">{t('cart.subtotal')} ({totalItems} items)</span>
-                  <span className="font-mono">${totalPrice.toFixed(2)}</span>
+                  <span className="font-mono">{formatPrice(totalPrice)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-white/60 font-body">{t('cart.shipping')}</span>
@@ -157,48 +158,24 @@ export function CartPage() {
                     {shippingCost === 0 ? (
                       <span className="text-blood">{t('common.free')}</span>
                     ) : (
-                      `$${shippingCost.toFixed(2)}`
+                      formatPrice(shippingCost)
                     )}
                   </span>
                 </div>
                 {totalPrice < 150 && (
                   <p className="text-white/40 text-xs font-body">
-                    {t('cart.freeShippingHint').replace('{{amount}}', (150 - totalPrice).toFixed(2))}
+                    {t('cart.freeShippingHint').replace('{{amount}}', formatPrice(150 - totalPrice))}
                   </p>
                 )}
                 <div className="border-t border-white/5 pt-4">
                   <div className="flex justify-between text-lg">
                     <span className="font-heading tracking-wider">{t('cart.total')}</span>
-                    <span className="font-mono">${totalWithShipping.toFixed(2)}</span>
+                    <span className="font-mono">{formatPrice(totalWithShipping)}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Promo Code */}
-              <div className="pt-4">
-                <label className="block text-white/40 text-xs font-body mb-2">
-                  {t('cart.promoCode')}
-                </label>
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    placeholder={t('cart.promoPlaceholder')}
-                    className="flex-1 px-4 py-3 bg-noir border border-white/10 text-white placeholder:text-white/30 focus:outline-none focus:border-blood/50 transition-colors duration-300"
-                  />
-                  <button
-                    onClick={(e) => {
-                      const input = (e.currentTarget as HTMLElement).previousElementSibling as HTMLInputElement;
-                      if (input.value.trim()) {
-                        alert(t('cart.promoInvalid') + ' "' + input.value + '"');
-                        input.value = '';
-                      }
-                    }}
-                    className="px-4 py-3 border border-white/10 text-white/70 hover:border-blood hover:text-blood transition-colors duration-300 font-body text-sm"
-                  >
-                    {t('cart.apply')}
-                  </button>
-                </div>
-              </div>
+
 
               <Link
                 to="/checkout"

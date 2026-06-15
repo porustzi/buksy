@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '../store/CartContext';
+import { formatPrice } from '../data/settings';
 
 type CheckoutStep = 'information' | 'shipping' | 'payment';
 
@@ -20,6 +21,7 @@ export function CheckoutPage() {
   const [step, setStep] = useState<CheckoutStep>('information');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [orderId, setOrderId] = useState('');
 
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
@@ -31,13 +33,6 @@ export function CheckoutPage() {
     city: '',
     country: '',
     postalCode: '',
-  });
-
-  const [paymentInfo, setPaymentInfo] = useState({
-    cardNumber: '',
-    cardHolder: '',
-    expiry: '',
-    cvv: '',
   });
 
   const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
@@ -57,36 +52,25 @@ export function CheckoutPage() {
     if (!shippingInfo.address.trim()) newErrors.address = 'Address is required';
     if (!shippingInfo.city.trim()) newErrors.city = 'City is required';
     if (!shippingInfo.country.trim()) newErrors.country = 'Country is required';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validatePayment = (): boolean => {
-    const newErrors: Record<string, string> = {};
-    if (!paymentInfo.cardNumber.trim()) newErrors.cardNumber = 'Card number is required';
-    else if (!/^\d{13,19}$/.test(paymentInfo.cardNumber.replace(/\s/g, ''))) newErrors.cardNumber = 'Invalid card number';
-    if (!paymentInfo.cardHolder.trim()) newErrors.cardHolder = 'Card holder name is required';
-    if (!paymentInfo.expiry.trim()) newErrors.expiry = 'Expiry date is required';
-    else if (!/^\d{2}\/\d{2}$/.test(paymentInfo.expiry)) newErrors.expiry = 'Use MM/YY format';
-    if (!paymentInfo.cvv.trim()) newErrors.cvv = 'CVV is required';
-    else if (!/^\d{3,4}$/.test(paymentInfo.cvv)) newErrors.cvv = 'Invalid CVV';
+    if (shippingInfo.phone.trim() && !/^\+?[\d\s\-()]{6,20}$/.test(shippingInfo.phone.trim()))
+      newErrors.phone = 'Invalid phone format';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handlePlaceOrder = async () => {
-    if (!validatePayment()) return;
+    if (!validateInformation()) { setStep('information'); return; }
     setIsProcessing(true);
     setSubmitError('');
     try {
       const response = await fetch('/.netlify/functions/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, shippingInfo, total, paymentMethod: 'cod' }),
+        body: JSON.stringify({ items, shippingInfo, total, paymentMethod: 'cod', shippingMethod }),
       });
       if (!response.ok) throw new Error('Order failed');
       const data = await response.json();
-      console.log('Order placed:', data.orderId);
+      setOrderId(data.orderId);
       setIsComplete(true);
       clearCart();
     } catch {
@@ -105,7 +89,7 @@ export function CheckoutPage() {
       const res = await fetch('/.netlify/functions/liqpay-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, shippingInfo, total, orderId }),
+        body: JSON.stringify({ items, shippingInfo, total, orderId, email: shippingInfo.email }),
       });
       const lp = await res.json();
       if (lp.mode === 'test') {
@@ -113,9 +97,11 @@ export function CheckoutPage() {
         const orderRes = await fetch('/.netlify/functions/order', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items, shippingInfo, total, paymentMethod: 'cod' }),
+          body: JSON.stringify({ items, shippingInfo, total, paymentMethod: 'cod', shippingMethod }),
         });
         if (!orderRes.ok) throw new Error('Order failed');
+        const od = await orderRes.json();
+        setOrderId(od.orderId);
         setIsComplete(true);
         clearCart();
       } else if (lp.data && lp.signature) {
@@ -132,6 +118,7 @@ export function CheckoutPage() {
         });
         document.body.appendChild(form);
         form.submit();
+        setTimeout(() => document.body.removeChild(form), 100);
       }
     } catch {
       setSubmitError('Payment failed. Try again.');
@@ -166,6 +153,11 @@ export function CheckoutPage() {
               <Check size={40} className="text-blood" />
             </div>
             <h1 className="font-display text-4xl font-light">{t('checkout.orderConfirmed')}</h1>
+            {orderId && (
+              <p className="text-blood font-mono text-sm">
+                #{orderId}
+              </p>
+            )}
             <p className="text-white/60 font-body max-w-md mx-auto">
               {t('checkout.orderConfirmedDesc')}
             </p>
@@ -278,7 +270,7 @@ export function CheckoutPage() {
                   </h2>
                   {Object.keys(errors).length > 0 && (
                     <div className="p-3 border border-red-500/30 bg-red-500/5">
-                      <p className="text-red-400 font-body text-sm">{t('checkout.fixErrors') || 'Please fix the errors below.'}</p>
+                      <p className="text-red-400 font-body text-sm">{Object.values(errors).join('; ')}</p>
                     </div>
                   )}
                   <div className="grid sm:grid-cols-2 gap-4">
@@ -420,7 +412,7 @@ export function CheckoutPage() {
                         {totalPrice >= 150 ? (
                           <span className="text-blood">{t('common.free')}</span>
                         ) : (
-                          '$15'
+                          formatPrice(15)
                         )}
                       </span>
                     </label>
@@ -452,7 +444,7 @@ export function CheckoutPage() {
                           </p>
                         </div>
                       </div>
-                      <span className="font-mono">$25</span>
+                      <span className="font-mono">{formatPrice(25)}</span>
                     </label>
                   </div>
 
@@ -474,85 +466,6 @@ export function CheckoutPage() {
                 <div className="space-y-5">
                   <h2 className="font-heading text-xl tracking-wider">{t('checkout.payment')}</h2>
 
-                  {Object.keys(errors).length > 0 && (
-                    <div className="p-3 border border-red-500/30 bg-red-500/5">
-                      <p className="text-red-400 font-body text-sm">{t('checkout.fixErrors') || 'Please fix the errors below.'}</p>
-                    </div>
-                  )}
-
-                  <div className="p-5 border border-white/10 bg-gradient-to-br from-ash to-noir">
-                    <div className="flex items-center justify-between mb-5">
-                      <CreditCard className="text-blood" size={22} />
-                      <div className="flex gap-1.5">
-                        <div className="w-8 h-5 bg-white/10 rounded" />
-                        <div className="w-8 h-5 bg-white/10 rounded" />
-                      </div>
-                    </div>
-                    <div className="space-y-3.5">
-                      <div>
-                        <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">{t('checkout.cardNumberLabel')}</label>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          maxLength={19}
-                          placeholder="0000 0000 0000 0000"
-                          value={paymentInfo.cardNumber}
-                          onChange={(e) => {
-                            let v = e.target.value.replace(/\D/g, '').slice(0, 16);
-                            v = v.replace(/(\d{4})(?=\d)/g, '$1 ');
-                            setPaymentInfo({ ...paymentInfo, cardNumber: v });
-                          }}
-                          className="w-full px-4 py-3 bg-noir/50 border border-white/10 text-white font-mono text-base tracking-[0.15em] placeholder:text-white/15 focus:outline-none focus:border-blood/50 transition-colors"
-                        />
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">{t('checkout.expiryLabel')}</label>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            maxLength={5}
-                            placeholder="ММ/РР"
-                            value={paymentInfo.expiry}
-                            onChange={(e) => {
-                              let v = e.target.value.replace(/\D/g, '').slice(0, 4);
-                              if (v.length >= 2) v = v.slice(0, 2) + '/' + v.slice(2);
-                              setPaymentInfo({ ...paymentInfo, expiry: v });
-                            }}
-                            className="w-full px-4 py-3 bg-noir/50 border border-white/10 text-white font-mono text-base tracking-[0.15em] placeholder:text-white/15 focus:outline-none focus:border-blood/50 transition-colors"
-                          />
-                        </div>
-                        <div>
-                          <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">{t('checkout.cvvLabel')}</label>
-                          <input
-                            type="text"
-                            inputMode="numeric"
-                            maxLength={3}
-                            placeholder="•••"
-                            value={paymentInfo.cvv}
-                            onChange={(e) => {
-                              const v = e.target.value.replace(/\D/g, '').slice(0, 3);
-                              setPaymentInfo({ ...paymentInfo, cvv: v });
-                            }}
-                            className="w-full px-4 py-3 bg-noir/50 border border-white/10 text-white font-mono text-base tracking-[0.3em] placeholder:text-white/15 focus:outline-none focus:border-blood/50 transition-colors"
-                          />
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-white/40 font-body text-xs mb-1.5 tracking-wider">{t('checkout.cardHolderLabel')}</label>
-                        <input
-                          type="text"
-                          placeholder="TARAS SHEVCHENKO"
-                          value={paymentInfo.cardHolder}
-                          onChange={(e) =>
-                            setPaymentInfo({ ...paymentInfo, cardHolder: e.target.value.toUpperCase() })
-                          }
-                          className="w-full px-4 py-3 bg-noir/50 border border-white/10 text-white font-mono text-sm tracking-[0.1em] placeholder:text-white/15 focus:outline-none focus:border-blood/50 transition-colors"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
                   {submitError && (
                     <p className="text-red-400 text-sm font-body text-center">{submitError}</p>
                   )}
@@ -572,14 +485,17 @@ export function CheckoutPage() {
                     >
                       {isProcessing ? '...' : <><Lock size={16} /> {t('checkout.submitOrder')}</>}
                     </button>
-                    <button
-                      onClick={async () => {
-                        setIsProcessing(true); setSubmitError('');
+                      <button
+                        onClick={async () => {
+                          if (!validateInformation()) { setStep('information'); return; }
+                          setIsProcessing(true); setSubmitError('');
                         try {
                           const r = await fetch('/.netlify/functions/order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ items, shippingInfo, total, paymentMethod: 'cod' }) });
                           if (!r.ok) throw new Error('Order failed');
+                          const d = await r.json();
+                          setOrderId(d.orderId);
                           setIsComplete(true); clearCart();
-                        } catch { setSubmitError('Помилка. Спробуй ще раз.'); }
+                        } catch { setSubmitError(t('checkout.orderError') || 'Failed'); }
                         finally { setIsProcessing(false); }
                       }}
                       disabled={isProcessing}
@@ -629,7 +545,7 @@ export function CheckoutPage() {
                       <p className="text-white/40 font-body text-xs mt-1">{item.size}</p>
                     </div>
                     <span className="font-mono text-sm">
-                      ${item.product.price * item.quantity}
+                      {formatPrice(item.product.price * item.quantity)}
                     </span>
                   </div>
                 ))}
@@ -637,21 +553,21 @@ export function CheckoutPage() {
               <div className="space-y-3 pt-4 mt-4 border-t border-white/5">
                 <div className="flex justify-between text-sm font-body">
                   <span className="text-white/60">{t('checkout.subtotal')}</span>
-                  <span className="font-mono">${totalPrice.toFixed(2)}</span>
+                  <span className="font-mono">{formatPrice(totalPrice)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-body">
                   <span className="text-white/60">{t('checkout.shipping')}</span>
                   <span className="font-mono">
-                    {shippingCost === 0 ? t('common.free') : `$${shippingCost.toFixed(2)}`}
+                    {shippingCost === 0 ? t('common.free') : formatPrice(shippingCost)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm font-body">
                   <span className="text-white/60">{t('checkout.tax')}</span>
-                  <span className="font-mono">${tax.toFixed(2)}</span>
+                  <span className="font-mono">{formatPrice(tax)}</span>
                 </div>
                 <div className="flex justify-between text-lg border-t border-white/5 pt-3">
                   <span className="font-heading tracking-wider">{t('checkout.total')}</span>
-                  <span className="font-mono text-xl">${total.toFixed(2)}</span>
+                  <span className="font-mono text-xl">{formatPrice(total)}</span>
                 </div>
               </div>
             </div>

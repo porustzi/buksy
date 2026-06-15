@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface LogoAnimationProps {
   onComplete: () => void;
@@ -7,15 +7,17 @@ interface LogoAnimationProps {
 
 export function LogoAnimation({ onComplete }: LogoAnimationProps) {
   const [phase, setPhase] = useState<'reveal' | 'pulse' | 'fade'>('reveal');
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
     const timers = [
       setTimeout(() => setPhase('pulse'), 800),
       setTimeout(() => setPhase('fade'), 1600),
-      setTimeout(() => onComplete(), 2200),
+      setTimeout(() => onCompleteRef.current(), 2200),
     ];
     return () => timers.forEach(clearTimeout);
-  }, [onComplete]);
+  }, []);
 
   return (
     <AnimatePresence>

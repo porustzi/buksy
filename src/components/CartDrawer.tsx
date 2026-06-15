@@ -3,6 +3,7 @@ import { X, Minus, Plus, ShoppingBag, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '../store/CartContext';
+import { formatPrice } from '../data/settings';
 
 export function CartDrawer() {
   const { t } = useTranslation();
@@ -113,7 +114,7 @@ export function CartDrawer() {
                             </button>
                           </div>
                           <p className="font-mono text-white">
-                            ${item.product.price * item.quantity}
+                            {formatPrice(item.product.price * item.quantity)}
                           </p>
                         </div>
                       </div>
@@ -134,7 +135,7 @@ export function CartDrawer() {
               <div className="px-6 py-5 border-t border-white/5 space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-white/60 font-body">{t('cart.subtotal')}</span>
-                  <span className="font-mono text-xl">${totalPrice.toFixed(2)}</span>
+                  <span className="font-mono text-xl">{formatPrice(totalPrice)}</span>
                 </div>
                 <p className="text-white/40 text-sm">
                   {t('cart.shippingTaxes')}

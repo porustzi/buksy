@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import {
   ChevronLeft,
   ChevronRight,
-  Heart,
   Share2,
   Truck,
   RotateCcw,
@@ -19,6 +18,8 @@ import { useTranslation } from 'react-i18next';
 import { products } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
 import { useCart } from '../store/CartContext';
+import { useSeo } from '../hooks/useSeo';
+import { formatPrice } from '../data/settings';
 
 export function ProductPage() {
   const { t } = useTranslation();
@@ -26,17 +27,28 @@ export function ProductPage() {
   const product = products.find((p) => p.slug === slug);
   const { addItem } = useCart();
 
+  useSeo({
+    title: product?.name,
+    description: product?.shortDescription,
+    image: product?.images[0],
+    url: typeof window !== 'undefined' ? window.location.href : undefined,
+  });
+
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState<'description' | 'details' | 'care'>('description');
   const [isAddedToCart, setIsAddedToCart] = useState(false);
+  const addedTimerRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     window.scrollTo(0, 0);
     setSelectedImage(0);
     setSelectedSize(null);
     setQuantity(1);
+    return () => {
+      if (addedTimerRef.current) clearTimeout(addedTimerRef.current);
+    };
   }, [slug]);
 
   if (!product) {
@@ -63,15 +75,18 @@ export function ProductPage() {
     if (size) {
       addItem(product, size, quantity);
       setIsAddedToCart(true);
-      setTimeout(() => setIsAddedToCart(false), 2000);
+      if (addedTimerRef.current) clearTimeout(addedTimerRef.current);
+      addedTimerRef.current = setTimeout(() => setIsAddedToCart(false), 2000);
     }
   };
 
   const nextImage = () => {
+    if (!product.images.length) return;
     setSelectedImage((prev) => (prev + 1) % product.images.length);
   };
 
   const prevImage = () => {
+    if (!product.images.length) return;
     setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length);
   };
 
@@ -177,10 +192,10 @@ export function ProductPage() {
                 {product.name}
               </h1>
               <div className="flex items-center gap-4">
-                <span className="font-mono text-3xl text-white">${product.price}</span>
+                <span className="font-mono text-3xl text-white">{formatPrice(product.price)}</span>
                 {product.originalPrice && (
                   <span className="font-mono text-xl text-white/40 line-through">
-                    ${product.originalPrice}
+                    {formatPrice(product.originalPrice)}
                   </span>
                 )}
               </div>
@@ -203,6 +218,14 @@ export function ProductPage() {
             </div>
 
             {/* Short Description */}
+            {product.stock !== undefined && product.stock <= 10 && product.stock > 0 && (
+              <p className="text-amber-400 font-body text-sm">
+                {t('product.lowStock', { count: product.stock }) || `Лише ${product.stock} шт. в наявності`}
+              </p>
+            )}
+            {product.stock === 0 && (
+              <p className="text-red-400 font-body text-sm">{t('product.outOfStock') || 'Немає в наявності'}</p>
+            )}
             <p className="text-white/70 font-body leading-relaxed">
               {product.shortDescription}
             </p>
@@ -269,21 +292,12 @@ export function ProductPage() {
               </motion.button>
 
               <button
-                onClick={async () => {
+                onClick={() => {
                   const url = window.location.href;
                   if (navigator.share) {
-                    try { await navigator.share({ title: product.name, url }); } catch {}
+                    void navigator.share({ title: product.name, url });
                   } else {
-                    try {
-                      await navigator.clipboard.writeText(url);
-                    } catch {
-                      const input = document.createElement('input');
-                      input.value = url;
-                      document.body.appendChild(input);
-                      input.select();
-                      document.execCommand('copy');
-                      document.body.removeChild(input);
-                    }
+                    void navigator.clipboard.writeText(url);
                   }
                 }}
                 className="p-4 border border-white/10 text-white/60 hover:border-blood hover:text-blood transition-all duration-300"

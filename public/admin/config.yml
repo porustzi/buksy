@@ -2,6 +2,8 @@ backend:
   name: git-gateway
   branch: main
 
+publish_mode: editorial_workflow
+
 # Для локальної розробки адмінки:
 # 1. Розкоментуй рядок нижче
 # 2. Запусти `npm run cms` в окремому терміналі
@@ -90,6 +92,7 @@ collections:
           - { label: "Розмір", name: name, widget: string }
           - { label: "В наявності", name: available, widget: boolean, default: true }
       - { label: "В наявності", name: inStock, widget: boolean, default: true }
+      - { label: "Кількість на складі", name: stock, widget: number, value_type: int, default: 99, required: false }
       - { label: "Новинка", name: isNew, widget: boolean, default: false, required: false }
       - { label: "В обраному", name: isFeatured, widget: boolean, default: false, required: false }
       - { label: "Бестселер", name: isBestseller, widget: boolean, default: false, required: false }

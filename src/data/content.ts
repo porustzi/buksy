@@ -204,9 +204,9 @@ export const contactInfo = {
   },
   "social": {
     "title": "МИ В СОЦМЕРЕЖАХ",
-    "instagram": "https://instagram.com",
-    "twitter": "https://twitter.com",
-    "youtube": "https://youtube.com"
+    "instagram": "#",
+    "twitter": "#",
+    "youtube": "#"
   },
   "faq": {
     "tagline": "ВІДПОВІДІ",
@@ -313,8 +313,8 @@ export const footerData = {
     "allRights": "Всі права захищено."
   },
   "social": {
-    "instagram": "https://instagram.com",
-    "twitter": "https://twitter.com",
-    "youtube": "https://youtube.com"
+    "instagram": "#",
+    "twitter": "#",
+    "youtube": "#"
   }
 };

@@ -1,4 +1,7 @@
 const crypto = require('crypto');
+const { esc } = require('./_utils');
+const { updateOrderStatus, decreaseStock } = require('./_supabase');
+const { sendEmail, paymentConfirmedHtml } = require('./_email');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -11,10 +14,13 @@ exports.handler = async (event) => {
     const signature = body.get('signature');
 
     const PRIVATE_KEY = process.env.LIQPAY_PRIVATE_KEY;
+    if (!PRIVATE_KEY) {
+      return { statusCode: 500, body: 'Server misconfigured: missing LIQPAY_PRIVATE_KEY' };
+    }
+
     const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
-    // Verify signature
     const expectedSig = crypto
       .createHash('sha1')
       .update(PRIVATE_KEY + data + PRIVATE_KEY)
@@ -29,34 +35,62 @@ exports.handler = async (event) => {
     if (payment.status === 'success' || payment.status === 'sandbox') {
       const info = JSON.parse(payment.info || '{}');
       const itemsText = (info.items || [])
-        .map((i) => `   ${i.qty}× ${i.name} (${i.size})`)
+        .map((i) => `   ${i.qty}× ${esc(i.name)} (${esc(i.size)})`)
         .join('\n');
 
       const msg = [
         '✅ <b>ОПЛАЧЕНО</b>',
-        `<code>#${payment.order_id}</code>`,
+        `<code>#${esc(payment.order_id)}</code>`,
         '',
-        `💳 ${payment.payment_id}`,
-        `💰 <b>${payment.amount} ${payment.currency}</b>`,
+        `💳 ${esc(String(payment.payment_id || ''))}`,
+        `💰 <b>${Number(payment.amount || 0).toFixed(2)} ${esc(payment.currency || '')}</b>`,
         '',
         itemsText ? '<b>🛍 Товари</b>\n' + itemsText : '',
         '',
-        info.shippingInfo
-          ? `👤 ${info.shippingInfo.firstName} ${info.shippingInfo.lastName}\n   ${info.shippingInfo.email}\n   ${info.shippingInfo.phone || ''}`
-          : '',
-        '',
         '━━━━━━━━━━━━━━━━',
         '✅ Оплата підтверджена',
-      ]
-        .filter(Boolean)
-        .join('\n');
+      ].filter(Boolean).join('\n');
 
+      // Telegram
       if (TOKEN && CHAT_ID) {
-        await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'HTML' }),
-        });
+        try {
+          const tgRes = await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'HTML' }),
+          });
+          if (!tgRes.ok) console.error('Telegram payment notification failed:', tgRes.status);
+        } catch (err) {
+          console.error('Telegram payment notification failed:', err.message);
+        }
+      }
+
+      // Update order status
+      updateOrderStatus(payment.order_id, {
+        status: 'paid',
+        payment_id: payment.payment_id,
+        paid_at: new Date().toISOString(),
+      }).catch(() => {});
+
+      // Decrease stock on payment
+      if (info.items && info.items.length) {
+        decreaseStock(info.items.map((i) => ({ product: { slug: i.name?.toLowerCase().replace(/\s+/g, '-') }, quantity: i.qty }))).catch(() => {});
+      }
+
+      // Email customer
+      const customerEmail = info.customer?.email || info.email;
+      if (customerEmail) {
+        sendEmail({
+          to: customerEmail,
+          subject: `Оплата отримана — замовлення #${payment.order_id}`,
+          html: paymentConfirmedHtml({
+            orderId: payment.order_id,
+            amount: payment.amount,
+            currency: payment.currency,
+            paymentId: payment.payment_id,
+            items: info.items,
+          }),
+        }).catch(() => {});
       }
     }
 
