@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Twitter, Youtube, Send } from 'lucide-react';
+import { Instagram, Music2, Send } from 'lucide-react';
 import { footerData } from '../data/content';
 
 export function Footer() {
@@ -29,8 +29,8 @@ export function Footer() {
             <p className="text-white/60 font-body text-sm leading-relaxed mb-6">{brand.description}</p>
             <div className="flex gap-4">
               <a href={f.social?.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Instagram size={18} /></a>
-              <a href={f.social?.twitter} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Twitter size={18} /></a>
-              <a href={f.social?.youtube} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Youtube size={18} /></a>
+              <a href={f.social?.tiktok} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Music2 size={18} /></a>
+              <a href={f.social?.telegram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Send size={18} /></a>
             </div>
           </div>
           <div><h4 className="font-heading text-sm tracking-[0.3em] mb-6 text-white/40">{f.navigation?.title}</h4><ul className="space-y-3">{(f.navigation?.links || []).map((l: { name: string; href: string }) => (<li key={l.href}><Link to={l.href} className="text-white/70 hover:text-blood transition-colors duration-300 font-body">{l.name}</Link></li>))}</ul></div>

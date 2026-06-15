@@ -314,8 +314,8 @@ export const footerData = {
   },
   "social": {
     "instagram": "#",
-    "twitter": "#",
-    "youtube": "#"
+    "tiktok": "#",
+    "telegram": "#"
   }
 };
 
