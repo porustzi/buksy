@@ -62,16 +62,64 @@ async function sendEmail({ to, subject, html }) {
 }
 
 function orderConfirmationHtml({ orderId, items, total, shippingInfo, trackingNumber }) {
-  const itemsHtml = items
-    .map(function (i) {
-      return '<tr><td style="padding:8px;border-bottom:1px solid #333">' +
-        i.quantity + '\u00d7 ' + i.product.name + ' (' + (i.size || '-') +
-        ')</td><td style="padding:8px;border-bottom:1px solid #333;text-align:right">\u20b4' +
-        (i.product.price * i.quantity).toFixed(2) + '</td></tr>';
-    })
-    .join('');
+  var itemsRows = items.map(function (i) {
+    var name = (i.product ? i.product.name : i.name || '');
+    var size = i.size || '';
+    var price = i.product ? i.product.price : i.price || 0;
+    var qty = i.quantity || i.qty || 1;
+    var lineTotal = (price * qty).toFixed(0);
+    return '<tr>' +
+      '<td style="padding:10px 8px;border-bottom:1px solid #2a2a2a;vertical-align:top">' +
+        '<div style="font-size:14px;font-weight:600">' + name + '</div>' +
+        (size ? '<div style="font-size:12px;color:#888;margin-top:2px">Розмір: ' + size + '</div>' : '') +
+        '<div style="font-size:12px;color:#666;margin-top:2px">' + qty + ' шт</div>' +
+      '</td>' +
+      '<td style="padding:10px 8px;border-bottom:1px solid #2a2a2a;text-align:right;vertical-align:top;font-size:14px;font-weight:600;white-space:nowrap">' + lineTotal + ' ₴</td>' +
+    '</tr>';
+  }).join('');
 
-  return '<!DOCTYPE html>\n<html><head><meta charset="utf-8"></head>\n<body style="font-family:Arial,sans-serif;background:#111;color:#eee;padding:20px">\n  <div style="max-width:600px;margin:0 auto;background:#1a1a1a;border:1px solid #333;padding:30px">\n    <h1 style="color:#b10006;font-size:24px;margin:0 0 20px">BUKSY</h1>\n    <h2 style="font-size:18px;margin:0 0 10px">\u0417\u0430\u043c\u043e\u0432\u043b\u0435\u043d\u043d\u044f \u043f\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0436\u0435\u043d\u043e</h2>\n    <p style="color:#999;margin:0 0 20px">\u041d\u043e\u043c\u0435\u0440 \u0437\u0430\u043c\u043e\u0432\u043b\u0435\u043d\u043d\u044f: <strong style="color:#b10006">#' + orderId + '</strong></p>\n    <table style="width:100%;border-collapse:collapse;margin:0 0 20px">' + itemsHtml + '</table>\n    <p style="text-align:right;font-size:18px"><strong>\u20b4' + total.toFixed(2) + '</strong></p>\n    <hr style="border-color:#333;margin:20px 0">\n    <p style="color:#999;font-size:14px;margin:0 0 10px"><strong>\u0414\u043e\u0441\u0442\u0430\u0432\u043a\u0430:</strong><br>' + shippingInfo.firstName + ' ' + shippingInfo.lastName + '<br>' + shippingInfo.address + (shippingInfo.apartment ? ', ' + shippingInfo.apartment : '') + '<br>' + shippingInfo.city + ', ' + shippingInfo.country + ', ' + shippingInfo.postalCode + '</p>\n    ' + (trackingNumber ? '<p style="color:#b10006;font-size:14px;margin:0 0 10px"><strong>\u0422\u0422\u041d \u041d\u043e\u0432\u0430 \u041f\u043e\u0448\u0442\u0430:</strong> ' + trackingNumber + '</p>' : '') + '\n    <hr style="border-color:#333;margin:20px 0">\n    <p style="color:#666;font-size:12px">BUKSY \u2014 Dark Luxury Streetwear<br>buksy.shop' + '\u0040' + 'gmail.com</p>\n  </div>\n</body></html>';
+  var branchLine = '';
+  if (shippingInfo && shippingInfo.novaPoshtaBranch) {
+    branchLine = '<tr><td style="padding:4px 0;color:#999;font-size:13px">Відділення НП</td><td style="padding:4px 0;text-align:right;font-size:13px;font-weight:600">№' + shippingInfo.novaPoshtaBranch + '</td></tr>';
+  }
+
+  return '<!DOCTYPE html>\n<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"></head>\n' +
+    '<body style="font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Arial,sans-serif;background:#0a0a0a;color:#e5e5e5;padding:20px;margin:0">\n' +
+    '  <div style="max-width:520px;margin:0 auto;background:#141414;border:1px solid #222;padding:40px 32px">\n' +
+    '\n    <table style="width:100%;margin:0 0 32px"><tr>\n' +
+    '      <td><h1 style="color:#e53935;font-size:28px;margin:0;letter-spacing:4px;font-weight:900">BUKSY</h1></td>\n' +
+    '      <td style="text-align:right"><span style="display:inline-block;background:#e53935;color:#fff;padding:4px 10px;font-size:11px;font-weight:700;letter-spacing:1px">НОВЕ</span></td>\n' +
+    '</tr></table>\n' +
+    '\n    <h2 style="font-size:16px;margin:0 0 6px;font-weight:700;color:#fff">Замовлення отримано</h2>\n' +
+    '    <p style="color:#e53935;font-size:14px;margin:0 0 24px;font-family:monospace">#' + orderId + '</p>\n' +
+    '\n    <div style="background:#1a1a1a;padding:16px;margin:0 0 24px">\n' +
+    '      <table style="width:100%;border-collapse:collapse">\n' +
+    '        <thead><tr>\n' +
+    '          <th style="text-align:left;padding:0 8px 8px;font-size:11px;color:#666;font-weight:600;letter-spacing:1px;text-transform:uppercase">Товар</th>\n' +
+    '          <th style="text-align:right;padding:0 8px 8px;font-size:11px;color:#666;font-weight:600;letter-spacing:1px;text-transform:uppercase">Сума</th>\n' +
+    '        </tr></thead>\n' +
+    '        <tbody>' + itemsRows + '</tbody>\n' +
+    '      </table>\n' +
+    '      <table style="width:100%;margin-top:16px;padding-top:16px;border-top:2px solid #2a2a2a">\n' +
+    '        <tr><td style="padding:4px 0;color:#999;font-size:13px">Доставка</td><td style="padding:4px 0;text-align:right;font-size:13px;font-weight:600;color:#4caf50">БЕЗКОШТОВНО</td></tr>\n' +
+    '        <tr><td style="padding:4px 0;color:#fff;font-size:15px;font-weight:700">Разом</td><td style="padding:4px 0;text-align:right;font-size:18px;font-weight:700;color:#fff">' + total.toFixed(0) + ' ₴</td></tr>\n' +
+    '      </table>\n' +
+    '    </div>\n' +
+    '\n    <table style="width:100%;margin:0 0 24px">\n' +
+    '      <tr><td colspan="2" style="padding:4px 0 8px;font-size:11px;color:#666;letter-spacing:1px;text-transform:uppercase">Отримувач</td></tr>\n' +
+    '      <tr><td style="padding:2px 0;font-size:14px;color:#ccc">' + (shippingInfo.firstName || '') + ' ' + (shippingInfo.lastName || '') + '</td></tr>\n' +
+    '      <tr><td style="padding:2px 0;font-size:13px;color:#888">' + (shippingInfo.address || '') + (shippingInfo.apartment ? ', ' + shippingInfo.apartment : '') + '</td></tr>\n' +
+    '      <tr><td style="padding:2px 0;font-size:13px;color:#888">' + (shippingInfo.city || '') + ', ' + (shippingInfo.country || '') + ', ' + (shippingInfo.postalCode || '') + '</td></tr>\n' +
+    '      ' + branchLine + '\n' +
+    '    </table>\n' +
+    '\n    <div style="padding:12px 16px;border-left:3px solid #e53935;background:#1a1a1a;margin:0 0 24px">\n' +
+    '      <p style="margin:0;font-size:13px;color:#e53935"><strong>Статус:</strong> Очікує оплати (Monobank)</p>\n' +
+    '      <p style="margin:4px 0 0;font-size:12px;color:#888">Ми повідомимо вас після підтвердження оплати.</p>\n' +
+    '    </div>\n' +
+    '\n    ' + (trackingNumber ? '<div style="padding:12px 16px;border-left:3px solid #e53935;background:#1a1a1a;margin:0 0 24px"><p style="margin:0;font-size:13px;color:#fff"><strong>ТТН Нова Пошта:</strong> ' + trackingNumber + '</p></div>' : '') + '\n' +
+    '\n    <hr style="border:none;border-top:1px solid #222;margin:24px 0 16px">\n' +
+    '    <p style="margin:0;font-size:11px;color:#555;text-align:center">BUKSY \u2014 Dark Luxury Streetwear<br>buksy.shop\u0040gmail.com</p>\n' +
+    '  </div>\n</body></html>';
 }
 
 function paymentConfirmedHtml({ orderId, amount, currency, paymentId, items }) {

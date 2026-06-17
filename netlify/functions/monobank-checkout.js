@@ -129,29 +129,27 @@ exports.handler = async (event) => {
       if (!TOKEN || !CHAT_ID) return;
       var info = shippingInfo || {};
       var itemLines = validatedItems.map(function (i) {
-        return '   ' + i.qty + '\u00d7 ' + i.name + ' (' + (i.size || '-') + ')';
+        return i.qty + '\u00d7 ' + i.name + (i.size ? ' (' + i.size + ')' : '') + ' \u2014 ' + (i.price * i.qty) + ' \u20B4';
       }).join('\n');
-      var msg = [
-        '\uD83D\uDED2 <b>\u041D\u041E\u0412\u0415 \u0417\u0410\u041C\u041E\u0412\u041B\u0415\u041D\u041D\u042F</b>',
-        '<code>#' + orderId + '</code>',
-        '',
-        '<b>\uD83D\uDC64 \u041A\u043B\u0456\u0454\u043D\u0442</b>',
-        '   ' + esc(String(info.firstName || '')) + ' ' + esc(String(info.lastName || '')),
-        '   ' + esc(String(email || '')),
-        info.phone ? '   ' + esc(String(info.phone)) : '',
-        '',
-        '<b>\uD83D\uDCCD \u0414\u043E\u0441\u0442\u0430\u0432\u043A\u0430</b>',
-        '   ' + esc(String(info.address || '')) + (info.apartment ? ', ' + esc(String(info.apartment)) : ''),
-        '   ' + esc(String(info.city || '')) + ', ' + esc(String(info.country || '')) + ', ' + esc(String(info.postalCode || '')),
-        info.novaPoshtaBranch ? '   \u041D\u041F \u2116' + esc(String(info.novaPoshtaBranch)) : '',
-        '',
-        '<b>\uD83D\uDECD \u0422\u043E\u0432\u0430\u0440\u0438</b>',
-        itemLines,
-        '',
-        '\uD83D\uDCB3 Monobank (\u043E\u0447\u0456\u043A\u0443\u0454 \u043E\u043F\u043B\u0430\u0442\u0438)',
-        '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501',
-        '\uD83D\uDCB0 <b>' + serverTotal.toFixed(0) + ' \u20B4</b>',
-      ].filter(Boolean).join('\n');
+      var msg = (
+        '\uD83D\uDED2 <b>НОВЕ ЗАМОВЛЕННЯ</b>\n' +
+        '<code>#' + orderId + '</code>\n' +
+        '\n' +
+        '\uD83D\uDC64 <b>' + esc(String(info.firstName || '-')) + ' ' + esc(String(info.lastName || '')) + '</b>\n' +
+        '\uD83D\uDCE7 ' + esc(String(email || '-')) + '\n' +
+        (info.phone ? '\uD83D\uDCF1 ' + esc(String(info.phone)) + '\n' : '') +
+        '\n' +
+        '\uD83D\uDCCD ' + esc(String(info.city || '-')) + ', ' + esc(String(info.country || '-')) + '\n' +
+        '\uD83D\uDE9A ' + esc(String(info.address || '-')) + (info.apartment ? ', ' + esc(String(info.apartment)) : '') + '\n' +
+        (info.novaPoshtaBranch ? '\uD83D\uDCE6 \u041D\u041F \u2116' + esc(String(info.novaPoshtaBranch)) + '\n' : '') +
+        '\n' +
+        '<b>Товари:</b>\n' +
+        itemLines + '\n' +
+        '\n' +
+        '\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n' +
+        '\uD83D\uDCB0 <b>' + serverTotal + ' \u20B4</b>  |  \uD83D\uDCB3 Monobank\n' +
+        '\u23F3 \u041E\u0447\u0456\u043A\u0443\u0454 \u043E\u043F\u043B\u0430\u0442\u0438'
+      );
       fetch('https://api.telegram.org/bot' + TOKEN + '/sendMessage', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
