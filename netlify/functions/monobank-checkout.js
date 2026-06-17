@@ -95,8 +95,11 @@ exports.handler = async (event) => {
 
     const monoData = await monoRes.json();
 
-    // Save order AFTER invoice created (fire-and-forget — callback handles payment)
-    saveOrder({
+    // Prepare all side-effect promises
+    var tasks = [];
+
+    // 1. Save order to Supabase
+    tasks.push(saveOrder({
       order_id: orderId,
       status: 'awaiting_payment',
       payment_method: 'monobank',
@@ -120,13 +123,12 @@ exports.handler = async (event) => {
       subtotal: serverTotal,
       total: serverTotal,
       created_at: new Date().toISOString(),
-    }).catch(function (err) { console.error('Save order failed:', err.message); });
+    }).catch(function (err) { console.error('Save order failed:', err.message); }));
 
-    // Telegram — notify admin of new order
-    (function () {
-      var TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-      var CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-      if (!TOKEN || !CHAT_ID) return;
+    // 2. Telegram notification
+    var TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+    var CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+    if (TOKEN && CHAT_ID) {
       var info = shippingInfo || {};
       var itemLines = validatedItems.map(function (i) {
         return i.qty + '\u00d7 ' + i.name + (i.size ? ' (' + i.size + ')' : '') + ' \u2014 ' + (i.price * i.qty) + ' \u20B4';
@@ -150,24 +152,32 @@ exports.handler = async (event) => {
         '\uD83D\uDCB0 <b>' + serverTotal + ' \u20B4</b>  |  \uD83D\uDCB3 Monobank\n' +
         '\u23F3 \u041E\u0447\u0456\u043A\u0443\u0454 \u043E\u043F\u043B\u0430\u0442\u0438'
       );
-      fetch('https://api.telegram.org/bot' + TOKEN + '/sendMessage', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'HTML' }),
-      }).catch(function (err) { console.error('Telegram notify failed:', err.message); });
-    })();
+      tasks.push(
+        fetch('https://api.telegram.org/bot' + TOKEN + '/sendMessage', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'HTML' }),
+        }).then(function (r) { if (!r.ok) console.error('Telegram notify failed:', r.status); })
+          .catch(function (err) { console.error('Telegram notify failed:', err.message); })
+      );
+    }
 
-    // Send immediate order confirmation email
+    // 3. Order confirmation email
     if (email) {
       var emailItems = validatedItems.map(function (i) {
         return { product: { name: i.name, price: i.price }, size: i.size, quantity: i.qty };
       });
-      sendEmail({
-        to: email,
-        subject: '\u0417\u0430\u043C\u043E\u0432\u043B\u0435\u043D\u043D\u044F #' + orderId + ' \u043E\u0442\u0440\u0438\u043C\u0430\u043D\u043E \u2014 BUKSY',
-        html: orderConfirmationHtml({ orderId: orderId, items: emailItems, total: serverTotal, shippingInfo: shippingInfo || {} }),
-      }).catch(function (err) { console.error('Order email failed:', err.message); });
+      tasks.push(
+        sendEmail({
+          to: email,
+          subject: '\u0417\u0430\u043C\u043E\u0432\u043B\u0435\u043D\u043D\u044F #' + orderId + ' \u043E\u0442\u0440\u0438\u043C\u0430\u043D\u043E \u2014 BUKSY',
+          html: orderConfirmationHtml({ orderId: orderId, items: emailItems, total: serverTotal, shippingInfo: shippingInfo || {} }),
+        }).catch(function (err) { console.error('Order email failed:', err.message); })
+      );
     }
+
+    // Wait for all side-effects to complete (Netlify kills pending promises after return)
+    await Promise.allSettled(tasks);
 
     return {
       statusCode: 200,

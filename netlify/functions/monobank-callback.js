@@ -105,28 +105,39 @@ exports.handler = async (event) => {
       return { statusCode: 200, body: 'OK' };
     }
 
-    // Send payment confirmation email to customer
+    // Collect all async side-effects
+    var tasks = [];
+
+    // Payment confirmation email
     try {
       const order = await getOrderByRef(body.reference);
       if (order && order.customer && order.customer.email) {
         var emailItems = (body.basketOrder || []).map(function (b) {
           return { qty: b.qty, name: b.name, size: '' };
         });
-        sendEmail({
-          to: order.customer.email,
-          subject: '\u041E\u043F\u043B\u0430\u0442\u0443 \u043F\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0436\u0435\u043D\u043E \u2014 \u0417\u0430\u043C\u043E\u0432\u043B\u0435\u043D\u043D\u044F #' + body.reference,
-          html: paymentConfirmedHtml({ orderId: body.reference, amount: amount, currency: 'UAH', paymentId: body.invoiceId, items: emailItems }),
-        }).catch(function (err) { console.error('Payment email failed:', err.message); });
+        tasks.push(
+          sendEmail({
+            to: order.customer.email,
+            subject: '\u041E\u043F\u043B\u0430\u0442\u0443 \u043F\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0436\u0435\u043D\u043E \u2014 \u0417\u0430\u043C\u043E\u0432\u043B\u0435\u043D\u043D\u044F #' + body.reference,
+            html: paymentConfirmedHtml({ orderId: body.reference, amount: amount, currency: 'UAH', paymentId: body.invoiceId, items: emailItems }),
+          }).catch(function (err) { console.error('Payment email failed:', err.message); })
+        );
       }
     } catch (e) { console.error('Failed to send payment email:', e.message); }
 
+    // Decrease stock
     if (body.basketOrder && body.basketOrder.length) {
-      decreaseStock(
-        body.basketOrder.map(function (b) {
-          return { product: { slug: b.code }, quantity: b.qty };
-        })
-      ).catch(function (err) { console.error('Stock decrease failed:', err.message); });
+      tasks.push(
+        decreaseStock(
+          body.basketOrder.map(function (b) {
+            return { product: { slug: b.code }, quantity: b.qty };
+          })
+        ).catch(function (err) { console.error('Stock decrease failed:', err.message); })
+      );
     }
+
+    // Wait for email + stock before returning
+    await Promise.allSettled(tasks);
 
     return { statusCode: 200, body: 'OK' };
   } catch (error) {
