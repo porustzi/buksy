@@ -112,6 +112,7 @@ exports.handler = async (event) => {
         city: shippingInfo.city || '',
         country: shippingInfo.country || '',
         postalCode: shippingInfo.postalCode || '',
+        novaPoshtaBranch: shippingInfo.novaPoshtaBranch || '',
       } : {},
       items: validatedItems.map((i) => ({ slug: i.slug, name: i.name, size: i.size, price: i.price, qty: i.qty })),
       shipping_cost: 0,

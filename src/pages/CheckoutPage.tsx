@@ -6,14 +6,13 @@ import {
   Lock,
   Check,
   ArrowLeft,
-  Truck,
   Shield,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '../store/CartContext';
 import { formatPrice } from '../data/settings';
 
-type CheckoutStep = 'information' | 'shipping' | 'payment';
+type CheckoutStep = 'information' | 'payment';
 
 export function CheckoutPage() {
   const { t } = useTranslation();
@@ -33,15 +32,13 @@ export function CheckoutPage() {
     city: '',
     country: '',
     postalCode: '',
+    novaPoshtaBranch: '',
   });
 
-  const [shippingMethod, setShippingMethod] = useState<'standard' | 'express'>('standard');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState('');
 
-  const shippingCost = totalPrice >= 150 ? 0 : shippingMethod === 'express' ? 25 : 15;
-  const tax = Math.round(totalPrice * 0.08 * 100) / 100;
-  const total = Math.round((totalPrice + shippingCost + tax) * 100) / 100;
+  const total = totalPrice;
 
   const validateInformation = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -52,6 +49,7 @@ export function CheckoutPage() {
     if (!shippingInfo.address.trim()) newErrors.address = 'Address is required';
     if (!shippingInfo.city.trim()) newErrors.city = 'City is required';
     if (!shippingInfo.country.trim()) newErrors.country = 'Country is required';
+    if (!shippingInfo.novaPoshtaBranch.trim()) newErrors.novaPoshtaBranch = 'Відділення НП обов\'язкове';
     if (shippingInfo.phone.trim() && !/^\+?[\d\s\-()]{6,20}$/.test(shippingInfo.phone.trim()))
       newErrors.phone = 'Invalid phone format';
     setErrors(newErrors);
@@ -138,7 +136,6 @@ export function CheckoutPage() {
 
   const steps: { id: CheckoutStep; nameKey: string }[] = [
     { id: 'information', nameKey: 'checkout.information' },
-    { id: 'shipping', nameKey: 'checkout.shippingStep' },
     { id: 'payment', nameKey: 'checkout.paymentStep' },
   ];
 
@@ -285,7 +282,7 @@ export function CheckoutPage() {
                     }
                     className="checkout-input w-full"
                   />
-                  <div className="grid sm:grid-cols-3 gap-4">
+                   <div className="grid sm:grid-cols-3 gap-4">
                     <input
                       type="text"
                       placeholder="Київ"
@@ -315,102 +312,24 @@ export function CheckoutPage() {
                     />
                   </div>
 
+                  <input
+                    type="text"
+                    placeholder="Відділення Нової Пошти №"
+                    value={shippingInfo.novaPoshtaBranch}
+                    onChange={(e) =>
+                      setShippingInfo({ ...shippingInfo, novaPoshtaBranch: e.target.value })
+                    }
+                    className="checkout-input w-full"
+                  />
+
                   <button
                     onClick={() => {
-                      if (validateInformation()) setStep('shipping');
+                      if (validateInformation()) setStep('payment');
                     }}
                     className="btn-primary w-full mt-8"
                   >
-                    {t('checkout.continueToShipping')}
+                    {t('checkout.continueToPayment')}
                   </button>
-                </div>
-              )}
-
-              {step === 'shipping' && (
-                <div className="space-y-6">
-                  <h2 className="font-heading text-xl tracking-wider mb-6">
-                    {t('checkout.shippingMethod')}
-                  </h2>
-                  <div className="space-y-4">
-                    <label
-                      className={`flex items-center justify-between p-6 border cursor-pointer transition-colors duration-300 ${
-                        shippingMethod === 'standard'
-                          ? 'border-blood bg-blood/5'
-                          : 'border-white/10 hover:border-white/30'
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <input
-                          type="radio"
-                          name="shipping"
-                          value="standard"
-                          checked={shippingMethod === 'standard'}
-                          onChange={() => setShippingMethod('standard')}
-                          className="w-4 h-4 accent-blood"
-                        />
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <Truck size={18} className="text-blood" />
-                            <span className="font-heading text-sm tracking-wider">
-                              {t('checkout.standardShipping')}
-                            </span>
-                          </div>
-                          <p className="text-white/60 font-body text-sm mt-1">
-                            {t('checkout.standardDays')}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="font-mono">
-                        {totalPrice >= 150 ? (
-                          <span className="text-blood">{t('common.free')}</span>
-                        ) : (
-                          formatPrice(15)
-                        )}
-                      </span>
-                    </label>
-                    <label
-                      className={`flex items-center justify-between p-6 border cursor-pointer transition-colors duration-300 ${
-                        shippingMethod === 'express'
-                          ? 'border-blood bg-blood/5'
-                          : 'border-white/10 hover:border-white/30'
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <input
-                          type="radio"
-                          name="shipping"
-                          value="express"
-                          checked={shippingMethod === 'express'}
-                          onChange={() => setShippingMethod('express')}
-                          className="w-4 h-4 accent-blood"
-                        />
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <Truck size={18} className="text-blood" />
-                            <span className="font-heading text-sm tracking-wider">
-                              {t('checkout.expressShipping')}
-                            </span>
-                          </div>
-                          <p className="text-white/60 font-body text-sm mt-1">
-                            {t('checkout.expressDays')}
-                          </p>
-                        </div>
-                      </div>
-                      <span className="font-mono">{formatPrice(25)}</span>
-                    </label>
-                  </div>
-
-                  <div className="flex gap-4 mt-8">
-                    <button onClick={() => setStep('information')} className="btn-secondary flex-1">
-                      {t('checkout.back')}
-                    </button>
-                    <button
-                      onClick={() => setStep('payment')}
-                      className="btn-primary flex-1"
-                    >
-                      {t('checkout.continueToPayment')}
-                    </button>
-                  </div>
                 </div>
               )}
 
@@ -446,7 +365,7 @@ export function CheckoutPage() {
                     </span>
                   </div>
 
-                  <button onClick={() => setStep('shipping')} className="w-full py-3 border border-white/5 text-white/40 font-body text-sm hover:text-white hover:border-white/20 transition-colors duration-300">
+                  <button onClick={() => setStep('information')} className="w-full py-3 border border-white/5 text-white/40 font-body text-sm hover:text-white hover:border-white/20 transition-colors duration-300">
                     ← {t('checkout.back2')}
                   </button>
                 </div>
@@ -487,21 +406,7 @@ export function CheckoutPage() {
                 ))}
               </div>
               <div className="space-y-3 pt-4 mt-4 border-t border-white/5">
-                <div className="flex justify-between text-sm font-body">
-                  <span className="text-white/60">{t('checkout.subtotal')}</span>
-                  <span className="font-mono">{formatPrice(totalPrice)}</span>
-                </div>
-                <div className="flex justify-between text-sm font-body">
-                  <span className="text-white/60">{t('checkout.shipping')}</span>
-                  <span className="font-mono">
-                    {shippingCost === 0 ? t('common.free') : formatPrice(shippingCost)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm font-body">
-                  <span className="text-white/60">{t('checkout.tax')}</span>
-                  <span className="font-mono">{formatPrice(tax)}</span>
-                </div>
-                <div className="flex justify-between text-lg border-t border-white/5 pt-3">
+                <div className="flex justify-between text-lg">
                   <span className="font-heading tracking-wider">{t('checkout.total')}</span>
                   <span className="font-mono text-xl">{formatPrice(total)}</span>
                 </div>

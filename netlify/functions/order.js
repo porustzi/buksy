@@ -3,13 +3,6 @@ const { saveOrder, decreaseStock } = require('./_supabase');
 const { sendEmail, orderConfirmationHtml } = require('./_email');
 const catalog = require('./_catalog.json');
 
-function calcServerTotal(items, shippingMethod) {
-  const subtotal = items.reduce((s, i) => s + i.pricePerUnit * i.quantity, 0);
-  const shipping = subtotal >= 150 ? 0 : (shippingMethod === 'express' ? 25 : 15);
-  const tax = subtotal * 0.08;
-  return { subtotal, shipping, tax, total: subtotal + shipping + tax };
-}
-
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -19,7 +12,7 @@ exports.handler = async (event) => {
   if (blocked) return blocked;
 
   try {
-    const { items, shippingInfo, paymentMethod, shippingMethod } = JSON.parse(event.body);
+    const { items, shippingInfo, paymentMethod } = JSON.parse(event.body);
 
     if (!items || !items.length) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Cart is empty' }) };
@@ -58,7 +51,7 @@ exports.handler = async (event) => {
     const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
     const orderId = 'BUK-' + Date.now().toString().slice(-6);
-    const { subtotal, shipping, tax, total } = calcServerTotal(safeItems, shippingMethod);
+    const total = safeItems.reduce((s, i) => s + i.pricePerUnit * i.quantity, 0);
 
     const itemsList = safeItems
       .map((i) => `   ${i.quantity}× ${esc(i.product.name)} (${esc(i.size)}) — $${(i.pricePerUnit * i.quantity).toFixed(2)}`)
@@ -89,13 +82,14 @@ exports.handler = async (event) => {
       '<b>📍 Доставка</b>',
       `   ${address}${apartment}`,
       `   ${city}, ${country}, ${postalCode}`,
+      info.novaPoshtaBranch ? '   \u041D\u041F \u2116' + esc(String(info.novaPoshtaBranch)) : '',
       '',
       '<b>🛍 Товари</b>',
       itemsList,
       '',
       paymentLabel,
       '━━━━━━━━━━━━━━━━',
-      `💰 <b>$${total.toFixed(2)}</b>`,
+      `\u{1F4B0} <b>${total.toFixed(0)} \u20B4</b>`,
     ].filter(Boolean).join('\n');
 
     if (TOKEN && CHAT_ID) {
@@ -116,13 +110,12 @@ exports.handler = async (event) => {
       order_id: orderId,
       status: paymentMethod === 'monobank' ? 'awaiting_payment' : 'new',
       payment_method: paymentMethod || 'card',
-      shipping_method: shippingMethod || 'standard',
       customer: { firstName: info.firstName, lastName: info.lastName, email, phone: info.phone },
-      shipping: { address: info.address, apartment: info.apartment, city: info.city, country: info.country, postalCode: info.postalCode },
+      shipping: { address: info.address, apartment: info.apartment, city: info.city, country: info.country, postalCode: info.postalCode, novaPoshtaBranch: info.novaPoshtaBranch || '' },
       items: safeItems.map((i) => ({ slug: i.product.slug, name: i.product.name, size: i.size, price: i.pricePerUnit, qty: i.quantity })),
-      subtotal,
-      shipping_cost: shipping,
-      tax,
+      subtotal: total,
+      shipping_cost: 0,
+      tax: 0,
       total,
       created_at: new Date().toISOString(),
     }).catch(function (err) { console.error('Save order failed:', err.message); });
