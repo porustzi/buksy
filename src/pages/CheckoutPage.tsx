@@ -61,11 +61,10 @@ export function CheckoutPage() {
     setIsProcessing(true);
     setSubmitError('');
     try {
-      const oid = 'BUK-' + Date.now().toString().slice(-6);
       const res = await fetch('/.netlify/functions/monobank-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, shippingInfo, total, orderId: oid, email: shippingInfo.email }),
+        body: JSON.stringify({ items, shippingInfo, email: shippingInfo.email }),
       });
       const data = await res.json();
       if (data.error) {
@@ -74,7 +73,7 @@ export function CheckoutPage() {
         return;
       }
       if (data.redirectUrl) {
-        setOrderId(oid);
+        setOrderId(data.orderId || '');
         clearCart();
         window.location.href = data.redirectUrl;
       }

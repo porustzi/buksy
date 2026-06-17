@@ -40,6 +40,12 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
+  // Rate limit BEFORE expensive crypto verification
+  const ip = event.headers['client-ip'] || 'unknown';
+  if (!rateLimit(ip, 30)) {
+    return { statusCode: 429, body: JSON.stringify({ error: 'Too many requests' }) };
+  }
+
   const rawBody = event.body || '';
   const xSign = event.headers['x-sign'] || '';
 
@@ -52,12 +58,6 @@ exports.handler = async (event) => {
   if (!xSign || !verifySignature(rawBody, xSign, pubKey)) {
     console.error('Monobank callback: invalid X-Sign');
     return { statusCode: 403, body: 'Invalid signature' };
-  }
-
-  // Rate limit AFTER signature verification
-  const ip = event.headers['client-ip'] || 'unknown';
-  if (!rateLimit(ip, 30)) {
-    return { statusCode: 429, body: JSON.stringify({ error: 'Too many requests' }) };
   }
 
   try {
@@ -100,7 +100,13 @@ exports.handler = async (event) => {
       }
     }
 
-    const wasPaid = await markOrderPaid(body.reference, body.invoiceId);
+    let wasPaid;
+    try {
+      wasPaid = await markOrderPaid(body.reference, body.invoiceId);
+    } catch (err) {
+      console.error('markOrderPaid DB error:', err.message);
+      return { statusCode: 500, body: 'DB error' };
+    }
     if (!wasPaid) {
       return { statusCode: 200, body: 'OK' };
     }
@@ -137,7 +143,10 @@ exports.handler = async (event) => {
     }
 
     // Wait for email + stock before returning
-    await Promise.allSettled(tasks);
+    await Promise.allSettled(tasks).then(function (results) {
+      var failed = results.filter(function (r) { return r.status === 'rejected'; }).length;
+      if (failed) console.error('monobank-callback: ' + failed + ' side-effect(s) failed');
+    });
 
     return { statusCode: 200, body: 'OK' };
   } catch (error) {

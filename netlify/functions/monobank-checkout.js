@@ -1,4 +1,4 @@
-const { guard, esc } = require('./_utils');
+const { guard, esc, validateEmail } = require('./_utils');
 const { saveOrder } = require('./_supabase');
 const { sendEmail, orderConfirmationHtml } = require('./_email');
 const catalog = require('./_catalog.json');
@@ -12,9 +12,10 @@ exports.handler = async (event) => {
   if (blocked) return blocked;
 
   try {
-    const { items, shippingInfo, total, orderId, email } = JSON.parse(event.body);
+    const { items, shippingInfo, email } = JSON.parse(event.body);
+    var orderId = 'BUK-' + Math.random().toString(36).slice(2, 8).toUpperCase() + '-' + Date.now().toString(36).toUpperCase().slice(-4);
 
-    if (!items || !items.length) {
+    if (!items || !Array.isArray(items) || !items.length) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Cart is empty' }) };
     }
 
@@ -59,7 +60,39 @@ exports.handler = async (event) => {
       code: i.slug,
     }));
 
-    // Create Monobank invoice FIRST (no orphaned order if it fails)
+    // 1. Save order FIRST to prevent orphaned invoices
+    try {
+      await saveOrder({
+        order_id: orderId,
+        status: 'awaiting_payment',
+        payment_method: 'monobank',
+        customer: {
+          email: email || '',
+          firstName: (shippingInfo && shippingInfo.firstName) || '',
+          lastName: (shippingInfo && shippingInfo.lastName) || '',
+          phone: (shippingInfo && shippingInfo.phone) || '',
+        },
+        shipping: shippingInfo ? {
+          address: shippingInfo.address || '',
+          apartment: shippingInfo.apartment || '',
+          city: shippingInfo.city || '',
+          country: shippingInfo.country || '',
+          postalCode: shippingInfo.postalCode || '',
+          novaPoshtaBranch: shippingInfo.novaPoshtaBranch || '',
+        } : {},
+        items: validatedItems.map((i) => ({ slug: i.slug, name: i.name, size: i.size, price: i.price, qty: i.qty })),
+        shipping_cost: 0,
+        tax: 0,
+        subtotal: serverTotal,
+        total: serverTotal,
+        created_at: new Date().toISOString(),
+      });
+    } catch (err) {
+      console.error('Save order failed:', err.message);
+      return { statusCode: 500, body: JSON.stringify({ error: 'Не вдалося створити замовлення' }) };
+    }
+
+    // 2. Create Monobank invoice (only after order is saved)
     const monoBody = {
       amount: amountKopecks,
       ccy: 980,
@@ -95,37 +128,10 @@ exports.handler = async (event) => {
 
     const monoData = await monoRes.json();
 
-    // Prepare all side-effect promises
+    // 3. Side-effects (fire-and-forget, but awaited for Netlify)
     var tasks = [];
 
-    // 1. Save order to Supabase
-    tasks.push(saveOrder({
-      order_id: orderId,
-      status: 'awaiting_payment',
-      payment_method: 'monobank',
-      customer: {
-        email: email || '',
-        firstName: (shippingInfo && shippingInfo.firstName) || '',
-        lastName: (shippingInfo && shippingInfo.lastName) || '',
-        phone: (shippingInfo && shippingInfo.phone) || '',
-      },
-      shipping: shippingInfo ? {
-        address: shippingInfo.address || '',
-        apartment: shippingInfo.apartment || '',
-        city: shippingInfo.city || '',
-        country: shippingInfo.country || '',
-        postalCode: shippingInfo.postalCode || '',
-        novaPoshtaBranch: shippingInfo.novaPoshtaBranch || '',
-      } : {},
-      items: validatedItems.map((i) => ({ slug: i.slug, name: i.name, size: i.size, price: i.price, qty: i.qty })),
-      shipping_cost: 0,
-      tax: 0,
-      subtotal: serverTotal,
-      total: serverTotal,
-      created_at: new Date().toISOString(),
-    }).catch(function (err) { console.error('Save order failed:', err.message); }));
-
-    // 2. Telegram notification
+    // Telegram notification
     var TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     var CHAT_ID = process.env.TELEGRAM_CHAT_ID;
     if (TOKEN && CHAT_ID) {
@@ -162,7 +168,7 @@ exports.handler = async (event) => {
       );
     }
 
-    // 3. Order confirmation email
+    // Order confirmation email
     if (email) {
       var emailItems = validatedItems.map(function (i) {
         return { product: { name: i.name, price: i.price }, size: i.size, quantity: i.qty };
@@ -176,12 +182,13 @@ exports.handler = async (event) => {
       );
     }
 
-    // Wait for all side-effects to complete (Netlify kills pending promises after return)
-    await Promise.allSettled(tasks);
+    var results = await Promise.allSettled(tasks);
+    var failed = results.filter(function (r) { return r.status === 'rejected'; }).length;
+    if (failed) console.error('monobank-checkout: ' + failed + ' side-effect(s) failed');
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ redirectUrl: monoData.pageUrl }),
+      body: JSON.stringify({ redirectUrl: monoData.pageUrl, orderId: orderId }),
     };
   } catch (error) {
     console.error('monobank-checkout error:', error);

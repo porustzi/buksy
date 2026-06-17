@@ -50,11 +50,11 @@ exports.handler = async (event) => {
 
     const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-    const orderId = 'BUK-' + Date.now().toString().slice(-6);
+    const orderId = 'BUK-' + Math.random().toString(36).slice(2, 8).toUpperCase() + '-' + Date.now().toString(36).toUpperCase().slice(-4);
     const total = safeItems.reduce((s, i) => s + i.pricePerUnit * i.quantity, 0);
 
     const itemsList = safeItems
-      .map((i) => `   ${i.quantity}× ${esc(i.product.name)} (${esc(i.size)}) — $${(i.pricePerUnit * i.quantity).toFixed(2)}`)
+      .map((i) =>        `   ${i.quantity}× ${esc(i.product.name)} (${esc(i.size)}) — ${(i.pricePerUnit * i.quantity).toFixed(0)} ₴`)
       .join('\n');
 
     const paymentLabel = paymentMethod === 'monobank' ? '\uD83D\uDCB3 Monobank (\u043E\u0447\u0456\u043A\u0443\u0454 \u043F\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0436\u0435\u043D\u043D\u044F)' : '\uD83D\uDCB3 \u041E\u043F\u043B\u0430\u0442\u0430';
@@ -123,11 +123,13 @@ exports.handler = async (event) => {
       created_at: new Date().toISOString(),
     }).catch(function (err) { console.error('Save order failed:', err.message); }));
 
-    // Decrease stock
-    tasks.push(
-      decreaseStock(safeItems.map((i) => ({ product: { slug: i.product.slug }, quantity: i.quantity })))
-        .catch(function (err) { console.error('Stock decrease failed:', err.message); })
-    );
+    // Decrease stock (skip for Monobank — callback handles it on payment confirmation)
+    if (paymentMethod !== 'monobank') {
+      tasks.push(
+        decreaseStock(safeItems.map((i) => ({ product: { slug: i.product.slug }, quantity: i.quantity })))
+          .catch(function (err) { console.error('Stock decrease failed:', err.message); })
+      );
+    }
 
     // Email
     if (email) {
@@ -140,8 +142,9 @@ exports.handler = async (event) => {
       );
     }
 
-    // Wait for all side-effects to complete
-    await Promise.allSettled(tasks);
+    var results = await Promise.allSettled(tasks);
+    var failed = results.filter(function (r) { return r.status === 'rejected'; }).length;
+    if (failed) console.error('order: ' + failed + ' side-effect(s) failed');
 
     return {
       statusCode: 200,

@@ -60,7 +60,7 @@ exports.handler = async (event) => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'HTML' }),
           });
-        } catch (e) {}
+        } catch (e) { console.error('Telegram update-tracking notify failed:', e.message); }
       }
 
       if (customerEmail) {
@@ -68,7 +68,7 @@ exports.handler = async (event) => {
           to: customerEmail,
           subject: '\u0417\u0430\u043c\u043e\u0432\u043b\u0435\u043d\u043d\u044f #' + orderId + ' \u0432\u0456\u0434\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043e',
           html: trackingUpdateHtml({ orderId, trackingNumber }),
-        }).catch(function () {});
+        }).catch(function (err) { console.error('Tracking email failed:', err.message); });
       }
 
       return { statusCode: 200, body: JSON.stringify({ success: true, ttn: trackingNumber }) };
@@ -140,7 +140,7 @@ exports.handler = async (event) => {
           status: 'shipped',
           tracking_number: ttn,
           shipped_at: new Date().toISOString(),
-        }).catch(function () {});
+        }).catch(function (err) { console.error('Tracking email failed:', err.message); });
 
         const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
         const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
@@ -158,7 +158,7 @@ exports.handler = async (event) => {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'HTML' }),
             });
-          } catch (e) {}
+          } catch (e) { console.error('Telegram update-tracking notify failed:', e.message); }
         }
 
         if (recipient.email) {
@@ -166,7 +166,7 @@ exports.handler = async (event) => {
             to: recipient.email,
             subject: '\u0417\u0430\u043c\u043e\u0432\u043b\u0435\u043d\u043d\u044f #' + orderId + ' \u0432\u0456\u0434\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u043e',
             html: trackingUpdateHtml({ orderId, trackingNumber: ttn }),
-          }).catch(function () {});
+        }).catch(function (err) { console.error('DB order update failed:', err.message); });
         }
       }
 
@@ -176,6 +176,6 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: JSON.stringify({ error: 'Unknown action' }) };
   } catch (error) {
     console.error('nova-poshta error:', error);
-    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+    return { statusCode: 500, body: JSON.stringify({ error: 'Internal server error' }) };
   }
 };
