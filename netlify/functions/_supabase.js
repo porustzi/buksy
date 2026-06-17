@@ -64,4 +64,16 @@ async function decreaseStock(items) {
   }
 }
 
-module.exports = { saveOrder, updateOrderStatus, markOrderPaid, decreaseStock };
+async function getOrderByRef(orderId) {
+  const supabase = getClient();
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('order_id', orderId)
+    .single();
+  if (error) { console.error('Supabase getOrderByRef error:', error.message); return null; }
+  return data;
+}
+
+module.exports = { saveOrder, updateOrderStatus, markOrderPaid, decreaseStock, getOrderByRef };

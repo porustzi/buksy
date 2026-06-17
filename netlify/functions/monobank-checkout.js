@@ -1,5 +1,6 @@
 const { guard } = require('./_utils');
 const { saveOrder } = require('./_supabase');
+const { sendEmail, orderConfirmationHtml } = require('./_email');
 const catalog = require('./_catalog.json');
 
 exports.handler = async (event) => {
@@ -119,6 +120,18 @@ exports.handler = async (event) => {
       total: serverTotal,
       created_at: new Date().toISOString(),
     }).catch(function (err) { console.error('Save order failed:', err.message); });
+
+    // Send immediate order confirmation email
+    if (email) {
+      var emailItems = validatedItems.map(function (i) {
+        return { product: { name: i.name, price: i.price }, size: i.size, quantity: i.qty };
+      });
+      sendEmail({
+        to: email,
+        subject: '\u0417\u0430\u043C\u043E\u0432\u043B\u0435\u043D\u043D\u044F #' + orderId + ' \u043E\u0442\u0440\u0438\u043C\u0430\u043D\u043E \u2014 BUKSY',
+        html: orderConfirmationHtml({ orderId: orderId, items: emailItems, total: serverTotal, shippingInfo: shippingInfo || {} }),
+      }).catch(function (err) { console.error('Order email failed:', err.message); });
+    }
 
     return {
       statusCode: 200,

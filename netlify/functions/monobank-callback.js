@@ -1,5 +1,5 @@
 const { esc, rateLimit } = require('./_utils');
-const { markOrderPaid, decreaseStock } = require('./_supabase');
+const { markOrderPaid, decreaseStock, getOrderByRef } = require('./_supabase');
 const { sendEmail, paymentConfirmedHtml } = require('./_email');
 const crypto = require('crypto');
 
@@ -104,6 +104,21 @@ exports.handler = async (event) => {
     if (!wasPaid) {
       return { statusCode: 200, body: 'OK' };
     }
+
+    // Send payment confirmation email to customer
+    try {
+      const order = await getOrderByRef(body.reference);
+      if (order && order.customer && order.customer.email) {
+        var emailItems = (body.basketOrder || []).map(function (b) {
+          return { qty: b.qty, name: b.name, size: '' };
+        });
+        sendEmail({
+          to: order.customer.email,
+          subject: '\u041E\u043F\u043B\u0430\u0442\u0443 \u043F\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0436\u0435\u043D\u043E \u2014 \u0417\u0430\u043C\u043E\u0432\u043B\u0435\u043D\u043D\u044F #' + body.reference,
+          html: paymentConfirmedHtml({ orderId: body.reference, amount: amount, currency: 'UAH', paymentId: body.invoiceId, items: emailItems }),
+        }).catch(function (err) { console.error('Payment email failed:', err.message); });
+      }
+    } catch (e) { console.error('Failed to send payment email:', e.message); }
 
     if (body.basketOrder && body.basketOrder.length) {
       decreaseStock(
