@@ -8,7 +8,6 @@ import {
   ArrowLeft,
   Truck,
   Shield,
-  Banknote,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '../store/CartContext';
@@ -59,38 +58,16 @@ export function CheckoutPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handlePlaceOrder = async () => {
-    if (!validateInformation()) { setStep('information'); return; }
-    setIsProcessing(true);
-    setSubmitError('');
-    try {
-      const response = await fetch('/.netlify/functions/order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, shippingInfo, total, paymentMethod: 'cod', shippingMethod }),
-      });
-      if (!response.ok) throw new Error('Order failed');
-      const data = await response.json();
-      setOrderId(data.orderId);
-      setIsComplete(true);
-      clearCart();
-    } catch {
-      setSubmitError(t('checkout.orderError') || 'Failed to place order. Please try again.');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
   const handleCardPayment = async () => {
     if (!validateInformation()) { setStep('information'); return; }
     setIsProcessing(true);
     setSubmitError('');
     try {
-      const orderId = 'BUK-' + Date.now().toString().slice(-6);
+      const oid = 'BUK-' + Date.now().toString().slice(-6);
       const res = await fetch('/.netlify/functions/monobank-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, shippingInfo, total, orderId, email: shippingInfo.email }),
+        body: JSON.stringify({ items, shippingInfo, total, orderId: oid, email: shippingInfo.email }),
       });
       const data = await res.json();
       if (data.error) {
@@ -99,10 +76,12 @@ export function CheckoutPage() {
         return;
       }
       if (data.redirectUrl) {
+        setOrderId(oid);
+        clearCart();
         window.location.href = data.redirectUrl;
       }
     } catch {
-      setSubmitError('Payment failed. Try again.');
+      setSubmitError('Помилка оплати. Спробуйте ще раз.');
     } finally {
       setIsProcessing(false);
     }
@@ -437,44 +416,33 @@ export function CheckoutPage() {
 
               {step === 'payment' && (
                 <div className="space-y-5">
-                  <h2 className="font-heading text-xl tracking-wider">{t('checkout.payment')}</h2>
+                   <h2 className="font-heading text-xl tracking-wider">{t('checkout.payment')}</h2>
 
                   {submitError && (
                     <p className="text-red-400 text-sm font-body text-center">{submitError}</p>
                   )}
 
-                  <div className="space-y-3">
-                    {/* Primary: Card Payment */}
-                    <button
-                      onClick={handleCardPayment}
-                      disabled={isProcessing}
-                      className="w-full py-4 bg-blood text-white font-heading text-sm tracking-wider hover:bg-blood/90 transition-colors duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
-                    >
-                      {isProcessing ? (
-                        <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      ) : (
-                        <><CreditCard size={18} /> {t('checkout.cardPayButton')}</>
-                      )}
-                    </button>
-
-                    {/* Secondary: COD */}
-                    <button
-                      onClick={handlePlaceOrder}
-                      disabled={isProcessing}
-                      className="w-full py-3.5 border border-white/20 text-white/70 font-heading text-sm tracking-wider hover:border-white/50 hover:text-white transition-colors duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
-                    >
-                      {isProcessing ? '...' : <><Banknote size={16} /> {t('checkout.submitOrder')}</>}
-                    </button>
-                  </div>
+                  {/* Card Payment — единственный способ */}
+                  <button
+                    onClick={handleCardPayment}
+                    disabled={isProcessing}
+                    className="w-full py-5 bg-blood text-white font-heading text-base tracking-widest hover:bg-blood/90 transition-colors duration-300 disabled:opacity-50 flex items-center justify-center gap-3"
+                  >
+                    {isProcessing ? (
+                      <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      <><CreditCard size={22} /> {t('checkout.cardPayButton')}</>
+                    )}
+                  </button>
 
                   <div className="flex items-center justify-center gap-6 pt-2 text-white/20 text-xs font-body">
                     <span className="flex items-center gap-1.5">
                       <Shield size={14} />
-                      SSL захист
+                      {t('checkout.secureSSL')}
                     </span>
                     <span className="flex items-center gap-1.5">
                       <CreditCard size={14} />
-                      Mono
+                      Monobank
                     </span>
                   </div>
 
@@ -500,7 +468,7 @@ export function CheckoutPage() {
                   >
                     <div className="relative">
                       <img
-                        src={item.product.images[0]}
+                        src={item.product.images?.[0] || '/placeholder.png'}
                         alt={item.product.name}
                         className="w-16 h-20 object-cover"
                       />

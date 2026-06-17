@@ -17,41 +17,55 @@ export function useSeo({ title, description, image, url }: SeoMeta = {}) {
     const pageTitle = title ? `${title} — BUKSY` : DEFAULT_TITLE;
     document.title = pageTitle;
 
-    const setMeta = (name: string, property: string | undefined, content: string) => {
-      const key = property || name;
-      const selector = property
-        ? `meta[property="${property}"]`
-        : `meta[name="${name}"]`;
+    const setOg = (name: string, content: string) => {
+      const selector = `meta[property="og:${name}"]`;
       let el = document.querySelector(selector) as HTMLMetaElement | null;
       if (!el) {
         el = document.createElement('meta');
-        if (property) el.setAttribute('property', property);
-        else el.setAttribute('name', name);
+        el.setAttribute('property', `og:${name}`);
         document.head.appendChild(el);
       }
       el.setAttribute('content', content);
-      prevRef.current[key] = el;
-      return el;
+      prevRef.current[`og:${name}`] = el;
+    };
+    const setTwitter = (name: string, content: string) => {
+      const selector = `meta[name="twitter:${name}"]`;
+      let el = document.querySelector(selector) as HTMLMetaElement | null;
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute('name', `twitter:${name}`);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('content', content);
+      prevRef.current[`twitter:${name}`] = el;
     };
 
-    setMeta('description', undefined, description || DEFAULT_DESC);
-    setMeta('og:title', 'og:title', pageTitle);
-    setMeta('og:description', 'og:description', description || DEFAULT_DESC);
-    setMeta('og:type', 'og:type', 'website');
-    setMeta('twitter:card', 'twitter:card', 'summary_large_image');
+    (function () {
+      var sel = 'meta[name="description"]';
+      var el = document.querySelector(sel);
+      if (!el) { el = document.createElement('meta'); el.setAttribute('name', 'description'); document.head.appendChild(el); }
+      el.setAttribute('content', description || DEFAULT_DESC);
+      prevRef.current['description'] = el;
+    })();
+
+    setOg('title', pageTitle);
+    setOg('description', description || DEFAULT_DESC);
+    setOg('type', 'website');
+    setTwitter('card', 'summary_large_image');
 
     if (image) {
-      setMeta('og:image', 'og:image', image);
-      setMeta('twitter:image', 'twitter:image', image);
+      setOg('image', image);
+      setTwitter('image', image);
     } else {
-      const ogImg = document.querySelector('meta[property="og:image"]');
-      if (ogImg) ogImg.remove();
-      const twImg = document.querySelector('meta[property="twitter:image"]');
-      if (twImg) twImg.remove();
+      ['og:image', 'twitter:image'].forEach(function (k) {
+        const el = prevRef.current[k];
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+        prevRef.current[k] = null;
+      });
     }
 
     if (url) {
-      setMeta('og:url', 'og:url', url);
+      setOg('url', url);
     }
 
     return () => {

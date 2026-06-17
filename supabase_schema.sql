@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS orders (
   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   order_id TEXT NOT NULL UNIQUE,
   status TEXT NOT NULL DEFAULT 'new',
-  payment_method TEXT DEFAULT 'cod',
+  payment_method TEXT DEFAULT 'card',
   shipping_method TEXT DEFAULT 'standard',
   customer JSONB DEFAULT '{}',
   shipping JSONB DEFAULT '{}',

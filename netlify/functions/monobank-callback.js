@@ -40,16 +40,10 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  // Rate limit only (no origin check — callback comes from Monobank)
-  const ip = event.headers['client-ip'] || event.headers['x-forwarded-for'] || 'unknown';
-  if (!rateLimit(ip, 30)) {
-    return { statusCode: 429, body: JSON.stringify({ error: 'Too many requests' }) };
-  }
-
   const rawBody = event.body || '';
   const xSign = event.headers['x-sign'] || '';
 
-  // Verify Monobank signature (required in production)
+  // Verify Monobank signature (required)
   const pubKey = await getPubKey();
   if (!pubKey) {
     console.error('Monobank callback: cannot verify signature (public key unavailable)');
@@ -58,6 +52,12 @@ exports.handler = async (event) => {
   if (!xSign || !verifySignature(rawBody, xSign, pubKey)) {
     console.error('Monobank callback: invalid X-Sign');
     return { statusCode: 403, body: 'Invalid signature' };
+  }
+
+  // Rate limit AFTER signature verification
+  const ip = event.headers['client-ip'] || 'unknown';
+  if (!rateLimit(ip, 30)) {
+    return { statusCode: 429, body: JSON.stringify({ error: 'Too many requests' }) };
   }
 
   try {
@@ -71,7 +71,6 @@ exports.handler = async (event) => {
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
     if (body.status !== 'success') {
-      console.log('Monobank callback: status=' + body.status + ', ref=' + body.reference);
       return { statusCode: 200, body: 'OK' };
     }
 
@@ -111,7 +110,7 @@ exports.handler = async (event) => {
         body.basketOrder.map(function (b) {
           return { product: { slug: b.code }, quantity: b.qty };
         })
-      ).catch(function () {});
+      ).catch(function (err) { console.error('Stock decrease failed:', err.message); });
     }
 
     return { statusCode: 200, body: 'OK' };

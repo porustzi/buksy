@@ -64,7 +64,7 @@ exports.handler = async (event) => {
       .map((i) => `   ${i.quantity}× ${esc(i.product.name)} (${esc(i.size)}) — $${(i.pricePerUnit * i.quantity).toFixed(2)}`)
       .join('\n');
 
-    const paymentLabel = paymentMethod === 'monobank' ? '💳 Monobank (очікує підтвердження)' : '💳 Оплата при отриманні';
+    const paymentLabel = paymentMethod === 'monobank' ? '\uD83D\uDCB3 Monobank (\u043E\u0447\u0456\u043A\u0443\u0454 \u043F\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0436\u0435\u043D\u043D\u044F)' : '\uD83D\uDCB3 \u041E\u043F\u043B\u0430\u0442\u0430';
 
     const firstName = esc(String(info.firstName || ''));
     const lastName = esc(String(info.lastName || ''));
@@ -115,7 +115,7 @@ exports.handler = async (event) => {
     saveOrder({
       order_id: orderId,
       status: paymentMethod === 'monobank' ? 'awaiting_payment' : 'new',
-      payment_method: paymentMethod || 'cod',
+      payment_method: paymentMethod || 'card',
       shipping_method: shippingMethod || 'standard',
       customer: { firstName: info.firstName, lastName: info.lastName, email, phone: info.phone },
       shipping: { address: info.address, apartment: info.apartment, city: info.city, country: info.country, postalCode: info.postalCode },
@@ -125,23 +125,19 @@ exports.handler = async (event) => {
       tax,
       total,
       created_at: new Date().toISOString(),
-    }).catch(() => {});
+    }).catch(function (err) { console.error('Save order failed:', err.message); });
 
     // Decrease stock
-    decreaseStock(safeItems.map((i) => ({ product: { slug: i.product.slug }, quantity: i.quantity }))).catch(() => {});
+    decreaseStock(safeItems.map((i) => ({ product: { slug: i.product.slug }, quantity: i.quantity })))
+      .catch(function (err) { console.error('Stock decrease failed:', err.message); });
 
     // Email
     if (email) {
       sendEmail({
         to: email,
-        subject: `Замовлення #${orderId} підтверджено — BUKSY`,
+        subject: '\u0417\u0430\u043C\u043E\u0432\u043B\u0435\u043D\u043D\u044F #' + orderId + ' \u043F\u0456\u0434\u0442\u0432\u0435\u0440\u0434\u0436\u0435\u043D\u043E \u2014 BUKSY',
         html: orderConfirmationHtml({ orderId, items: safeItems, total, shippingInfo: info }),
-      }).catch(() => {});
-    }
-
-    // Auto-create TTN if Nova Poshta is configured
-    if (paymentMethod !== 'monobank') {
-      autoCreateTtn(orderId, info, safeItems, total).catch(() => {});
+      }).catch(function (err) { console.error('Email send failed:', err.message); });
     }
 
     return {
@@ -152,96 +148,3 @@ exports.handler = async (event) => {
     return { statusCode: 500, body: JSON.stringify({ error: 'Internal server error' }) };
   }
 };
-
-// Auto-create Nova Poshta TTN for COD orders
-async function autoCreateTtn(orderId, shippingInfo, items, total) {
-  const apiKey = process.env.NOVA_POSHTA_API_KEY;
-  const senderCity = process.env.NP_SENDER_CITY_REF;
-  const senderAddr = process.env.NP_SENDER_ADDRESS_REF;
-  const senderContact = process.env.NP_SENDER_CONTACT_REF;
-  const senderPhone = process.env.NP_SENDER_PHONE;
-
-  if (!apiKey || !senderCity || !senderAddr || !senderContact) return;
-
-  try {
-    const cargoDesc = items.map(function (i) { return i.product.name; }).join(', ').slice(0, 255);
-    const codAmount = Math.round(total);
-
-    const props = {
-      SenderPhone: senderPhone || '',
-      CitySender: senderCity,
-      SenderAddress: senderAddr,
-      ContactSender: senderContact,
-      SendersPhone: senderPhone || '',
-      RecipientCityName: String(shippingInfo.city || ''),
-      RecipientAddressName: String(shippingInfo.address || ''),
-      RecipientName: [shippingInfo.firstName, shippingInfo.lastName].filter(Boolean).join(' ') || 'Клієнт',
-      RecipientType: 'PrivatePerson',
-      RecipientsPhone: String(shippingInfo.phone || ''),
-      ServiceType: 'WarehouseWarehouse',
-      PaymentMethod: 'Cash',
-      CargoType: 'Cargo',
-      Weight: '1',
-      SeatsAmount: '1',
-      Description: cargoDesc || 'Товари',
-      Cost: String(codAmount),
-      BackwardDeliveryData: [
-        { PayerType: 'Recipient', CargoType: 'Money', RedeliveryString: String(codAmount) },
-      ],
-    };
-
-    const npRes = await fetch('https://api.novaposhta.ua/v2.0/json/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ apiKey, modelName: 'InternetDocument', calledMethod: 'save', methodProperties: props }),
-    });
-
-    const npData = await npRes.json();
-    if (!npData.success) return;
-
-    const ttn = (npData.data[0] || {}).IntDocNumber;
-    if (!ttn) return;
-
-    // Update order with TTN
-    const { updateOrderStatus } = require('./_supabase');
-    const { sendEmail, trackingUpdateHtml } = require('./_email');
-    await updateOrderStatus(orderId, {
-      status: 'shipped',
-      tracking_number: ttn,
-      shipped_at: new Date().toISOString(),
-    }).catch(function () {});
-
-    // Telegram
-    const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-    const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
-    if (TOKEN && CHAT_ID) {
-      const ttnMsg = [
-        '\uD83D\uDCE6 <b>ТТН створено авто</b>',
-        '<code>#' + orderId + '</code>',
-        '',
-        '\uD83D\uDE9A <b>ТТН: ' + ttn + '</b>',
-        '\uD83D\uDCB0 Наложений: ' + codAmount + ' грн',
-      ].join('\n');
-      try {
-        await fetch('https://api.telegram.org/bot' + TOKEN + '/sendMessage', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: CHAT_ID, text: ttnMsg, parse_mode: 'HTML' }),
-        });
-      } catch (e) {}
-    }
-
-    // Email customer tracking
-    if (shippingInfo.email) {
-      sendEmail({
-        to: shippingInfo.email,
-        subject: 'Замовлення #' + orderId + ' відправлено — BUKSY',
-        html: trackingUpdateHtml({ orderId, trackingNumber: ttn }),
-      }).catch(function () {});
-    }
-
-    console.log('[NP Auto] TTN ' + ttn + ' for order ' + orderId);
-  } catch (err) {
-    console.error('[NP Auto] Error:', err.message);
-  }
-}

@@ -19,13 +19,12 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Invalid email format' }) };
     }
 
-    // TODO: Add email service (Mailchimp/SendGrid) integration
-    // const API_KEY = process.env.MAILCHIMP_API_KEY;
-    // await addSubscriber(email);
+    // Log subscription (plug in Mailchimp/SendGrid later)
+    console.log('[Subscribe] email=' + email);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, message: 'Successfully subscribed!' }),
+      body: JSON.stringify({ success: true, message: 'Підписку оформлено!' }),
     };
   } catch (error) {
     return { statusCode: 500, body: JSON.stringify({ error: 'Internal server error' }) };

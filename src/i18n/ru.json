@@ -121,7 +121,9 @@
     "verified": "ПОДТВЕРЖДЕНО",
     "productNotFound": "Товар не найден",
     "returnToShop": "Вернуться в магазин",
-    "share": "Поделиться"
+    "share": "Поделиться",
+    "lowStock": "Только {{count}} шт. в наличии",
+    "outOfStock": "Нет в наличии"
   },
   "cart": {
     "yourCart": "Ваша корзина",
@@ -194,8 +196,7 @@
     "continueShopping2": "ПРОДОЛЖИТЬ ПОКУПКИ",
     "orderError": "Ошибка. Попробуйте ещё раз.",
     "fixErrors": "Пожалуйста, исправьте ошибки ниже.",
-    "cardPayButton": "ОПЛАТИТЬ КАРТОЙ",
-    "submitOrder": "Оплата при получении"
+    "cardPayButton": "ОПЛАТИТЬ КАРТОЙ"
   },
   "contact": {
     "getInTouch": "СВЯЖИТЕСЬ С НАМИ",

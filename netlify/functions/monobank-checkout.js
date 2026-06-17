@@ -41,7 +41,7 @@ exports.handler = async (event) => {
     if (!MONOBANK_TOKEN) {
       console.error('[Monobank] MONOBANK_TOKEN env var not set');
       return {
-        statusCode: 200,
+        statusCode: 500,
         body: JSON.stringify({ error: 'Monobank не налаштовано' }),
       };
     }
@@ -58,34 +58,7 @@ exports.handler = async (event) => {
       code: i.slug,
     }));
 
-    const desc = validatedItems.map((i) => i.qty + '\u00d7 ' + i.name).join(', ').slice(0, 255);
-
-    // Save order before redirect
-    await saveOrder({
-      order_id: orderId,
-      status: 'awaiting_payment',
-      payment_method: 'monobank',
-      customer: {
-        email: email || '',
-        firstName: (shippingInfo && shippingInfo.firstName) || '',
-        lastName: (shippingInfo && shippingInfo.lastName) || '',
-        phone: (shippingInfo && shippingInfo.phone) || '',
-      },
-      shipping: shippingInfo ? {
-        address: shippingInfo.address || '',
-        apartment: shippingInfo.apartment || '',
-        city: shippingInfo.city || '',
-        country: shippingInfo.country || '',
-        postalCode: shippingInfo.postalCode || '',
-      } : {},
-      items: validatedItems.map((i) => ({ slug: i.slug, name: i.name, size: i.size, price: i.price, qty: i.qty })),
-      shipping_cost: 0,
-      tax: 0,
-      subtotal: serverTotal,
-      total: serverTotal,
-      created_at: new Date().toISOString(),
-    }).catch(() => {});
-
+    // Create Monobank invoice FIRST (no orphaned order if it fails)
     const monoBody = {
       amount: amountKopecks,
       ccy: 980,
@@ -120,6 +93,32 @@ exports.handler = async (event) => {
     }
 
     const monoData = await monoRes.json();
+
+    // Save order AFTER invoice created (fire-and-forget — callback handles payment)
+    saveOrder({
+      order_id: orderId,
+      status: 'awaiting_payment',
+      payment_method: 'monobank',
+      customer: {
+        email: email || '',
+        firstName: (shippingInfo && shippingInfo.firstName) || '',
+        lastName: (shippingInfo && shippingInfo.lastName) || '',
+        phone: (shippingInfo && shippingInfo.phone) || '',
+      },
+      shipping: shippingInfo ? {
+        address: shippingInfo.address || '',
+        apartment: shippingInfo.apartment || '',
+        city: shippingInfo.city || '',
+        country: shippingInfo.country || '',
+        postalCode: shippingInfo.postalCode || '',
+      } : {},
+      items: validatedItems.map((i) => ({ slug: i.slug, name: i.name, size: i.size, price: i.price, qty: i.qty })),
+      shipping_cost: 0,
+      tax: 0,
+      subtotal: serverTotal,
+      total: serverTotal,
+      created_at: new Date().toISOString(),
+    }).catch(function (err) { console.error('Save order failed:', err.message); });
 
     return {
       statusCode: 200,

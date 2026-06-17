@@ -121,7 +121,9 @@
     "verified": "ПІДТВЕРДЖЕНО",
     "productNotFound": "Товар не знайдено",
     "returnToShop": "Повернутись до магазину",
-    "share": "Поділитись"
+    "share": "Поділитись",
+    "lowStock": "Лише {{count}} шт. в наявності",
+    "outOfStock": "Немає в наявності"
   },
   "cart": {
     "yourCart": "Ваш кошик",
@@ -194,8 +196,7 @@
     "continueShopping2": "ПРОДОВЖИТИ ПОКУПКИ",
     "orderError": "Помилка. Спробуйте ще раз.",
     "fixErrors": "Будь ласка, виправте помилки нижче.",
-    "cardPayButton": "ОПЛАТИТИ КАРТКОЮ",
-    "submitOrder": "Оплата при отриманні"
+    "cardPayButton": "ОПЛАТИТИ КАРТКОЮ"
   },
   "contact": {
     "getInTouch": "ЗВ'ЯЖІТЬСЯ З НАМИ",

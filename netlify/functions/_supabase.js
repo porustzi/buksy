@@ -58,7 +58,7 @@ async function decreaseStock(items) {
     // Ensure product exists in inventory (insert with default stock if missing)
     await supabase.from('inventory')
       .upsert({ slug, name: slug, stock: 99, updated_at: new Date().toISOString() }, { onConflict: 'slug', ignoreDuplicates: true })
-      .then(function () {}, function () {});
+      .then(function () {}, function (err) { console.error('Inventory upsert failed for ' + slug + ':', err.message); });
     const { error } = await supabase.rpc('decrease_stock', { product_slug: slug, qty });
     if (error) console.error('Stock decrease failed for ' + slug + ':', error.message);
   }

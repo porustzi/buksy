@@ -1,2 +1,2 @@
 export const CURRENCY = '₴';
-export const formatPrice = (price: number): string => `${CURRENCY}${price.toFixed(0)}`;
+export const formatPrice = (price: number): string => `${price.toFixed(0)} ${CURRENCY}`;

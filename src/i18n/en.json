@@ -121,7 +121,9 @@
     "verified": "VERIFIED",
     "productNotFound": "Product not found",
     "returnToShop": "Return to shop",
-    "share": "Share"
+    "share": "Share",
+    "lowStock": "Only {{count}} left in stock",
+    "outOfStock": "Out of stock"
   },
   "cart": {
     "yourCart": "Your Cart",
@@ -194,8 +196,7 @@
     "continueShopping2": "CONTINUE SHOPPING",
     "orderError": "Error. Please try again.",
     "fixErrors": "Please fix the errors below.",
-    "cardPayButton": "PAY BY CARD",
-    "submitOrder": "Cash on Delivery"
+    "cardPayButton": "PAY BY CARD"
   },
   "contact": {
     "getInTouch": "GET IN TOUCH",
