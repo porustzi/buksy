@@ -1,4 +1,4 @@
-const { esc, guard } = require('./_utils');
+const { esc, guard, validateEmail } = require('./_utils');
 const { saveOrder, decreaseStock } = require('./_supabase');
 const { sendEmail, orderConfirmationHtml } = require('./_email');
 const catalog = require('./_catalog.json');
@@ -14,7 +14,7 @@ exports.handler = async (event) => {
   try {
     const { items, shippingInfo, paymentMethod } = JSON.parse(event.body);
 
-    if (!items || !items.length) {
+    if (!items || !Array.isArray(items) || !items.length) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Cart is empty' }) };
     }
 

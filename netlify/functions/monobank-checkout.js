@@ -19,6 +19,10 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Cart is empty' }) };
     }
 
+    if (email && !validateEmail(email)) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'Invalid email format' }) };
+    }
+
     const MONOBANK_TOKEN = process.env.MONOBANK_TOKEN;
     const SITE_URL = process.env.URL || 'http://localhost:8888';
 
@@ -101,7 +105,7 @@ exports.handler = async (event) => {
         destination: 'Замовлення #' + orderId + ' — BUKSY',
         basketOrder,
       },
-      redirectUrl: SITE_URL + '/checkout',
+      redirectUrl: SITE_URL + '/checkout?orderId=' + orderId,
       webHookUrl: SITE_URL + '/.netlify/functions/monobank-callback',
       validity: 3600,
       paymentType: 'debit',

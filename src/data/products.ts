@@ -2,55 +2,52 @@ import { Product, Review } from '../types';
 
 export const products: Product[] = [
   {
-    "id": "12",
-    "name": "Лонгслив Hysteric Glamour",
-    "slug": "ауа",
-    "price": 199,
-    "originalPrice": 299,
+    "id": "1",
+    "name": "Buksy T-Shirt",
+    "slug": "buksyshirt",
+    "price": 1299,
+    "originalPrice": 1599,
     "category": "t-shirts",
-    "image1": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNSBVIxZdE6aOq2cDsSGp3nPgX1BTIu9CPjw&s",
-    "image2": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNSBVIxZdE6aOq2cDsSGp3nPgX1BTIu9CPjw&s",
-    "image3": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNSBVIxZdE6aOq2cDsSGp3nPgX1BTIu9CPjw&s",
+    "image1": "/uploads/11231321.jpg",
+    "image2": "/uploads/43424234.jpg",
+    "image3": "/uploads/12313123133.jpg",
     "sizes": [
       {
         "available": true,
-        "name": "39"
+        "name": "S"
       },
       {
-        "available": false,
-        "name": "40"
+        "available": true,
+        "name": "M"
+      },
+      {
+        "available": true,
+        "name": "L"
       }
     ],
     "inStock": true,
+    "stock": 2,
     "isNew": true,
-    "isFeatured": true,
+    "isFeatured": false,
     "isBestseller": true,
-    "rating": 4.8,
-    "shortDescription": "шмотка",
-    "description": "крутая шмотка",
+    "rating": 5,
+    "shortDescription": "Культова футболка Buksy🩸\n\nЩільна 100% бавовна 250 г/м², вільний крій та характер, який відчувається з першого погляду. Створена для тих, хто обирає власний шлях, а не слідує за натовпом.\n",
+    "description": "Культова футболка Buksy🩸\n\nНе просто базова річ, а частина стилю. Преміальна щільна бавовна, комфортна посадка та дизайн, що залишається впізнаваним незалежно від часу та трендів.\n",
     "details": [
-      "заебанный"
+      "Щільна 100% бавовна 250 г/м²"
     ],
     "care": [
-      "отличный"
+      "Прасувати навиворіт при середній температурі",
+      "Не використовувати відбілювач",
+      "Прати при температурі до 30°C"
     ],
-    "reviews": [
-      {
-        "rating": 5,
-        "verified": true,
-        "id": "1",
-        "author": "егор",
-        "title": "ахуенно",
-        "content": "я еблан"
-      }
-    ],
+    "reviews": [],
     "images": [
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNSBVIxZdE6aOq2cDsSGp3nPgX1BTIu9CPjw&s",
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNSBVIxZdE6aOq2cDsSGp3nPgX1BTIu9CPjw&s",
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNSBVIxZdE6aOq2cDsSGp3nPgX1BTIu9CPjw&s"
+      "/uploads/11231321.jpg",
+      "/uploads/43424234.jpg",
+      "/uploads/12313123133.jpg"
     ],
-    "reviewCount": 1,
-    "stock": 99
+    "reviewCount": 0
   }
 ];
 

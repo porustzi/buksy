@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   CreditCard,
@@ -17,10 +17,20 @@ type CheckoutStep = 'information' | 'payment';
 export function CheckoutPage() {
   const { t } = useTranslation();
   const { items, totalPrice, clearCart } = useCart();
+  const [searchParams] = useSearchParams();
   const [step, setStep] = useState<CheckoutStep>('information');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [orderId, setOrderId] = useState('');
+
+  // Show confirmation if returning from Monobank payment
+  useEffect(() => {
+    var paidOrderId = searchParams.get('orderId');
+    if (paidOrderId && items.length === 0) {
+      setOrderId(paidOrderId);
+      setIsComplete(true);
+    }
+  }, []);
 
   const [shippingInfo, setShippingInfo] = useState({
     firstName: '',
@@ -73,7 +83,6 @@ export function CheckoutPage() {
         return;
       }
       if (data.redirectUrl) {
-        setOrderId(data.orderId || '');
         clearCart();
         window.location.href = data.redirectUrl;
       }

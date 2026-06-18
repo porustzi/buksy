@@ -49,22 +49,17 @@ async function markOrderPaid(orderId, paymentId) {
 }
 
 async function decreaseStock(items) {
-  const supabase = getClient();
+  var supabase = getClient();
   if (!supabase) return [];
   var errors = [];
-  for (const item of items) {
-    const slug = item.product?.slug;
-    const qty = Number(item.quantity) || 0;
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var slug = item.product?.slug;
+    var qty = Number(item.quantity) || 0;
     if (!slug || qty <= 0) continue;
-    try {
-      await supabase.from('inventory')
-        .upsert({ slug, name: slug, stock: 99, updated_at: new Date().toISOString() }, { onConflict: 'slug', ignoreDuplicates: true });
-    } catch (err) {
-      console.error('Inventory upsert failed for ' + slug + ':', err.message);
-    }
-    const { error } = await supabase.rpc('decrease_stock', { product_slug: slug, qty });
-    if (error) {
-      console.error('Stock decrease failed for ' + slug + ':', error.message);
+    var resp = await supabase.rpc('decrease_stock', { product_slug: slug, qty: qty });
+    if (resp.error) {
+      console.error('decreaseStock failed for', slug, ':', resp.error.message);
       errors.push(slug);
     }
   }

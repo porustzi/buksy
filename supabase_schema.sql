@@ -1,5 +1,5 @@
 -- Run this in your Supabase SQL Editor to set up the database.
--- If updating an existing install, just re-run the FUNCTION part at the bottom.
+-- Safe to re-run — uses IF NOT EXISTS / OR REPLACE.
 
 -- Orders table
 CREATE TABLE IF NOT EXISTS orders (
@@ -19,11 +19,15 @@ CREATE TABLE IF NOT EXISTS orders (
   tracking_number TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   paid_at TIMESTAMPTZ,
-  shipped_at TIMESTAMPTZ
+  shipped_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_orders_order_id ON orders(order_id);
+-- Unique constraint auto-creates index; drop redundant explicit index
+DROP INDEX IF EXISTS idx_orders_order_id;
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_id ON orders(payment_id);
+CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at);
 
 -- Inventory table
 CREATE TABLE IF NOT EXISTS inventory (
@@ -31,12 +35,14 @@ CREATE TABLE IF NOT EXISTS inventory (
   slug TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
   stock INTEGER NOT NULL DEFAULT 99,
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT chk_stock_nonnegative CHECK (stock >= 0)
 );
 
-CREATE INDEX IF NOT EXISTS idx_inventory_slug ON inventory(slug);
+DROP INDEX IF EXISTS idx_inventory_slug;
 
--- Decrease stock (idempotent: creates product row if missing)
+-- Atomic stock decrease: INSERTs product row if missing, then atomically decreases stock.
+-- RAISEs if insufficient stock (caught by caller as Supabase error).
 CREATE OR REPLACE FUNCTION decrease_stock(product_slug TEXT, qty INTEGER)
 RETURNS VOID AS $$
 BEGIN
@@ -45,14 +51,19 @@ BEGIN
   ON CONFLICT (slug) DO NOTHING;
 
   UPDATE inventory
-  SET stock = GREATEST(stock - qty, 0),
+  SET stock = stock - qty,
       updated_at = NOW()
-  WHERE slug = product_slug;
+  WHERE slug = product_slug AND stock >= qty;
+
+  IF NOT FOUND THEN
+    RAISE EXCEPTION 'Insufficient stock for %', product_slug;
+  END IF;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Row-Level Security (bypassed by service_role key used in functions)
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE inventory ENABLE ROW LEVEL SECURITY;
 
--- Service role bypasses RLS entirely.
--- No policies for anon — public access denied.
+-- DO NOT CREATE POLICIES — service_role bypasses RLS.
+-- Anon/authenticated keys get empty result sets (intentional).
