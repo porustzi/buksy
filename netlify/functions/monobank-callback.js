@@ -165,27 +165,27 @@ exports.handler = async function (event) {
   var pubKey = await getPubKey();
   if (!pubKey) {
     console.error('Monobank callback: cannot verify signature (public key unavailable)');
-    return { statusCode: 500, body: 'Server misconfigured — cannot verify Monobank signature' };
+    return { statusCode: 500, body: JSON.stringify({ error: 'Monobank signature verification unavailable' }) };
   }
   if (!xSign || !verifySignature(rawBody, xSign, pubKey)) {
     console.error('Monobank callback: invalid X-Sign');
-    return { statusCode: 403, body: 'Invalid signature' };
+    return { statusCode: 403, body: JSON.stringify({ error: 'Invalid signature' }) };
   }
 
   // Parse body
   var parsed = parseBody(event, RATE_LIMIT.WEBHOOK ? 65536 : 65536);
   if (parsed.error) {
-    return { statusCode: 400, body: 'Invalid JSON payload' };
+    return { statusCode: 400, body: JSON.stringify({ error: 'Invalid JSON payload' }) };
   }
   var body = parsed.data;
 
   try {
     if (!body.invoiceId || !body.status || !body.reference) {
-      return { statusCode: 400, body: 'Invalid callback payload' };
+      return { statusCode: 400, body: JSON.stringify({ error: 'Invalid callback payload' }) };
     }
 
     if (body.status !== 'success') {
-      return { statusCode: 200, body: 'OK' };
+      return { statusCode: 200, body: JSON.stringify({ ok: true }) };
     }
 
     var amountPaid = Number(body.amount || body.finalAmount || 0) / 100;
@@ -206,14 +206,14 @@ exports.handler = async function (event) {
 
     // Idempotent: if already paid, return OK silently
     if (!wasPaid) {
-      return { statusCode: 200, body: 'OK' };
+      return { statusCode: 200, body: JSON.stringify({ ok: true }) };
     }
 
     // Notifications only fire on first successful payment
     await notifyTelegram(body.reference, body.invoiceId, amountPaid, orderTotal);
     await notifyEmail(body.reference, body.invoiceId, amountPaid, body.basketOrder, order.customer?.email);
 
-    return { statusCode: 200, body: 'OK' };
+    return { statusCode: 200, body: JSON.stringify({ ok: true }) };
   } catch (error) {
     if (error instanceof OrderNotFoundError) {
       return { statusCode: 404, body: 'Order not found' };

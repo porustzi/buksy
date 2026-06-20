@@ -113,7 +113,7 @@ DECLARE
   item_record RECORD;
   was_updated BOOLEAN := FALSE;
 BEGIN
-  -- Guard 1: only mark unpaid orders that haven't had stock decreased
+  -- Guard 1: only process awaiting_payment orders that haven't had stock decreased
   UPDATE orders
   SET status        = 'paid',
       payment_id    = p_payment_id,
@@ -121,7 +121,7 @@ BEGIN
       paid_at       = NOW(),
       updated_at    = NOW()
   WHERE order_id    = p_order_id
-    AND status     != 'paid'
+    AND status      = 'awaiting_payment'
     AND stock_decreased = FALSE
   RETURNING TRUE INTO was_updated;
 

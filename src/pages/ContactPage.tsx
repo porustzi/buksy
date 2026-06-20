@@ -20,6 +20,9 @@ export function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setIsSubmitting(true); setSubmitError('');
+    if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { setSubmitError('Enter a valid email'); setIsSubmitting(false); return; }
+    if (!formData.message.trim()) { setSubmitError('Message is required'); setIsSubmitting(false); return; }
+    if (formData.message.length > 4096) { setSubmitError('Message too long'); setIsSubmitting(false); return; }
     try {
       const res = await fetch('/.netlify/functions/contact', { method: 'POST', headers: apiHeaders(), body: JSON.stringify(formData) });
       if (!res.ok) throw new Error('Failed');

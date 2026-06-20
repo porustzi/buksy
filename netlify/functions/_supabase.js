@@ -78,8 +78,7 @@ function classifyRpcError(error, amountPaid, orderTotal) {
   var code = error.code || '';
 
   if (code === RPC_ERRORS.STOCK_INSUFFICIENT) {
-    var slug = (error.message || '').split('Insufficient stock for ')[1] || 'unknown';
-    throw new StockInsufficientError(slug.trim());
+    throw new StockInsufficientError('stock');
   }
   if (code === RPC_ERRORS.AMOUNT_MISMATCH) {
     throw new AmountMismatchError(amountPaid || 0, orderTotal || 0);
@@ -300,7 +299,7 @@ async function decreaseStockBulk(items) {
     var it = items[i];
     var slug = it.slug || it.product?.slug;
     var qty = Number(it.quantity || it.qty) || 0;
-    var def = Number(it.default_stock) || 99;
+    var def = Number(it.default_stock) || require('./_constants').PAYMENT.DEFAULT_STOCK;
     if (!slug) throw new ValidationError('Missing slug at index ' + i, 'items[' + i + '].slug');
     if (qty <= 0) throw new ValidationError('Invalid qty at index ' + i, 'items[' + i + '].qty');
     payload.push({ slug: slug, qty: qty, default_stock: def });

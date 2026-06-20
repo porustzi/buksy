@@ -73,6 +73,7 @@ exports.handler = async function (event) {
       body: JSON.stringify({ success: true, message: 'Message received. We will get back to you soon.' }),
     };
   } catch (error) {
+    console.error('contact error:', error);
     return { statusCode: 500, body: JSON.stringify({ error: 'Internal server error' }) };
   }
 };
