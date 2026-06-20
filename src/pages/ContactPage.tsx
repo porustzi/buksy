@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone, Send, Instagram, Music2 } from 'lucide-react';
 import { contactInfo } from '../data/content';
 import { useSeo } from '../hooks/useSeo';
+import { apiHeaders } from '../data/settings';
 
 export function ContactPage() {
   const hero = contactInfo.hero || {};
@@ -20,7 +21,7 @@ export function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setIsSubmitting(true); setSubmitError('');
     try {
-      const res = await fetch('/.netlify/functions/contact', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(formData) });
+      const res = await fetch('/.netlify/functions/contact', { method: 'POST', headers: apiHeaders(), body: JSON.stringify(formData) });
       if (!res.ok) throw new Error('Failed');
       setIsSubmitted(true); setFormData({ name: '', email: '', subject: '', message: '' });
     } catch (err) {

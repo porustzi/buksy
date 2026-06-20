@@ -95,9 +95,18 @@ function guard(event, maxPerMin) {
   if (!rateLimit(ip, maxPerMin)) {
     return { statusCode: 429, body: JSON.stringify({ error: 'Too many requests' }) };
   }
-  if (!isSameOrigin(event)) {
-    return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden' }) };
+
+  var sameOrigin = isSameOrigin(event);
+  var apiKeyProvided = event.headers['x-api-key'] || '';
+  var expectedKey = process.env.API_SECRET || '';
+
+  if (!sameOrigin) {
+    if (!expectedKey) return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden' }) };
+    if (!apiKeyProvided || apiKeyProvided !== expectedKey) {
+      return { statusCode: 403, body: JSON.stringify({ error: 'Forbidden' }) };
+    }
   }
+
   return null;
 }
 

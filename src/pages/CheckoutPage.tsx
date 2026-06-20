@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '../store/CartContext';
-import { formatPrice } from '../data/settings';
+import { formatPrice, apiHeaders } from '../data/settings';
 
 type CheckoutStep = 'information' | 'payment';
 
@@ -77,7 +77,7 @@ export function CheckoutPage() {
     try {
       const res = await fetch('/.netlify/functions/monobank-checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: apiHeaders(),
         body: JSON.stringify({ items, shippingInfo, email: shippingInfo.email, idempotencyKey: idempotencyKeyRef.current }),
       });
       const data = await res.json();
