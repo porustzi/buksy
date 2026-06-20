@@ -15,12 +15,12 @@ function getClient() {
 }
 
 async function saveOrder(order) {
-  const supabase = getClient();
+  var supabase = getClient();
   if (!supabase) return null;
-  const { data, error } = await supabase.from('orders').insert(order).select('id').single();
+  var { data, error } = await supabase.from('orders').insert(order).select('order_id, total, status').single();
   if (error) {
     if (error.code === '23505' && error.message.includes('idempotency_key')) {
-      return { duplicate: true };
+      return { duplicate: true, idempotencyKey: order.idempotency_key };
     }
     console.error('Supabase saveOrder error:', error.message);
     return null;
@@ -28,25 +28,46 @@ async function saveOrder(order) {
   return data;
 }
 
-async function updateOrderStatus(orderId, updates) {
-  const supabase = getClient();
+async function getOrderByIdempotencyKey(key) {
+  var supabase = getClient();
   if (!supabase) return null;
-  const { error } = await supabase.from('orders').update(updates).eq('order_id', orderId);
+  var { data, error } = await supabase
+    .from('orders')
+    .select('*')
+    .eq('idempotency_key', key)
+    .single();
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    console.error('Supabase getOrderByIdempotencyKey error:', error.message);
+    return null;
+  }
+  return data;
+}
+
+async function updateOrderStatus(orderId, updates) {
+  var supabase = getClient();
+  if (!supabase) return null;
+  var { error } = await supabase.from('orders').update(updates).eq('order_id', orderId);
   if (error) console.error('Supabase updateOrder error:', error.message);
   return !error;
 }
 
-async function markOrderPaidWithStock(orderId, paymentId, itemsJson) {
+async function markOrderPaidWithStock(orderId, paymentId, amountPaid, orderTotal, itemsJson) {
   var supabase = getClient();
   if (!supabase) throw new Error('Supabase not configured');
   var { data, error } = await supabase.rpc('mark_order_paid_with_stock', {
     p_order_id: orderId,
     p_payment_id: paymentId,
+    p_amount_paid: amountPaid,
+    p_order_total: orderTotal,
     p_items: itemsJson
   });
   if (error) {
     if (error.message && error.message.includes('Insufficient stock')) {
       throw new Error('STOCK_INSUFFICIENT: ' + error.message);
+    }
+    if (error.message && error.message.includes('Amount mismatch')) {
+      throw new Error('AMOUNT_MISMATCH: ' + error.message);
     }
     console.error('Supabase markOrderPaidWithStock error:', error.message);
     throw new Error('Failed to process payment');
@@ -93,4 +114,4 @@ async function getOrderByRef(orderId) {
   return data;
 }
 
-module.exports = { saveOrder, updateOrderStatus, markOrderPaidWithStock, decreaseStock, getStock, getOrderByRef };
+module.exports = { saveOrder, getOrderByIdempotencyKey, updateOrderStatus, markOrderPaidWithStock, decreaseStock, getStock, getOrderByRef };

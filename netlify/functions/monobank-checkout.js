@@ -1,5 +1,5 @@
 const { guard, esc, sanitize, validateEmail, parseBody, generateOrderId } = require('./_utils');
-const { saveOrder, getStock } = require('./_supabase');
+const { saveOrder, getStock, getOrderByIdempotencyKey } = require('./_supabase');
 const { sendEmail, orderConfirmationHtml } = require('./_email');
 const catalog = require('./_catalog.json');
 
@@ -118,9 +118,25 @@ exports.handler = async (event) => {
       created_at: new Date().toISOString(),
     };
 
+    var existingOrderId = null;
+
     try {
       const saved = await saveOrder(orderRecord);
       if (saved && saved.duplicate) {
+        const existing = await getOrderByIdempotencyKey(idempotencyKey);
+        if (existing) {
+          existingOrderId = existing.order_id;
+          if (existing.status === 'awaiting_payment') {
+            return {
+              statusCode: 200,
+              body: JSON.stringify({
+                redirectUrl: SITE_URL + '/checkout?orderId=' + existing.order_id,
+                orderId: existing.order_id,
+              }),
+            };
+          }
+          return { statusCode: 409, body: JSON.stringify({ error: 'Це замовлення вже оформлено', duplicate: true, orderId: existing.order_id }) };
+        }
         return { statusCode: 409, body: JSON.stringify({ error: 'Це замовлення вже оформлено', duplicate: true }) };
       }
     } catch (err) {

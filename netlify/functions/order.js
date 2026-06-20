@@ -1,5 +1,5 @@
 const { esc, sanitize, guard, validateEmail, parseBody, generateOrderId } = require('./_utils');
-const { saveOrder, decreaseStock, getStock } = require('./_supabase');
+const { saveOrder, decreaseStock, getStock, getOrderByIdempotencyKey } = require('./_supabase');
 const { sendEmail, orderConfirmationHtml } = require('./_email');
 const catalog = require('./_catalog.json');
 
@@ -159,6 +159,13 @@ exports.handler = async (event) => {
     }
 
     if (saved && saved.duplicate) {
+      var existing = await getOrderByIdempotencyKey(idempotencyKey);
+      if (existing) {
+        return {
+          statusCode: 200,
+          body: JSON.stringify({ success: true, orderId: existing.order_id, total: Number(existing.total), message: 'Order already placed' }),
+        };
+      }
       return {
         statusCode: 409,
         body: JSON.stringify({ error: 'Це замовлення вже оформлено', duplicate: true }),
