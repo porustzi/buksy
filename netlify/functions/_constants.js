@@ -9,6 +9,16 @@ const ERROR_CODES = Object.freeze({
   NO_ROWS: 'PGRST116',
 });
 
+/** Custom RPC error codes (set via RAISE EXCEPTION ... USING ERRCODE) */
+const RPC_ERRORS = Object.freeze({
+  STOCK_INSUFFICIENT: 'STK00',
+  AMOUNT_MISMATCH: 'AMT00',
+  ORDER_ALREADY_PAID: 'PAID0',
+});
+
+/** Timeout for database operations (ms) */
+const DB_TIMEOUT = 10000;
+
 /** Rate-limiting configuration */
 const RATE_LIMIT = Object.freeze({
   /** Max requests per minute for checkout */
@@ -85,6 +95,8 @@ const PUBKEY_CACHE_TTL = 3600000;
 
 module.exports = {
   ERROR_CODES,
+  RPC_ERRORS,
+  DB_TIMEOUT,
   RATE_LIMIT,
   FIELD_LIMITS,
   ORDER_LIMITS,

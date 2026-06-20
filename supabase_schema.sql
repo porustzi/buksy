@@ -49,8 +49,8 @@ DROP INDEX IF EXISTS idx_inventory_slug;
 -- RPC FUNCTIONS
 -- ============================================================================
 
--- Atomic stock decrease: seeds product with default_stock, then decreases.
--- RAISEs if insufficient stock. Stock never goes below 0 (enforced by CHECK).
+-- Atomic stock decrease (single item). Seeds with default_stock, then decreases.
+-- Uses custom ERRCODE 'STK00' for insufficient stock.
 CREATE OR REPLACE FUNCTION decrease_stock(product_slug TEXT, qty INTEGER, default_stock INTEGER DEFAULT 99)
 RETURNS VOID AS $$
 BEGIN
@@ -64,8 +64,35 @@ BEGIN
   WHERE slug = product_slug AND stock >= qty;
 
   IF NOT FOUND THEN
-    RAISE EXCEPTION 'Insufficient stock for %', product_slug;
+    RAISE EXCEPTION 'Insufficient stock for %', product_slug USING ERRCODE = 'STK00';
   END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Bulk stock decrease: processes ALL items in ONE atomic transaction.
+-- If any item fails, entire transaction rolls back.
+-- Returns JSON: { "ok": true } or raises STK00.
+CREATE OR REPLACE FUNCTION decrease_stock_bulk(p_items JSONB)
+RETURNS JSONB AS $$
+DECLARE
+  item_record RECORD;
+BEGIN
+  FOR item_record IN SELECT * FROM jsonb_to_recordset(p_items) AS (slug TEXT, qty INTEGER, default_stock INTEGER)
+  LOOP
+    INSERT INTO inventory (slug, name, stock)
+    VALUES (item_record.slug, item_record.slug, COALESCE(item_record.default_stock, 99))
+    ON CONFLICT (slug) DO NOTHING;
+
+    UPDATE inventory
+    SET stock = stock - item_record.qty, updated_at = NOW()
+    WHERE slug = item_record.slug AND stock >= item_record.qty;
+
+    IF NOT FOUND THEN
+      RAISE EXCEPTION 'Insufficient stock for %', item_record.slug USING ERRCODE = 'STK00';
+    END IF;
+  END LOOP;
+
+  RETURN '{"ok": true}'::jsonb;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -104,7 +131,7 @@ BEGIN
 
   -- Guard 2: amount verification — paid amount must be >= 99% of order total
   IF p_amount_paid IS NULL OR p_amount_paid < (p_order_total * 0.99) THEN
-    RAISE EXCEPTION 'Amount mismatch: paid % but order total is %', p_amount_paid, p_order_total;
+    RAISE EXCEPTION 'Amount mismatch: paid % but order total is %', p_amount_paid, p_order_total USING ERRCODE = 'AMT00';
   END IF;
 
   -- Guard 3: decrease stock atomically
@@ -124,7 +151,7 @@ BEGIN
         -- Rollback entire transaction: un-mark paid + RAISE
         UPDATE orders SET status = 'awaiting_payment', payment_id = NULL, amount_paid = NULL, paid_at = NULL, updated_at = NOW()
         WHERE order_id = p_order_id;
-        RAISE EXCEPTION 'Insufficient stock for %', item_record.slug;
+        RAISE EXCEPTION 'Insufficient stock for %', item_record.slug USING ERRCODE = 'STK00';
       END IF;
     END LOOP;
   END IF;

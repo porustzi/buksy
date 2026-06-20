@@ -291,31 +291,25 @@ exports.handler = async function (event) {
 
     // 3. Save order to DB
     var orderRecord = createOrderRecord(orderId, idempotencyKey, validatedItems, shipping, safeEmail);
-    var saved;
     try {
-      saved = await saveOrder(orderRecord);
+      await saveOrder(orderRecord);
     } catch (err) {
+      if (err instanceof DuplicateOrderError) {
+        var existing = await getOrderByIdempotencyKey(idempotencyKey);
+        if (existing) {
+          if (existing.status === ORDER_STATUS.AWAITING_PAYMENT) {
+            var SITE_URL = process.env.URL || process.env.DEPLOY_URL || '';
+            return {
+              statusCode: 200,
+              body: JSON.stringify({ redirectUrl: SITE_URL + '/checkout?orderId=' + existing.order_id, orderId: existing.order_id }),
+            };
+          }
+          return { statusCode: 409, body: JSON.stringify({ error: 'Це замовлення вже оформлено', duplicate: true, orderId: existing.order_id }) };
+        }
+        return { statusCode: 409, body: JSON.stringify({ error: 'Це замовлення вже оформлено', duplicate: true }) };
+      }
       console.error('Save order failed:', err.message);
       return { statusCode: 500, body: JSON.stringify({ error: 'Не вдалося створити замовлення' }) };
-    }
-
-    // 4. Handle idempotency — return existing order data
-    if (saved === null) {
-      var existing = await getOrderByIdempotencyKey(idempotencyKey);
-      if (existing) {
-        if (existing.status === ORDER_STATUS.AWAITING_PAYMENT) {
-          var SITE_URL = process.env.URL || process.env.DEPLOY_URL || '';
-          return {
-            statusCode: 200,
-            body: JSON.stringify({
-              redirectUrl: SITE_URL + '/checkout?orderId=' + existing.order_id,
-              orderId: existing.order_id,
-            }),
-          };
-        }
-        return { statusCode: 409, body: JSON.stringify({ error: 'Це замовлення вже оформлено', duplicate: true, orderId: existing.order_id }) };
-      }
-      return { statusCode: 409, body: JSON.stringify({ error: 'Це замовлення вже оформлено', duplicate: true }) };
     }
 
     // 5. Create Monobank invoice (after order is saved)

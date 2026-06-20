@@ -5,10 +5,11 @@
  * Flow: validate → save order → decrease stock (atomic) → notifications
  */
 var { esc, sanitize, sanitizeShippingInfo, validateItems, validateEmail, validateIdempotencyKey, validatePaymentMethod, parseBody, generateOrderId } = require('./_utils');
-var { saveOrder, decreaseStock, getStock, getOrderByIdempotencyKey } = require('./_supabase');
+var { saveOrder, decreaseStockBulk, getStock, getOrderByIdempotencyKey } = require('./_supabase');
 var { sendEmail, orderConfirmationHtml } = require('./_email');
 var catalog = require('./_catalog.json');
 var { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS, PAYMENT, ORDER_STATUS, PAYMENT_METHOD } = require('./_constants');
+var { DuplicateOrderError } = require('./_errors');
 
 /**
  * Validate catalog items and check DB stock.
@@ -154,61 +155,37 @@ exports.handler = async function (event) {
     var total = safeItems.reduce(function (s, i) { return s + i.pricePerUnit * i.quantity; }, 0);
 
     // 3. Save order to DB (must succeed before stock decrease)
-    var saved;
     try {
-      saved = await saveOrder({
+      await saveOrder({
         order_id: orderId,
         idempotency_key: idempotencyKey || null,
         status: paymentMethod === PAYMENT_METHOD.MONOBANK ? ORDER_STATUS.AWAITING_PAYMENT : ORDER_STATUS.NEW,
         payment_method: paymentMethod || PAYMENT_METHOD.CARD,
-        customer: {
-          firstName: shipping.firstName,
-          lastName: shipping.lastName,
-          email: safeEmail,
-          phone: shipping.phone,
-        },
-        shipping: {
-          address: shipping.address,
-          apartment: shipping.apartment,
-          city: shipping.city,
-          country: shipping.country,
-          postalCode: shipping.postalCode,
-          novaPoshtaBranch: shipping.novaPoshtaBranch,
-        },
+        customer: { firstName: shipping.firstName, lastName: shipping.lastName, email: safeEmail, phone: shipping.phone },
+        shipping: { address: shipping.address, apartment: shipping.apartment, city: shipping.city, country: shipping.country, postalCode: shipping.postalCode, novaPoshtaBranch: shipping.novaPoshtaBranch },
         items: safeItems.map(function (i) { return { slug: i.product.slug, name: i.product.name, size: i.size, price: i.pricePerUnit, qty: i.quantity }; }),
-        subtotal: total,
-        shipping_cost: 0,
-        tax: 0,
-        total: total,
-        created_at: new Date().toISOString(),
+        subtotal: total, shipping_cost: 0, tax: 0, total: total, created_at: new Date().toISOString(),
       });
     } catch (err) {
+      if (err instanceof DuplicateOrderError) {
+        var existing = await getOrderByIdempotencyKey(idempotencyKey);
+        if (existing) {
+          return { statusCode: 200, body: JSON.stringify({ success: true, orderId: existing.order_id, total: Number(existing.total), message: 'Order already placed' }) };
+        }
+        return { statusCode: 409, body: JSON.stringify({ error: 'Це замовлення вже оформлено', duplicate: true }) };
+      }
       console.error('Save order failed:', err.message);
       return { statusCode: 500, body: JSON.stringify({ error: 'Не вдалося створити замовлення' }) };
-    }
-
-    // 4. Handle idempotency — return existing order
-    if (saved === null) {
-      var existing = await getOrderByIdempotencyKey(idempotencyKey);
-      if (existing) {
-        return {
-          statusCode: 200,
-          body: JSON.stringify({ success: true, orderId: existing.order_id, total: Number(existing.total), message: 'Order already placed' }),
-        };
-      }
-      return { statusCode: 409, body: JSON.stringify({ error: 'Це замовлення вже оформлено', duplicate: true }) };
     }
 
     // 5. Decrease stock (skip for Monobank — callback handles it)
     var tasks = [];
     if (paymentMethod !== PAYMENT_METHOD.MONOBANK) {
       tasks.push(
-        decreaseStock(safeItems.map(function (i) {
+        decreaseStockBulk(safeItems.map(function (i) {
           var catStock = catalog[i.product.slug] ? Number(catalog[i.product.slug].stock) : PAYMENT.DEFAULT_STOCK;
-          return { product: { slug: i.product.slug }, quantity: i.quantity, default_stock: catStock || PAYMENT.DEFAULT_STOCK };
-        })).then(function (errors) {
-          if (errors.length) console.error('Stock decrease failed for:', errors.join(', '));
-        }).catch(function (err) { console.error('Stock decrease error:', err.message); })
+          return { slug: i.product.slug, qty: i.quantity, default_stock: catStock || PAYMENT.DEFAULT_STOCK };
+        })).catch(function (err) { console.error('Stock decrease error:', err.message); })
       );
     }
 

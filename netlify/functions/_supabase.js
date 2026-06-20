@@ -4,9 +4,10 @@
  *
  * Principles:
  * - Throw typed errors (DatabaseError, OrderNotFoundError, etc.) for all failures.
- * - Return null ONLY for genuine not-found cases (PGRST116) where caller handles it.
- * - Never return null for DB connection/query errors.
- * - All functions are JSDoc-typed.
+ * - Return null ONLY for getOrderByIdempotencyKey not-found.
+ * - All RPC calls wrapped in withTimeout.
+ * - Input validation at the top of every function.
+ * - Error classification by error.code (RPC_ERRORS), never string.includes().
  */
 var { createClient } = require('@supabase/supabase-js');
 var {
@@ -17,7 +18,7 @@ var {
   AmountMismatchError,
   ValidationError,
 } = require('./_errors');
-var { ERROR_CODES } = require('./_constants');
+var { ERROR_CODES, RPC_ERRORS, DB_TIMEOUT } = require('./_constants');
 
 // ============================================================================
 // Client Singleton
@@ -29,14 +30,14 @@ var client = null;
 /**
  * Get or create the Supabase client (singleton).
  * @returns {import('@supabase/supabase-js').SupabaseClient}
- * @throws {DatabaseError} if Supabase is not configured
+ * @throws {DatabaseError}
  */
 function getClient() {
   if (client) return client;
   var url = process.env.SUPABASE_URL;
   var key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
-    throw new DatabaseError('Supabase not configured — SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY missing', 'DB_CONFIG');
+    throw new DatabaseError('Supabase not configured', 'DB_CONFIG');
   }
   client = createClient(url, key);
   return client;
@@ -47,17 +48,90 @@ function getClient() {
 // ============================================================================
 
 /**
- * Wrap a Supabase query error into a typed DatabaseError.
- * @param {*} error — Supabase error object
- * @param {string} context — description of the operation
- * @throws {DuplicateOrderError|DatabaseError}
+ * Promise with timeout. Rejects if fn takes longer than timeoutMs.
+ * @template T
+ * @param {Promise<T>} promise
+ * @param {number} timeoutMs
+ * @returns {Promise<T>}
  */
-function handleDbError(error, context) {
+function withTimeout(promise, timeoutMs) {
+  var t = timeoutMs || DB_TIMEOUT;
+  return Promise.race([
+    promise,
+    new Promise(function (_, reject) {
+      setTimeout(function () {
+        reject(new DatabaseError('DB operation timed out after ' + t + 'ms', 'DB_TIMEOUT'));
+      }, t);
+    }),
+  ]);
+}
+
+/**
+ * Classify RPC error by its error code, not message text.
+ * @param {*} error — Supabase error object with .code and .message
+ * @param {number} [amountPaid]
+ * @param {number} [orderTotal]
+ * @throws {StockInsufficientError|AmountMismatchError|DuplicateOrderError|DatabaseError}
+ */
+function classifyRpcError(error, amountPaid, orderTotal) {
   if (!error) return;
-  if (error.code === ERROR_CODES.UNIQUE_VIOLATION && error.message && error.message.indexOf('idempotency_key') !== -1) {
-    throw new DuplicateOrderError('(unknown)');
+  var code = error.code || '';
+
+  if (code === RPC_ERRORS.STOCK_INSUFFICIENT) {
+    var slug = (error.message || '').split('Insufficient stock for ')[1] || 'unknown';
+    throw new StockInsufficientError(slug.trim());
   }
-  throw new DatabaseError(context + ': ' + (error.message || 'unknown'), error.code || 'DB_ERROR', error);
+  if (code === RPC_ERRORS.AMOUNT_MISMATCH) {
+    throw new AmountMismatchError(amountPaid || 0, orderTotal || 0);
+  }
+  if (code === RPC_ERRORS.ORDER_ALREADY_PAID) {
+    return; // not an error — already paid (idempotent)
+  }
+  if (code === ERROR_CODES.UNIQUE_VIOLATION) {
+    var msg = error.message || '';
+    if (msg.indexOf('idempotency_key') !== -1 || msg.indexOf('payment_id') !== -1) {
+      throw new DuplicateOrderError('(via unique constraint)');
+    }
+  }
+  throw new DatabaseError(
+    (error.message || 'Unknown DB error'),
+    code || 'DB_ERROR',
+    error
+  );
+}
+
+// ============================================================================
+// Validation Helpers
+// ============================================================================
+
+/**
+ * @param {string} orderId
+ * @throws {ValidationError}
+ */
+function _validateOrderId(orderId) {
+  if (!orderId || typeof orderId !== 'string' || !/^BUK-[A-F0-9]{8}-[A-F0-9]{6}$/.test(orderId)) {
+    throw new ValidationError('Invalid order_id: ' + orderId, 'orderId');
+  }
+}
+
+/**
+ * @param {string} key
+ * @throws {ValidationError}
+ */
+function _validateIdempotencyKey(key) {
+  if (key && (typeof key !== 'string' || key.length > 128)) {
+    throw new ValidationError('Invalid idempotency_key', 'idempotencyKey');
+  }
+}
+
+/**
+ * @param {Array} items
+ * @throws {ValidationError}
+ */
+function _validateItemsArray(items) {
+  if (items && (!Array.isArray(items) || !items.length)) {
+    throw new ValidationError('Items must be a non-empty array', 'items');
+  }
 }
 
 // ============================================================================
@@ -65,30 +139,27 @@ function handleDbError(error, context) {
 // ============================================================================
 
 /**
- * Save a new order. Throws on DB error. Returns null on duplicate idempotency_key.
+ * Save a new order. Throws DuplicateOrderError on idempotency collision.
  *
- * @param {object} order — full order record
+ * @param {object} order
  * @param {string} order.order_id
  * @param {string} [order.idempotency_key]
- * @param {string} order.status
- * @param {string} order.payment_method
- * @param {object} order.customer
- * @param {object} order.shipping
- * @param {Array}  order.items
- * @param {number} order.subtotal
- * @param {number} order.total
- * @returns {Promise<{ order_id: string, total: number, status: string }|null>}
- *    null if idempotency_key collision detected
- * @throws {DatabaseError}
+ * @returns {Promise<{ order_id: string, total: number, status: string }>}
+ * @throws {DuplicateOrderError|DatabaseError|ValidationError}
  */
 async function saveOrder(order) {
+  _validateOrderId(order.order_id);
+  _validateIdempotencyKey(order.idempotency_key);
+
   var supabase = getClient();
-  var { data, error } = await supabase.from('orders').insert(order).select('order_id, total, status').single();
+  var { data, error } = await withTimeout(
+    supabase.from('orders').insert(order).select('order_id, total, status').single()
+  );
   if (error) {
     if (error.code === ERROR_CODES.UNIQUE_VIOLATION && error.message && error.message.indexOf('idempotency_key') !== -1) {
-      return null;
+      throw new DuplicateOrderError(order.idempotency_key || 'unknown');
     }
-    handleDbError(error, 'saveOrder');
+    classifyRpcError(error);
   }
   return data;
 }
@@ -98,60 +169,70 @@ async function saveOrder(order) {
  *
  * @param {string} key
  * @returns {Promise<object|null>} null if not found
- * @throws {DatabaseError}
+ * @throws {DatabaseError|ValidationError}
  */
 async function getOrderByIdempotencyKey(key) {
+  _validateIdempotencyKey(key);
+
   var supabase = getClient();
-  var { data, error } = await supabase
-    .from('orders')
-    .select('*')
-    .eq('idempotency_key', key)
-    .single();
+  var { data, error } = await withTimeout(
+    supabase.from('orders').select('*').eq('idempotency_key', key).single()
+  );
   if (error) {
     if (error.code === ERROR_CODES.NO_ROWS) return null;
-    handleDbError(error, 'getOrderByIdempotencyKey');
+    classifyRpcError(error);
   }
   return data;
 }
 
 /**
- * Find an order by order_id.
+ * Find an order by order_id. Throws if not found.
  *
  * @param {string} orderId
- * @returns {Promise<object>} the order
- * @throws {OrderNotFoundError|DatabaseError}
+ * @returns {Promise<object>}
+ * @throws {OrderNotFoundError|DatabaseError|ValidationError}
  */
 async function getOrderByRef(orderId) {
+  _validateOrderId(orderId);
+
   var supabase = getClient();
-  var { data, error } = await supabase
-    .from('orders')
-    .select('*')
-    .eq('order_id', orderId)
-    .single();
+  var { data, error } = await withTimeout(
+    supabase.from('orders').select('*').eq('order_id', orderId).single()
+  );
   if (error) {
-    if (error.code === ERROR_CODES.NO_ROWS) {
-      throw new OrderNotFoundError(orderId);
-    }
-    handleDbError(error, 'getOrderByRef');
+    if (error.code === ERROR_CODES.NO_ROWS) throw new OrderNotFoundError(orderId);
+    classifyRpcError(error);
   }
   return data;
 }
 
 /**
- * Update order status fields.
+ * Update order status. Throws if no rows were affected.
  *
  * @param {string} orderId
  * @param {object} updates — { status?, tracking_number?, shipped_at? }
- * @returns {Promise<boolean>} true if updated, false if no rows matched
- * @throws {DatabaseError}
+ * @returns {Promise<boolean>} true
+ * @throws {OrderNotFoundError|DatabaseError|ValidationError}
  */
 async function updateOrderStatus(orderId, updates) {
-  var supabase = getClient();
-  var { error } = await supabase.from('orders').update(updates).eq('order_id', orderId);
-  if (error) {
-    handleDbError(error, 'updateOrderStatus');
+  _validateOrderId(orderId);
+  if (!updates || typeof updates !== 'object' || Object.keys(updates).length === 0) {
+    throw new ValidationError('No update fields provided', 'updates');
   }
-  return !error;
+
+  var supabase = getClient();
+  var { data, error } = await withTimeout(
+    supabase.from('orders').update(updates).eq('order_id', orderId).select('id').single()
+  );
+  if (error) {
+    if (error.code === ERROR_CODES.NO_ROWS) throw new OrderNotFoundError(orderId);
+    classifyRpcError(error);
+  }
+  // data is null if .select('id').single() returns nothing ⇒ no rows matched
+  if (!data) {
+    throw new OrderNotFoundError(orderId);
+  }
+  return true;
 }
 
 // ============================================================================
@@ -159,35 +240,42 @@ async function updateOrderStatus(orderId, updates) {
 // ============================================================================
 
 /**
- * Atomically mark an order as paid, verify the paid amount, and decrease stock.
- * All in a single database transaction.
+ * Atomically mark order as paid, verify amount, decrease stock.
+ * All in a single DB transaction.
  *
  * @param {string}  orderId
  * @param {string}  paymentId
- * @param {number}  amountPaid — amount received from payment provider (UAH)
- * @param {number}  orderTotal — expected order total from DB
- * @param {Array|null} items — [{ slug, qty, default_stock }] for stock decrease
- * @returns {Promise<boolean>} true if order was newly marked paid, false if already paid
- * @throws {AmountMismatchError|StockInsufficientError|DatabaseError}
+ * @param {number}  amountPaid
+ * @param {number}  orderTotal
+ * @param {Array|null} items — [{ slug, qty, default_stock }]
+ * @returns {Promise<boolean>} true if newly paid, false if already paid
+ * @throws {AmountMismatchError|StockInsufficientError|DatabaseError|ValidationError}
  */
 async function markOrderPaidWithStock(orderId, paymentId, amountPaid, orderTotal, items) {
+  _validateOrderId(orderId);
+  if (!paymentId || typeof paymentId !== 'string') {
+    throw new ValidationError('Invalid payment_id', 'paymentId');
+  }
+  if (typeof amountPaid !== 'number' || amountPaid <= 0) {
+    throw new ValidationError('Invalid amount_paid: ' + amountPaid, 'amountPaid');
+  }
+  if (typeof orderTotal !== 'number' || orderTotal <= 0) {
+    throw new ValidationError('Invalid order_total: ' + orderTotal, 'orderTotal');
+  }
+  _validateItemsArray(items);
+
   var supabase = getClient();
-  var { data, error } = await supabase.rpc('mark_order_paid_with_stock', {
-    p_order_id: orderId,
-    p_payment_id: paymentId,
-    p_amount_paid: amountPaid,
-    p_order_total: orderTotal,
-    p_items: items && items.length ? items : null,
-  });
+  var { data, error } = await withTimeout(
+    supabase.rpc('mark_order_paid_with_stock', {
+      p_order_id: orderId,
+      p_payment_id: paymentId,
+      p_amount_paid: amountPaid,
+      p_order_total: orderTotal,
+      p_items: items && items.length ? items : null,
+    })
+  );
   if (error) {
-    var msg = error.message || '';
-    if (msg.indexOf('Insufficient stock') !== -1) {
-      throw new StockInsufficientError(msg.split('Insufficient stock for ')[1] || 'unknown');
-    }
-    if (msg.indexOf('Amount mismatch') !== -1) {
-      throw new AmountMismatchError(amountPaid, orderTotal);
-    }
-    handleDbError(error, 'markOrderPaidWithStock');
+    classifyRpcError(error, amountPaid, orderTotal);
   }
   return !!data;
 }
@@ -197,46 +285,55 @@ async function markOrderPaidWithStock(orderId, paymentId, amountPaid, orderTotal
 // ============================================================================
 
 /**
- * Atomically decrease stock for multiple items in a single RPC call.
+ * Atomically decrease stock for ALL items in ONE RPC call.
+ * Entire operation rolls back if any item fails.
  *
  * @param {Array<{ slug: string, qty: number, default_stock?: number }>} items
- * @returns {Promise<Array<string>>} array of slugs that failed (empty if all succeeded)
- * @throws {DatabaseError}
+ * @returns {Promise<boolean>} true on success
+ * @throws {StockInsufficientError|DatabaseError|ValidationError}
  */
-async function decreaseStock(items) {
-  var supabase = getClient();
-  var errors = [];
+async function decreaseStockBulk(items) {
+  _validateItemsArray(items);
+
+  var payload = [];
   for (var i = 0; i < items.length; i++) {
-    var item = items[i];
-    var slug = item.slug || item.product?.slug;
-    var qty = Number(item.quantity || item.qty) || 0;
-    var defaultStock = Number(item.default_stock) || 99;
-    if (!slug || qty <= 0) continue;
-    var resp = await supabase.rpc('decrease_stock', {
-      product_slug: slug,
-      qty: qty,
-      default_stock: defaultStock,
-    });
-    if (resp.error) {
-      console.error('decreaseStock failed for', slug, ':', resp.error.message);
-      errors.push(slug);
-    }
+    var it = items[i];
+    var slug = it.slug || it.product?.slug;
+    var qty = Number(it.quantity || it.qty) || 0;
+    var def = Number(it.default_stock) || 99;
+    if (!slug) throw new ValidationError('Missing slug at index ' + i, 'items[' + i + '].slug');
+    if (qty <= 0) throw new ValidationError('Invalid qty at index ' + i, 'items[' + i + '].qty');
+    payload.push({ slug: slug, qty: qty, default_stock: def });
   }
-  return errors;
+
+  var supabase = getClient();
+  var { error } = await withTimeout(
+    supabase.rpc('decrease_stock_bulk', { p_items: payload })
+  );
+  if (error) {
+    classifyRpcError(error);
+  }
+  return true;
 }
 
 /**
- * Get current inventory stock for a product.
+ * Get current inventory stock.
  *
  * @param {string} slug
- * @returns {Promise<number>} current stock (99 if not yet in inventory)
- * @throws {DatabaseError}
+ * @returns {Promise<number>}
+ * @throws {DatabaseError|ValidationError}
  */
 async function getStock(slug) {
+  if (!slug || typeof slug !== 'string') {
+    throw new ValidationError('Invalid slug', 'slug');
+  }
+
   var supabase = getClient();
-  var { data, error } = await supabase.rpc('get_stock', { product_slug: slug });
+  var { data, error } = await withTimeout(
+    supabase.rpc('get_stock', { product_slug: slug })
+  );
   if (error) {
-    handleDbError(error, 'getStock');
+    classifyRpcError(error);
   }
   return data;
 }
@@ -248,6 +345,6 @@ module.exports = {
   getOrderByRef,
   updateOrderStatus,
   markOrderPaidWithStock,
-  decreaseStock,
+  decreaseStockBulk,
   getStock,
 };
