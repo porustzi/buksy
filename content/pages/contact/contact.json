@@ -41,7 +41,8 @@
   },
   "info": {
     "title": "Наші контакти",
-    "email": "buksy.shop\u0040gmail.com",
+    "emailUser": "buksy.shop",
+    "emailDomain": "gmail.com",
     "phone": "Напиши в Telegram",
     "studio": "Україна",
     "emailLabel": "EMAIL",

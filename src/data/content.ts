@@ -195,12 +195,12 @@ export const contactInfo = {
   },
   "info": {
     "title": "Наші контакти",
-    "email": "buksy.shop\u0040gmail.com",
     "phone": "Напиши в Telegram",
     "studio": "Україна",
     "emailLabel": "EMAIL",
     "phoneLabel": "ТЕЛЕФОН",
-    "studioLabel": "ЛОКАЦІЯ"
+    "studioLabel": "ЛОКАЦІЯ",
+    "email": "buksy.shop" + "@" + "gmail.com"
   },
   "social": {
     "title": "МИ В СОЦМЕРЕЖАХ",

@@ -213,7 +213,8 @@ collections:
         widget: object
         fields:
           - { label: "Заголовок", name: title, widget: string }
-          - { label: "Email адреса", name: email, widget: string }
+          - { label: "Email (до @)", name: emailUser, widget: string }
+          - { label: "Email (домен)", name: emailDomain, widget: string }
           - { label: "Телефон", name: phone, widget: string }
           - { label: "Адреса студії", name: studio, widget: text }
           - { label: "Email лейбл", name: emailLabel, widget: string }
