@@ -1,14 +1,19 @@
-const { esc, sanitize, guard, validateEmail, parseBody } = require('./_utils');
+/**
+ * @module contact
+ * Contact form handler — validates input and sends Telegram notification.
+ */
+var { esc, sanitize, guard, validateEmail, parseBody } = require('./_utils');
+var { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS } = require('./_constants');
 
-exports.handler = async (event) => {
+exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const blocked = guard(event, 5);
+  var blocked = guard(event, RATE_LIMIT.CONTACT);
   if (blocked) return blocked;
 
-  var parsed = parseBody(event, 16384);
+  var parsed = parseBody(event, ORDER_LIMITS.MAX_CONTACT_BODY);
   if (parsed.error) {
     return { statusCode: 400, body: JSON.stringify({ error: parsed.error }) };
   }
@@ -28,20 +33,20 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: JSON.stringify({ error: 'Invalid email format' }) };
     }
 
-    if (message.length > 4096) {
-      return { statusCode: 400, body: JSON.stringify({ error: 'Message too long (max 4096 chars)' }) };
+    if (message.length > FIELD_LIMITS.MESSAGE) {
+      return { statusCode: 400, body: JSON.stringify({ error: 'Message too long (max ' + FIELD_LIMITS.MESSAGE + ' chars)' }) };
     }
 
-    const safeEmail = sanitize(String(email), 256);
-    const safeMessage = sanitize(message, 4096);
-    const safeName = name ? sanitize(String(name), 128) : '';
-    const safeSubject = subject ? sanitize(String(subject), 256) : '';
+    var safeEmail = sanitize(String(email), FIELD_LIMITS.EMAIL);
+    var safeMessage = sanitize(message, FIELD_LIMITS.MESSAGE);
+    var safeName = name ? sanitize(String(name), FIELD_LIMITS.NAME) : '';
+    var safeSubject = subject ? sanitize(String(subject), FIELD_LIMITS.SUBJECT) : '';
 
-    const TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-    const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+    var TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+    var CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
     if (TOKEN && CHAT_ID) {
-      const msg = [
+      var tgMsg = [
         '\u2709\uFE0F <b>НОВА ЗАЯВКА</b>',
         '',
         safeName ? '\uD83D\uDC64 <b>' + esc(safeName) + '</b>' : '\uD83D\uDC64 <b>—</b>',
@@ -52,10 +57,10 @@ exports.handler = async (event) => {
       ].filter(Boolean).join('\n');
 
       try {
-        const tgRes = await fetch(`https://api.telegram.org/bot${TOKEN}/sendMessage`, {
+        var tgRes = await fetch('https://api.telegram.org/bot' + TOKEN + '/sendMessage', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: 'HTML' }),
+          body: JSON.stringify({ chat_id: CHAT_ID, text: tgMsg, parse_mode: 'HTML' }),
         });
         if (!tgRes.ok) console.error('Telegram contact notification failed:', tgRes.status);
       } catch (err) {
