@@ -52,9 +52,13 @@ exports.handler = async (event) => {
         return { statusCode: 400, body: JSON.stringify({ error: 'Invalid quantity for ' + slug }) };
       }
 
+      if (entry.stock < qty) {
+        return { statusCode: 400, body: JSON.stringify({ error: 'Insufficient stock for ' + entry.name + ': ' + entry.stock + ' available' }) };
+      }
+
       const dbStock = await getStock(slug);
       if (dbStock !== null && dbStock < qty) {
-        return { statusCode: 400, body: JSON.stringify({ error: 'Insufficient stock for ' + entry.name + ': ' + dbStock + ' available' }) };
+        return { statusCode: 400, body: JSON.stringify({ error: 'Insufficient stock for ' + entry.name + ': ' + dbStock + ' available (DB)' }) };
       }
 
       validatedItems.push({ slug, name: entry.name, size: item.size ? sanitize(String(item.size), 64) : '', qty, price: entry.price });

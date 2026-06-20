@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
@@ -47,6 +47,8 @@ export function CheckoutPage() {
     novaPoshtaBranch: '',
   });
 
+  const idempotencyKeyRef = useRef(crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState('');
 
@@ -73,11 +75,10 @@ export function CheckoutPage() {
     setIsProcessing(true);
     setSubmitError('');
     try {
-      var idempotencyKey = crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2);
       const res = await fetch('/.netlify/functions/monobank-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items, shippingInfo, email: shippingInfo.email, idempotencyKey }),
+        body: JSON.stringify({ items, shippingInfo, email: shippingInfo.email, idempotencyKey: idempotencyKeyRef.current }),
       });
       const data = await res.json();
       if (data.error) {
