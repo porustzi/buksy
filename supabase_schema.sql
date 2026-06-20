@@ -1,6 +1,22 @@
 -- Run this in your Supabase SQL Editor to set up the database.
 -- Safe to re-run — uses IF NOT EXISTS / OR REPLACE.
 -- ============================================================================
+-- MIGRATION: add missing columns to existing orders table
+-- ============================================================================
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'orders' AND column_name = 'idempotency_key') THEN
+    ALTER TABLE orders ADD COLUMN idempotency_key TEXT;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'orders' AND column_name = 'stock_decreased') THEN
+    ALTER TABLE orders ADD COLUMN stock_decreased BOOLEAN NOT NULL DEFAULT FALSE;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'orders' AND column_name = 'amount_paid') THEN
+    ALTER TABLE orders ADD COLUMN amount_paid NUMERIC(12,2);
+  END IF;
+END $$;
+
+-- ============================================================================
 -- TABLES
 -- ============================================================================
 
