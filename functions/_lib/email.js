@@ -16,7 +16,7 @@ export async function sendEmail(env, { to, subject, html }) {
     const res = await fetch(GMAIL_WEBHOOK, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to, subject, html }),
+      body: JSON.stringify({ to, subject, html }),
     });
     const txt = await res.text();
     if (res.ok && txt === 'ok') { console.log('[GMAIL] Sent: ' + subject); return true; }
