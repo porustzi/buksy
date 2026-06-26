@@ -65,7 +65,7 @@ export async function onRequest(context) {
       fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(() => {});
     }
     if (safeEmail) {
-      sendEmail(env, { to: safeEmail, subject: 'Замовлення #' + orderId + ' підтверджено — BUKSY', html: orderConfirmationHtml({ orderId, items: safeItems, total, shippingInfo: shipping }) }).catch(() => {});
+      sendEmail(env, { to: safeEmail, subject: 'Замовлення #' + orderId + ' підтверджено — BUKSY', html: orderConfirmationHtml({ orderId, items: safeItems, total, shippingInfo: shipping }) }).catch(e => console.error('[EMAIL] send failed:', e.message));
     }
 
     return okResponse({ success: true, orderId, total, message: 'Order placed!' });

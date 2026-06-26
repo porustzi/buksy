@@ -86,7 +86,7 @@ export async function onRequest(context) {
       fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(e => console.error('[TG]', e.message));
     }
     if (safeEmail) {
-      sendEmail(env, { to: safeEmail, subject: 'Замовлення #' + orderId + ' отримано — BUKSY', html: orderConfirmationHtml({ orderId, items: validatedItems.map(i => ({ product: { name: i.name, price: i.price }, size: i.size, quantity: i.qty })), total: serverTotal, shippingInfo: shipping }) }).catch(e => console.error('[EMAIL]', e.message));
+      sendEmail(env, { to: safeEmail, subject: 'Замовлення #' + orderId + ' отримано — BUKSY', html: orderConfirmationHtml({ orderId, items: validatedItems.map(i => ({ product: { name: i.name, price: i.price }, size: i.size, quantity: i.qty })), total: serverTotal, shippingInfo: shipping }) }).catch(e => console.error('[EMAIL] send failed:', e.message));
     }
 
     return okResponse({ redirectUrl: monoData.pageUrl, orderId });
