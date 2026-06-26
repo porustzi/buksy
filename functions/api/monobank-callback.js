@@ -73,10 +73,10 @@ export async function onRequest(context) {
     const tgToken = env.TELEGRAM_BOT_TOKEN, tgChat = env.TELEGRAM_CHAT_ID;
     if (tgToken && tgChat) {
       const tgMsg = `✅ <b>ОПЛАЧЕНО (Monobank)</b>\n<code>#${esc(body.reference)}</code>\n\n💳 ${esc(body.invoiceId)}\n💰 <b>${amountPaid.toFixed(2)} UAH</b>\n\n📋 Сума замовлення: ${orderTotal.toFixed(2)} UAH\n\n━━━━━━━━━━━━━━━━\n✅ Оплата підтверджена`;
-      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(() => {});
+      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(e => console.error('[TG-CALLBACK]', e.message));
     }
     if (order.customer?.email) {
-      sendEmail(env, { to: order.customer.email, subject: 'Оплату підтверджено — Замовлення #' + body.reference, html: paymentConfirmedHtml({ orderId: body.reference, amount: amountPaid, currency: 'UAH', paymentId: body.invoiceId, items: (body.basketOrder || []).map(b => ({ qty: b.qty, name: b.name, size: '' })) }) }).catch(() => {});
+      sendEmail(env, { to: order.customer.email, subject: 'Оплату підтверджено — Замовлення #' + body.reference, html: paymentConfirmedHtml({ orderId: body.reference, amount: amountPaid, currency: 'UAH', paymentId: body.invoiceId, items: (body.basketOrder || []).map(b => ({ qty: b.qty, name: b.name, size: '' })) }) }).catch(e => console.error('[EMAIL-CALLBACK] send failed:', e.message));
     }
 
     return jsonResponse(200, { ok: true });
