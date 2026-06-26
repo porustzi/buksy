@@ -1,40 +1,55 @@
 import { esc, sanitize } from './utils.js';
 import { FIELD_LIMITS } from './constants.js';
 
+const GMAIL_WEBHOOK = 'https://script.google.com/macros/s/AKfycbw6xmTPIPUqq8sVTI-5Iy6eBQoaX97hIJWEyyoWecnk9rUg10zHYU_TYLrU11RH2B0Y/exec';
+
 export async function sendEmail(env, { to, subject, html }) {
   if (!to || typeof to !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
     console.error('[EMAIL] Invalid recipient');
     return false;
   }
 
-  // Primary: try Resend API (fetch-based, works on Workers)
+  const from = env.EMAIL_FROM || 'buksy.shop@gmail.com';
+
+  // 1. Primary: Gmail via Google Apps Script
+  try {
+    const res = await fetch(GMAIL_WEBHOOK, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from, to, subject, html }),
+    });
+    const txt = await res.text();
+    if (res.ok && txt === 'ok') { console.log('[GMAIL] Sent: ' + subject); return true; }
+    console.error('[GMAIL] Failed: ' + res.status + ' — ' + txt.slice(0, 300));
+  } catch (err) { console.error('[GMAIL] Error:', err.message); }
+
+  // 2. Resend fallback
   const resendKey = env.RESEND_API_KEY;
   if (resendKey) {
     try {
-      const from = env.EMAIL_FROM || env.EMAIL_SMTP_USER || 'orders@buksy.studio';
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + resendKey },
-        body: JSON.stringify({ from, to: [to], subject, html }),
+        body: JSON.stringify({ from: 'BUKSY <' + from + '>', to: [to], subject, html }),
       });
       if (res.ok) { console.log('[RESEND] Sent: ' + subject); return true; }
-      console.error('[RESEND] Failed: ' + res.status);
+      const rBody = await res.text().catch(() => '');
+      console.error('[RESEND] ' + res.status + ': ' + rBody.slice(0, 300));
     } catch (err) { console.error('[RESEND] Error:', err.message); }
   }
 
-  // Fallback: Generic webhook (compatible with Resend, SendGrid, etc.)
+  // 3. Webhook fallback
   const webhookUrl = env.EMAIL_WEBHOOK_URL;
   const apiKey = env.EMAIL_API_KEY;
-  if (!webhookUrl) { console.log('[EMAIL] Not configured'); return false; }
-
+  if (!webhookUrl) { console.log('[EMAIL] No backend available'); return false; }
   try {
     const res = await fetch(webhookUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...(apiKey ? { Authorization: 'Bearer ' + apiKey } : {}) },
-      body: JSON.stringify({ from: env.EMAIL_FROM || 'orders@buksy.studio', to, subject, html }),
+      body: JSON.stringify({ from, to, subject, html }),
     });
-    if (!res.ok) { console.error('[EMAIL] Failed: ' + res.status); return false; }
-    console.log('[EMAIL] Sent: ' + subject);
+    if (!res.ok) { console.error('[EMAIL] Webhook failed: ' + res.status); return false; }
+    console.log('[EMAIL] Webhook sent: ' + subject);
     return true;
   } catch (err) { console.error('[EMAIL] Error:', err.message); return false; }
 }
