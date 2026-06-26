@@ -1,6 +1,9 @@
-# Admin — Decap CMS
+# Admin
 /admin  /admin/index.html  200
 /admin/*  /admin/index.html  200
 
-# SPA fallback — all non-file routes serve index.html
+# API
+/api/*  /api/:splat  200
+
+# SPA fallback
 /*  /index.html  200

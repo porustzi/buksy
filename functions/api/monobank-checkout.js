@@ -3,7 +3,7 @@ import { saveOrder, getOrderByIdempotencyKey } from '../_lib/supabase.js';
 import { validateCatalogItems } from '../_lib/catalog.js';
 import { sendEmail, orderConfirmationHtml } from '../_lib/email.js';
 import { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS, PAYMENT, ORDER_STATUS, PAYMENT_METHOD } from '../_lib/constants.js';
-import { DuplicateOrderError } from '../_lib/errors.js';
+import { DuplicateOrderError, ValidationError } from '../_lib/errors.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -83,14 +83,15 @@ export async function onRequest(context) {
     if (tgToken && tgChat) {
       const lines = validatedItems.map(i => i.qty + '× ' + i.name + (i.size ? ' (' + i.size + ')' : '') + ' — ' + (i.price * i.qty) + ' ₴').join('\n');
       const tgMsg = `🛒 <b>НОВЕ ЗАМОВЛЕННЯ</b>\n<code>#${orderId}</code>\n\n👤 <b>${esc(shipping.firstName || '-')} ${esc(shipping.lastName || '')}</b>\n📧 ${esc(safeEmail || '-')}\n${shipping.phone ? '📱 ' + esc(shipping.phone) + '\n' : ''}\n📍 ${esc(shipping.city || '-')}, ${esc(shipping.country || '-')}\n🚚 ${esc(shipping.address || '-')}${shipping.apartment ? ', ' + esc(shipping.apartment) : ''}\n${shipping.novaPoshtaBranch ? '📦 НП №' + esc(shipping.novaPoshtaBranch) + '\n' : ''}\n<b>Товари:</b>\n${lines}\n\n━━━━━━━━━━━━\n💰 <b>${serverTotal} ₴</b>  |  💳 Monobank\n⏳ Очікує оплати`;
-      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(() => {});
+      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(e => console.error('[TG]', e.message));
     }
     if (safeEmail) {
-      sendEmail(env, { to: safeEmail, subject: 'Замовлення #' + orderId + ' отримано — BUKSY', html: orderConfirmationHtml({ orderId, items: validatedItems.map(i => ({ product: { name: i.name, price: i.price }, size: i.size, quantity: i.qty })), total: serverTotal, shippingInfo: shipping }) }).catch(() => {});
+      sendEmail(env, { to: safeEmail, subject: 'Замовлення #' + orderId + ' отримано — BUKSY', html: orderConfirmationHtml({ orderId, items: validatedItems.map(i => ({ product: { name: i.name, price: i.price }, size: i.size, quantity: i.qty })), total: serverTotal, shippingInfo: shipping }) }).catch(e => console.error('[EMAIL]', e.message));
     }
 
     return okResponse({ redirectUrl: monoData.pageUrl, orderId });
   } catch (e) {
+    if (e instanceof ValidationError) return errorResponse(400, e.message);
     if (e.statusCode) return new Response(e.body, { status: e.statusCode, headers: { 'Content-Type': 'application/json' } });
     console.error('monobank-checkout:', e);
     return errorResponse(500, 'Internal server error');

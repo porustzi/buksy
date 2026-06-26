@@ -3,7 +3,7 @@ import { saveOrder, decreaseStockBulk } from '../_lib/supabase.js';
 import { validateCatalogItems } from '../_lib/catalog.js';
 import { sendEmail, orderConfirmationHtml } from '../_lib/email.js';
 import { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS, PAYMENT, ORDER_STATUS, PAYMENT_METHOD } from '../_lib/constants.js';
-import { DuplicateOrderError } from '../_lib/errors.js';
+import { DuplicateOrderError, ValidationError } from '../_lib/errors.js';
 
 export async function onRequest(context) {
   const { request, env } = context;
@@ -70,6 +70,7 @@ export async function onRequest(context) {
 
     return okResponse({ success: true, orderId, total, message: 'Order placed!' });
   } catch (e) {
+    if (e instanceof ValidationError) return errorResponse(400, e.message);
     if (e.statusCode) return new Response(e.body, { status: e.statusCode, headers: { 'Content-Type': 'application/json' } });
     console.error('order:', e);
     return errorResponse(500, 'Internal error');

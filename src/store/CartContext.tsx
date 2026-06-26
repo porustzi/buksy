@@ -139,7 +139,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [state.items]);
 
   const addItem = (product: Product, size: string, quantity = 1) => {
-    dispatch({ type: 'ADD_ITEM', product, size, quantity });
+    const maxStock = product.stock ?? 99;
+    const existing = state.items.find(i => i.product.id === product.id && i.size === size);
+    const currentQty = existing ? existing.quantity : 0;
+    const capped = Math.min(quantity, Math.max(0, maxStock - currentQty));
+    if (capped <= 0) return;
+    dispatch({ type: 'ADD_ITEM', product, size, quantity: capped });
   };
 
   const removeItem = (productId: string, size: string) => {
@@ -147,7 +152,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
   };
 
   const updateQuantity = (productId: string, size: string, quantity: number) => {
-    dispatch({ type: 'UPDATE_QUANTITY', productId, size, quantity });
+    const item = state.items.find(i => i.product.id === productId && i.size === size);
+    if (item) {
+      const maxStock = item.product.stock ?? 99;
+      dispatch({ type: 'UPDATE_QUANTITY', productId, size, quantity: Math.min(quantity, maxStock) });
+    }
   };
 
   const clearCart = () => {

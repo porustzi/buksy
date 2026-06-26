@@ -2,14 +2,12 @@ import { sanitize } from './utils.js';
 import { getStock } from './supabase.js';
 import { FIELD_LIMITS, ORDER_LIMITS, PAYMENT } from './constants.js';
 
-// The _catalog.json will be generated at build time by transform-products.mjs
-// We import it dynamically since it's in the project root for CF build
+// _catalog.json is copied to functions/_lib/ during build by transform-products.mjs
 let catalogCache = null;
 async function getCatalog() {
   if (catalogCache) return catalogCache;
-  // Try importing the generated catalog
   try {
-    const mod = await import('../../_catalog.json');
+    const mod = await import('./_catalog.json');
     catalogCache = mod.default || mod;
   } catch {
     catalogCache = {};
