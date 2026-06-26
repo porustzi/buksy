@@ -93,7 +93,7 @@ export async function onRequest(context) {
   } catch (e) {
     if (e instanceof ValidationError) return errorResponse(400, e.message);
     if (e.statusCode) return new Response(e.body, { status: e.statusCode, headers: { 'Content-Type': 'application/json' } });
-    console.error('monobank-checkout:', e);
-    return errorResponse(500, 'Internal server error');
+    console.error('monobank-checkout:', e.name, e.message, e.code || '');
+    return errorResponse(500, 'Internal server error: ' + (e.message || 'unknown'));
   }
 }

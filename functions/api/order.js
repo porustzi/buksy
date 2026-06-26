@@ -72,7 +72,7 @@ export async function onRequest(context) {
   } catch (e) {
     if (e instanceof ValidationError) return errorResponse(400, e.message);
     if (e.statusCode) return new Response(e.body, { status: e.statusCode, headers: { 'Content-Type': 'application/json' } });
-    console.error('order:', e);
-    return errorResponse(500, 'Internal error');
+    console.error('order:', e.name, e.message, e.code || '');
+    return errorResponse(500, 'Internal error: ' + (e.message || 'unknown'));
   }
 }
