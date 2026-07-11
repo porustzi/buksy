@@ -1,20 +1,22 @@
-import { esc, rateLimit, parseBody, pemToArrayBuffer, base64ToUint8Array, jsonResponse, errorResponse } from '../_lib/utils.js';
+import { rateLimit, parseBody, pemToArrayBuffer, base64ToUint8Array, jsonResponse, errorResponse } from '../_lib/utils.js';
 import { markOrderPaidWithStock, getOrderByRef } from '../_lib/supabase.js';
 import { sendEmail, paymentConfirmedHtml } from '../_lib/email.js';
 import { RATE_LIMIT, PAYMENT, PUBKEY_CACHE_TTL } from '../_lib/constants.js';
-import { OrderNotFoundError, StockInsufficientError, AmountMismatchError, SignatureError } from '../_lib/errors.js';
+import { OrderNotFoundError, StockInsufficientError, AmountMismatchError } from '../_lib/errors.js';
+import { esc } from '../_lib/utils.js';
 
 let cache = { key: null, ts: 0, raw: null };
 
 async function getPubKey(env) {
-  if (cache.key && Date.now() - cache.ts < PUBKEY_CACHE_TTL) return cache;
+  const now = Date.now();
+  if (cache.key && now - cache.ts < PUBKEY_CACHE_TTL) return cache;
   const TOKEN = env.MONOBANK_TOKEN;
-  if (!TOKEN) return null;
+  if (!TOKEN) return cache.key ? cache : null;
   try {
     const res = await fetch('https://api.monobank.ua/api/merchant/pubkey', { headers: { 'X-Token': TOKEN } });
     if (!res.ok) return cache.key ? cache : null;
     const data = await res.json();
-    cache = { key: data.key, raw: data.key, ts: Date.now() };
+    cache = { key: data.key, raw: data.key, ts: now };
     return cache;
   } catch { return cache.key ? cache : null; }
 }
@@ -59,7 +61,9 @@ export async function onRequest(context) {
     if (!body.invoiceId || !body.status || !body.reference) return errorResponse(400, 'Invalid payload');
     if (body.status !== 'success') return jsonResponse(200, { ok: true });
 
-    const amountPaid = Number(body.amount || body.finalAmount || 0) / 100;
+    const amountPaid = Number(body.amount || body.finalAmount) / 100;
+    if (!amountPaid || amountPaid <= 0) return errorResponse(400, 'Missing amount');
+
     const itemsForStock = buildStockItems(body.basketOrder);
 
     const order = await getOrderByRef(env, body.reference);
@@ -69,14 +73,13 @@ export async function onRequest(context) {
 
     if (!wasPaid) return jsonResponse(200, { ok: true });
 
-    // Notifications only on first success
     const tgToken = env.TELEGRAM_BOT_TOKEN, tgChat = env.TELEGRAM_CHAT_ID;
     if (tgToken && tgChat) {
       const tgMsg = `✅ <b>ОПЛАЧЕНО (Monobank)</b>\n<code>#${esc(body.reference)}</code>\n\n💳 ${esc(body.invoiceId)}\n💰 <b>${amountPaid.toFixed(2)} UAH</b>\n\n📋 Сума замовлення: ${orderTotal.toFixed(2)} UAH\n\n━━━━━━━━━━━━━━━━\n✅ Оплата підтверджена`;
-      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(e => console.error('[TG-CALLBACK]', e.message));
+      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(() => {});
     }
     if (order.customer?.email) {
-      sendEmail(env, { to: order.customer.email, subject: 'Оплату підтверджено — Замовлення #' + body.reference, html: paymentConfirmedHtml({ orderId: body.reference, amount: amountPaid, currency: 'UAH', paymentId: body.invoiceId, items: (body.basketOrder || []).map(b => ({ qty: b.qty, name: b.name, size: '' })) }) }).catch(e => console.error('[EMAIL-CALLBACK] send failed:', e.message));
+      sendEmail(env, { to: order.customer.email, subject: 'Оплату підтверджено — Замовлення #' + body.reference, html: paymentConfirmedHtml({ orderId: body.reference, amount: amountPaid, currency: 'UAH', paymentId: body.invoiceId, items: (body.basketOrder || []).map(b => ({ qty: b.qty, name: b.name, size: '' })) }) }).catch(() => {});
     }
 
     return jsonResponse(200, { ok: true });
@@ -84,7 +87,6 @@ export async function onRequest(context) {
     if (err instanceof OrderNotFoundError) return errorResponse(404, 'Order not found');
     if (err instanceof AmountMismatchError) return errorResponse(400, 'Amount mismatch');
     if (err instanceof StockInsufficientError) return errorResponse(409, 'Insufficient stock');
-    console.error('monobank-callback:', err);
     return errorResponse(500, 'Internal server error');
   }
 }

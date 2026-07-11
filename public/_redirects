@@ -1,15 +1,6 @@
-# Static assets first
-/index.html  /index.html  200
-/favicon.svg  /favicon.svg  200
-/logo.png  /logo.png  200
-/assets/*  /assets/:splat  200
-/uploads/*  /uploads/:splat  200
-
 # Admin
 /admin  /admin/index.html  200
+/admin/*  /admin/index.html  200
 
-# API
-/api/*  /api/:splat  200
-
-# SPA — serve index.html for unmatched paths (loop warning is false positive, rule still works)
+# SPA fallback — all non-file routes serve index.html
 /*  /index.html  200

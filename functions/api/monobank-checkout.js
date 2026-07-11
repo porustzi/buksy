@@ -17,7 +17,8 @@ export async function onRequest(context) {
   const body = parsed.data;
 
   try {
-    const { items, shippingInfo, email, idempotencyKey } = body;
+    const { items, shippingInfo, email } = body;
+    const idempotencyKey = body.idempotencyKey || ('auto-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2));
 
     validateItems(items);
     if (email && !validateEmail(email)) return errorResponse(400, 'Invalid email');
@@ -95,6 +96,6 @@ export async function onRequest(context) {
     if (e instanceof ValidationError) return errorResponse(400, e.message);
     if (e.statusCode) return new Response(e.body, { status: e.statusCode, headers: { 'Content-Type': 'application/json' } });
     console.error('monobank-checkout:', e.name, e.message, e.code || '');
-    return errorResponse(500, 'Internal server error: ' + (e.message || 'unknown'));
+    return errorResponse(500, 'Internal server error');
   }
 }

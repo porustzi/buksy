@@ -66,7 +66,7 @@ export function validateItems(items) {
   }
 }
 export function validateEmail(email) {
-  return typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  return typeof email === 'string' && /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/.test(email);
 }
 export function validateIdempotencyKey(key) {
   if (key && (typeof key !== 'string' || key.length > FIELD_LIMITS.IDEMPOTENCY_KEY)) {

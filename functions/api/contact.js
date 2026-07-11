@@ -25,7 +25,7 @@ export async function onRequest(context) {
   const tgToken = env.TELEGRAM_BOT_TOKEN, tgChat = env.TELEGRAM_CHAT_ID;
   if (tgToken && tgChat) {
     const tgMsg = `📬 <b>ПОВІДОМЛЕННЯ</b>\n\n👤 ${esc(name) || 'Анонім'}\n📧 ${esc(email)}\n📋 ${esc(subject) || 'Без теми'}\n\n${esc(message)}`;
-    fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(() => {});
+    fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(e => console.error('[TG-CONTACT]', e.message));
   }
 
   // Email notification to store
@@ -34,7 +34,7 @@ export async function onRequest(context) {
     to,
     subject: 'Нове повідомлення: ' + (subject || 'Без теми') + ' — BUKSY',
     html: `<h2>Нове повідомлення з сайту</h2><p><strong>Ім'я:</strong> ${esc(name) || '—'}</p><p><strong>Email:</strong> ${esc(email)}</p><p><strong>Тема:</strong> ${esc(subject) || '—'}</p><p><strong>Повідомлення:</strong></p><blockquote style="padding:12px;background:#f5f5f5;border-left:3px solid #b10006">${esc(message).replace(/\n/g, '<br>')}</blockquote>`,
-  }).catch(() => {});
+  }).catch(e => console.error('[EMAIL-CONTACT] send failed:', e.message));
 
   return okResponse({ success: true });
 }

@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import { CartItem, Product } from '../types';
 import { products as allProducts } from '../data/products';
 
@@ -138,59 +138,48 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toStored(state.items)));
   }, [state.items]);
 
-  const addItem = (product: Product, size: string, quantity = 1) => {
+  const addItem = useCallback((product: Product, size: string, quantity = 1) => {
     const maxStock = product.stock ?? 99;
     const existing = state.items.find(i => i.product.id === product.id && i.size === size);
     const currentQty = existing ? existing.quantity : 0;
     const capped = Math.min(quantity, Math.max(0, maxStock - currentQty));
     if (capped <= 0) return;
     dispatch({ type: 'ADD_ITEM', product, size, quantity: capped });
-  };
+  }, [state.items]);
 
-  const removeItem = (productId: string, size: string) => {
+  const removeItem = useCallback((productId: string, size: string) => {
     dispatch({ type: 'REMOVE_ITEM', productId, size });
-  };
+  }, []);
 
-  const updateQuantity = (productId: string, size: string, quantity: number) => {
+  const updateQuantity = useCallback((productId: string, size: string, quantity: number) => {
     const item = state.items.find(i => i.product.id === productId && i.size === size);
     if (item) {
       const maxStock = item.product.stock ?? 99;
       dispatch({ type: 'UPDATE_QUANTITY', productId, size, quantity: Math.min(quantity, maxStock) });
     }
-  };
+  }, [state.items]);
 
-  const clearCart = () => {
-    dispatch({ type: 'CLEAR_CART' });
-  };
+  const clearCart = useCallback(() => dispatch({ type: 'CLEAR_CART' }), []);
+  const toggleCart = useCallback(() => dispatch({ type: 'TOGGLE_CART' }), []);
+  const closeCart = useCallback(() => dispatch({ type: 'CLOSE_CART' }), []);
 
-  const toggleCart = () => {
-    dispatch({ type: 'TOGGLE_CART' });
-  };
+  const totalItems = useMemo(() => state.items.reduce((sum, item) => sum + item.quantity, 0), [state.items]);
+  const totalPrice = useMemo(() => state.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0), [state.items]);
 
-  const closeCart = () => {
-    dispatch({ type: 'CLOSE_CART' });
-  };
-
-  const totalItems = state.items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = state.items.reduce(
-    (sum, item) => sum + item.product.price * item.quantity,
-    0
-  );
+  const value = useMemo(() => ({
+    ...state,
+    addItem,
+    removeItem,
+    updateQuantity,
+    clearCart,
+    toggleCart,
+    closeCart,
+    totalItems,
+    totalPrice,
+  }), [state, addItem, removeItem, updateQuantity, clearCart, toggleCart, closeCart, totalItems, totalPrice]);
 
   return (
-    <CartContext.Provider
-      value={{
-        ...state,
-        addItem,
-        removeItem,
-        updateQuantity,
-        clearCart,
-        toggleCart,
-        closeCart,
-        totalItems,
-        totalPrice,
-      }}
-    >
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   );

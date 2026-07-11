@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronDown } from 'lucide-react';
@@ -10,8 +11,8 @@ import { useSeo } from '../hooks/useSeo';
 export function HomePage() {
   const { t } = useTranslation();
   useSeo({ title: 'Преміальний темний стрітвір' });
-  const featuredProducts = products.filter((p) => p.isFeatured);
-  const bestsellers = products.filter((p) => p.isBestseller);
+  const featuredProducts = useMemo(() => products.filter((p) => p.isFeatured), []);
+  const bestsellers = useMemo(() => products.filter((p) => p.isBestseller), []);
   const hero = homepage.hero || {};
   const feat = homepage.featured || {};
   const phil = homepage.philosophy || {};
@@ -23,7 +24,7 @@ export function HomePage() {
   return (
     <div className="overflow-hidden">
       <section className="relative h-screen">
-        <div className="absolute inset-0"><img src={heroImg} alt="" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-r from-noir via-noir/80 to-noir/40" /><div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-noir/50" /></div>
+        <div className="absolute inset-0"><img src={heroImg} alt="BUKSY Dark Luxury Streetwear" fetchPriority="high" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-r from-noir via-noir/80 to-noir/40" /><div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-noir/50" /></div>
         <div className="relative z-10 h-full flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.2 }} className="max-w-2xl">
             <p className="font-heading text-sm tracking-[0.4em] text-blood mb-4">{hero.tagline}</p>
@@ -53,7 +54,7 @@ export function HomePage() {
 
       <section className="relative py-32 bg-ash">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
-          <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="relative"><div className="aspect-[4/5] overflow-hidden"><img src={philImg} alt="" className="w-full h-full object-cover" /></div><div className="absolute -bottom-6 -right-6 w-48 h-48 border border-blood/30 hidden lg:block" /></motion.div>
+          <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="relative"><div className="aspect-[4/5] overflow-hidden"><img src={philImg} alt="BUKSY філософія бренду" className="w-full h-full object-cover" /></div><div className="absolute -bottom-6 -right-6 w-48 h-48 border border-blood/30 hidden lg:block" /></motion.div>
           <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.2 }} className="lg:pl-8">
             <p className="section-subtitle mb-3">{phil.tagline}</p><h2 className="section-title mb-8">{phil.title1} <br />{phil.title2}</h2>
             <div className="space-y-6 text-white/70 font-body leading-relaxed"><p>{phil.text1}</p><p>{phil.text2}</p><p>{phil.text3}</p></div>
@@ -75,7 +76,7 @@ export function HomePage() {
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
             {[{ nameKey: 'shop.categoryHoodies', slug: 'hoodies', image: products.find(p => p.category === 'hoodies')?.images[0] || '' },{ nameKey: 'shop.categoryTShirts', slug: 't-shirts', image: products.find(p => p.category === 't-shirts')?.images[0] || '' },{ nameKey: 'shop.categoryJackets', slug: 'jackets', image: products.find(p => p.category === 'jackets')?.images[0] || '' },{ nameKey: 'shop.categoryPants', slug: 'pants', image: products.find(p => p.category === 'pants')?.images[0] || '' },{ nameKey: 'shop.categoryAccessories', slug: 'accessories', image: products.find(p => p.category === 'accessories')?.images[0] || '' },{ nameKey: 'shop.categoryFootwear', slug: 'footwear', image: products.find(p => p.category === 'footwear')?.images[0] || '' }].map((cat, i) => (
               <motion.div key={cat.slug} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
-                <Link to={`/shop?category=${cat.slug}`} className="group relative block aspect-[4/3] overflow-hidden bg-noir"><img src={cat.image} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" /><div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/40 to-transparent" /><div className="absolute bottom-4 left-4 right-4"><h3 className="font-heading text-lg tracking-[0.2em] text-white group-hover:text-blood transition-colors duration-300">{t(cat.nameKey).toUpperCase()}</h3></div></Link>
+                <Link to={`/shop?category=${cat.slug}`} className="group relative block aspect-[4/3] overflow-hidden bg-noir"><img src={cat.image} alt={t(cat.nameKey)} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" /><div className="absolute inset-0 bg-gradient-to-t from-noir via-noir/40 to-transparent" /><div className="absolute bottom-4 left-4 right-4"><h3 className="font-heading text-lg tracking-[0.2em] text-white group-hover:text-blood transition-colors duration-300">{t(cat.nameKey).toUpperCase()}</h3></div></Link>
               </motion.div>))}
           </div>
         </div>

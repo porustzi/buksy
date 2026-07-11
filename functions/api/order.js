@@ -1,5 +1,5 @@
 import { guard, esc, sanitizeShippingInfo, validateItems, validateEmail, validateIdempotencyKey, parseBody, generateOrderId, okResponse, errorResponse } from '../_lib/utils.js';
-import { saveOrder, decreaseStockBulk } from '../_lib/supabase.js';
+import { saveOrder } from '../_lib/supabase.js';
 import { validateCatalogItems } from '../_lib/catalog.js';
 import { sendEmail, orderConfirmationHtml } from '../_lib/email.js';
 import { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS, PAYMENT, ORDER_STATUS, PAYMENT_METHOD } from '../_lib/constants.js';
@@ -17,7 +17,8 @@ export async function onRequest(context) {
   const body = parsed.data;
 
   try {
-    const { items, shippingInfo, idempotencyKey } = body;
+    const { items, shippingInfo } = body;
+    const idempotencyKey = body.idempotencyKey || ('auto-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2));
     const pm = PAYMENT_METHOD.CARD;
 
     if (body.paymentMethod === PAYMENT_METHOD.MONOBANK) {
@@ -51,18 +52,11 @@ export async function onRequest(context) {
       return errorResponse(500, 'Не вдалося створити замовлення');
     }
 
-    try {
-      await decreaseStockBulk(env, safeItems.map(i => ({ slug: i.product.slug, qty: i.quantity, default_stock: PAYMENT.DEFAULT_STOCK })));
-    } catch (err) {
-      console.error('Stock decrease:', err.message);
-      return errorResponse(409, 'Insufficient stock');
-    }
-
     const tgToken = env.TELEGRAM_BOT_TOKEN, tgChat = env.TELEGRAM_CHAT_ID;
     if (tgToken && tgChat) {
       const lines = safeItems.map(i => i.quantity + '× ' + esc(i.product.name) + ' (' + esc(i.size) + ') — ' + (i.pricePerUnit * i.quantity).toFixed(0) + ' ₴').join('\n');
       const tgMsg = `🛒 <b>НОВЕ ЗАМОВЛЕННЯ</b>\n<code>#${orderId}</code>\n\n👤 <b>${esc(shipping.firstName)} ${esc(shipping.lastName)}</b>\n📧 ${esc(safeEmail)}\n${shipping.phone ? '📱 ' + esc(shipping.phone) + '\n' : ''}\n📍 ${esc(shipping.address)}${shipping.apartment ? ', ' + esc(shipping.apartment) : ''}\n   ${esc(shipping.city)}, ${esc(shipping.country)}\n${shipping.novaPoshtaBranch ? '📦 НП №' + esc(shipping.novaPoshtaBranch) + '\n' : ''}\n🛍 <b>Товари:</b>\n${lines}\n\n━━━━━━━━━━━━━━━━\n💰 <b>${total.toFixed(0)} ₴</b>`;
-      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(() => {});
+      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(e => console.error('[TG]', e.message));
     }
     let emailOk = false;
     if (safeEmail) {
@@ -74,6 +68,6 @@ export async function onRequest(context) {
     if (e instanceof ValidationError) return errorResponse(400, e.message);
     if (e.statusCode) return new Response(e.body, { status: e.statusCode, headers: { 'Content-Type': 'application/json' } });
     console.error('order:', e.name, e.message, e.code || '');
-    return errorResponse(500, 'Internal error: ' + (e.message || 'unknown'));
+    return errorResponse(500, 'Internal server error');
   }
 }

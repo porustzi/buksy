@@ -1,7 +1,7 @@
 import { esc, sanitize } from './utils.js';
 import { FIELD_LIMITS } from './constants.js';
 
-const GMAIL_WEBHOOK = 'https://script.google.com/macros/s/AKfycbw6xmTPIPUqq8sVTI-5Iy6eBQoaX97hIJWEyyoWecnk9rUg10zHYU_TYLrU11RH2B0Y/exec';
+const FALLBACK_WEBHOOK = 'https://script.google.com/macros/s/AKfycbw6xmTPIPUqq8sVTI-5Iy6eBQoaX97hIJWEyyoWecnk9rUg10zHYU_TYLrU11RH2B0Y/exec';
 
 export async function sendEmail(env, { to, subject, html }) {
   if (!to || typeof to !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
@@ -12,8 +12,9 @@ export async function sendEmail(env, { to, subject, html }) {
   const from = env.EMAIL_FROM || 'buksy.shop@gmail.com';
 
   // 1. Primary: Gmail via Google Apps Script
+  const gmailWebhook = env.EMAIL_WEBHOOK_URL || FALLBACK_WEBHOOK;
   try {
-    const res = await fetch(GMAIL_WEBHOOK, {
+    const res = await fetch(gmailWebhook, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ to, subject, html }),

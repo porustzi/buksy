@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { DatabaseError, DuplicateOrderError, OrderNotFoundError, StockInsufficientError, AmountMismatchError, ValidationError } from './errors.js';
 import { ERROR_CODES, RPC_ERRORS, DB_TIMEOUT } from './constants.js';
+import { validateOrderId, validateIdempotencyKey } from './utils.js';
 
 let client = null;
 
@@ -34,12 +35,6 @@ function classifyRpcError(error, amountPaid, orderTotal) {
   throw new DatabaseError(error.message || 'DB error', code || 'DB_ERROR', error);
 }
 
-function _validateOrderId(id) {
-  if (!id || typeof id !== 'string' || !/^BUK-[A-F0-9]{8}-[A-F0-9]{6}$/.test(id)) throw new ValidationError('Invalid order_id: ' + id, 'orderId');
-}
-function _validateIdempotencyKey(key) {
-  if (key && (typeof key !== 'string' || key.length > 128)) throw new ValidationError('Invalid idempotency_key', 'idempotencyKey');
-}
 function _validateItemsArray(items) {
   if (items && (!Array.isArray(items) || !items.length)) throw new ValidationError('Items must be non-empty array', 'items');
 }
@@ -48,8 +43,8 @@ function _validateItemsArray(items) {
 // Order Operations
 // ============================================================================
 export async function saveOrder(env, order) {
-  _validateOrderId(order.order_id);
-  _validateIdempotencyKey(order.idempotency_key);
+  validateOrderId(order.order_id);
+  validateIdempotencyKey(order.idempotency_key);
   const supabase = getClient(env);
   const { data, error } = await withTimeout(supabase.from('orders').insert(order).select('order_id, total, status').single());
   if (error) {
@@ -62,7 +57,7 @@ export async function saveOrder(env, order) {
 }
 
 export async function getOrderByIdempotencyKey(env, key) {
-  _validateIdempotencyKey(key);
+  validateIdempotencyKey(key);
   const supabase = getClient(env);
   const { data, error } = await withTimeout(supabase.from('orders').select('*').eq('idempotency_key', key).single());
   if (error) { if (error.code === ERROR_CODES.NO_ROWS) return null; classifyRpcError(error); }
@@ -70,7 +65,7 @@ export async function getOrderByIdempotencyKey(env, key) {
 }
 
 export async function getOrderByRef(env, orderId) {
-  _validateOrderId(orderId);
+  validateOrderId(orderId);
   const supabase = getClient(env);
   const { data, error } = await withTimeout(supabase.from('orders').select('*').eq('order_id', orderId).single());
   if (error) { if (error.code === ERROR_CODES.NO_ROWS) throw new OrderNotFoundError(orderId); classifyRpcError(error); }
@@ -78,7 +73,7 @@ export async function getOrderByRef(env, orderId) {
 }
 
 export async function updateOrderStatus(env, orderId, updates) {
-  _validateOrderId(orderId);
+  validateOrderId(orderId);
   if (!updates || typeof updates !== 'object' || Object.keys(updates).length === 0) throw new ValidationError('No update fields', 'updates');
   const supabase = getClient(env);
   const { data, error } = await withTimeout(supabase.from('orders').update(updates).eq('order_id', orderId).select('id').single());
@@ -91,7 +86,7 @@ export async function updateOrderStatus(env, orderId, updates) {
 // Payment Operations
 // ============================================================================
 export async function markOrderPaidWithStock(env, orderId, paymentId, amountPaid, orderTotal, items) {
-  _validateOrderId(orderId);
+  validateOrderId(orderId);
   if (!paymentId || typeof paymentId !== 'string') throw new ValidationError('Invalid payment_id', 'paymentId');
   if (typeof amountPaid !== 'number' || amountPaid <= 0) throw new ValidationError('Invalid amount_paid', 'amountPaid');
   if (typeof orderTotal !== 'number' || orderTotal <= 0) throw new ValidationError('Invalid order_total', 'orderTotal');

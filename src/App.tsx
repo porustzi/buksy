@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { CartProvider } from './store/CartContext';
 import './i18n/i18n';
 
@@ -9,15 +9,16 @@ import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
 import { LogoAnimation } from './components/LogoAnimation';
 import { ToastContainer } from './components/Toast';
-import { HomePage } from './pages/HomePage';
-import { ShopPage } from './pages/ShopPage';
-import { ProductPage } from './pages/ProductPage';
-import { AboutPage } from './pages/AboutPage';
-import { ContactPage } from './pages/ContactPage';
-import { CartPage } from './pages/CartPage';
-import { CheckoutPage } from './pages/CheckoutPage';
-import { InfoPage } from './pages/InfoPage';
-import { EditorialPage } from './pages/EditorialPage';
+
+const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
+const ShopPage = lazy(() => import('./pages/ShopPage').then(m => ({ default: m.ShopPage })));
+const ProductPage = lazy(() => import('./pages/ProductPage').then(m => ({ default: m.ProductPage })));
+const AboutPage = lazy(() => import('./pages/AboutPage').then(m => ({ default: m.AboutPage })));
+const ContactPage = lazy(() => import('./pages/ContactPage').then(m => ({ default: m.ContactPage })));
+const CartPage = lazy(() => import('./pages/CartPage').then(m => ({ default: m.CartPage })));
+const CheckoutPage = lazy(() => import('./pages/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
+const InfoPage = lazy(() => import('./pages/InfoPage').then(m => ({ default: m.InfoPage })));
+const EditorialPage = lazy(() => import('./pages/EditorialPage').then(m => ({ default: m.EditorialPage })));
 
 function PageWrapper({ children }: { children: React.ReactNode }) {
   return (
@@ -32,6 +33,10 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
   );
 }
 
+function LoadingFallback() {
+  return <div className="min-h-screen bg-noir" />;
+}
+
 function AppRoutes() {
   const location = useLocation();
 
@@ -41,80 +46,19 @@ function AppRoutes() {
 
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route
-          path="/"
-          element={
-            <PageWrapper>
-              <HomePage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/shop"
-          element={
-            <PageWrapper>
-              <ShopPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/product/:slug"
-          element={
-            <PageWrapper>
-              <ProductPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/about"
-          element={
-            <PageWrapper>
-              <AboutPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/editorial"
-          element={
-            <PageWrapper>
-              <EditorialPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/contact"
-          element={
-            <PageWrapper>
-              <ContactPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/cart"
-          element={
-            <PageWrapper>
-              <CartPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/checkout"
-          element={
-            <PageWrapper>
-              <CheckoutPage />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/:slug"
-          element={
-            <PageWrapper>
-              <InfoPage />
-            </PageWrapper>
-          }
-        />
-      </Routes>
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageWrapper><HomePage /></PageWrapper>} />
+          <Route path="/shop" element={<PageWrapper><ShopPage /></PageWrapper>} />
+          <Route path="/product/:slug" element={<PageWrapper><ProductPage /></PageWrapper>} />
+          <Route path="/about" element={<PageWrapper><AboutPage /></PageWrapper>} />
+          <Route path="/editorial" element={<PageWrapper><EditorialPage /></PageWrapper>} />
+          <Route path="/contact" element={<PageWrapper><ContactPage /></PageWrapper>} />
+          <Route path="/cart" element={<PageWrapper><CartPage /></PageWrapper>} />
+          <Route path="/checkout" element={<PageWrapper><CheckoutPage /></PageWrapper>} />
+          <Route path=":slug" element={<PageWrapper><InfoPage /></PageWrapper>} />
+        </Routes>
+      </Suspense>
     </AnimatePresence>
   );
 }

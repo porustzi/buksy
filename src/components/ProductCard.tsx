@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Eye, ShoppingBag } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { memo } from 'react';
 import { Product } from '../types';
 import { useCart } from '../store/CartContext';
 import { formatPrice } from '../data/settings';
@@ -13,7 +14,7 @@ interface ProductCardProps {
   index?: number;
 }
 
-export function ProductCard({ product, index = 0 }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ product, index = 0 }: ProductCardProps) {
   const { t } = useTranslation();
   const { addItem } = useCart();
   const navigate = useNavigate();
@@ -159,4 +160,4 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
       </Link>
     </motion.div>
   );
-}
+});

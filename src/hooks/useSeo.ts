@@ -9,64 +9,63 @@ interface SeoMeta {
 
 const DEFAULT_TITLE = 'BUKSY | Dark Luxury Streetwear';
 const DEFAULT_DESC = 'Premium dark streetwear for the unconventional. Luxury gothic fashion with contemporary edge.';
+const DEFAULT_IMAGE = '/logo.png';
+const SITE_URL = 'https://buksy.shop';
 
 export function useSeo({ title, description, image, url }: SeoMeta = {}) {
-  const prevRef = useRef<Record<string, HTMLMetaElement | null>>({});
+  const prevRef = useRef<Record<string, HTMLElement | null>>({});
 
   useEffect(() => {
     const pageTitle = title ? `${title} — BUKSY` : DEFAULT_TITLE;
     document.title = pageTitle;
+    const desc = description || DEFAULT_DESC;
+    const pageUrl = url || window.location.href;
+    const ogImage = image || SITE_URL + DEFAULT_IMAGE;
 
-    const setOg = (name: string, content: string) => {
-      const selector = `meta[property="og:${name}"]`;
+    const setMeta = (attr: string, name: string, content: string) => {
+      const selector = `meta[${attr}="${name}"]`;
       let el = document.querySelector(selector) as HTMLMetaElement | null;
       if (!el) {
         el = document.createElement('meta');
-        el.setAttribute('property', `og:${name}`);
+        el.setAttribute(attr, name);
         document.head.appendChild(el);
       }
       el.setAttribute('content', content);
-      prevRef.current[`og:${name}`] = el;
+      prevRef.current[`${attr}:${name}`] = el;
     };
-    const setTwitter = (name: string, content: string) => {
-      const selector = `meta[name="twitter:${name}"]`;
-      let el = document.querySelector(selector) as HTMLMetaElement | null;
+
+    const setCanonical = (href: string) => {
+      let el = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
       if (!el) {
-        el = document.createElement('meta');
-        el.setAttribute('name', `twitter:${name}`);
+        el = document.createElement('link');
+        el.setAttribute('rel', 'canonical');
         document.head.appendChild(el);
       }
-      el.setAttribute('content', content);
-      prevRef.current[`twitter:${name}`] = el;
+      el.setAttribute('href', href);
+      prevRef.current['canonical'] = el;
     };
 
-    (function () {
-      var sel = 'meta[name="description"]';
-      var el = document.querySelector(sel);
-      if (!el) { el = document.createElement('meta'); el.setAttribute('name', 'description'); document.head.appendChild(el); }
-      el.setAttribute('content', description || DEFAULT_DESC);
-      prevRef.current['description'] = el;
-    })();
+    // Canonical
+    const canonicalUrl = pageUrl.split('?')[0].split('#')[0];
+    setCanonical(canonicalUrl);
 
-    setOg('title', pageTitle);
-    setOg('description', description || DEFAULT_DESC);
-    setOg('type', 'website');
-    setTwitter('card', 'summary_large_image');
+    // Description
+    setMeta('name', 'description', desc);
 
-    if (image) {
-      setOg('image', image);
-      setTwitter('image', image);
-    } else {
-      ['og:image', 'twitter:image'].forEach(function (k) {
-        const el = prevRef.current[k];
-        if (el && el.parentNode) el.parentNode.removeChild(el);
-        prevRef.current[k] = null;
-      });
-    }
+    // Open Graph
+    setMeta('property', 'og:title', pageTitle);
+    setMeta('property', 'og:description', desc);
+    setMeta('property', 'og:type', 'website');
+    setMeta('property', 'og:image', ogImage);
+    setMeta('property', 'og:url', canonicalUrl);
+    setMeta('property', 'og:site_name', 'BUKSY');
+    setMeta('property', 'og:locale', 'uk_UA');
 
-    if (url) {
-      setOg('url', url);
-    }
+    // Twitter
+    setMeta('name', 'twitter:card', 'summary_large_image');
+    setMeta('name', 'twitter:title', pageTitle);
+    setMeta('name', 'twitter:description', desc);
+    setMeta('name', 'twitter:image', ogImage);
 
     return () => {
       document.title = DEFAULT_TITLE;

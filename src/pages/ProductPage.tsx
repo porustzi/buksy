@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -41,7 +41,46 @@ export function ProductPage() {
   const [activeTab, setActiveTab] = useState<'description' | 'details' | 'care'>('description');
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const addedTimerRef = useRef<ReturnType<typeof setTimeout>>();
-  const isOutOfStock = product.stock !== undefined && product.stock <= 0;
+  const isOutOfStock = product ? (product.stock !== undefined && product.stock <= 0) : false;
+
+  // JSON-LD structured data
+  const productJsonLd = useMemo(() => {
+    if (!product) return null;
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: product.name,
+      description: product.shortDescription,
+      image: product.images?.[0],
+      sku: product.id,
+      brand: { '@type': 'Brand', name: 'BUKSY' },
+      offers: {
+        '@type': 'Offer',
+        price: product.price,
+        priceCurrency: 'UAH',
+        availability: isOutOfStock ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
+        url: window.location.href,
+      },
+      aggregateRating: product.rating > 0 ? {
+        '@type': 'AggregateRating',
+        ratingValue: product.rating,
+        reviewCount: product.reviewCount || 1,
+      } : undefined,
+    };
+  }, [product, isOutOfStock]);
+
+  const breadcrumbJsonLd = useMemo(() => {
+    if (!product) return null;
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Головна', item: window.location.origin },
+        { '@type': 'ListItem', position: 2, name: 'Магазин', item: window.location.origin + '/shop' },
+        { '@type': 'ListItem', position: 3, name: product.name, item: window.location.href },
+      ],
+    };
+  }, [product]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -66,9 +105,10 @@ export function ProductPage() {
     );
   }
 
-  const relatedProducts = products
-    .filter((p) => p.category === product.category && p.id !== product.id)
-    .slice(0, 4);
+  const relatedProducts = useMemo(() =>
+    products.filter((p) => p.category === product?.category && p.id !== product?.id).slice(0, 4),
+    [product?.category, product?.id]
+  );
 
   const productReviews = product.reviews || [];
 
@@ -96,11 +136,18 @@ export function ProductPage() {
 
   return (
     <div className="min-h-screen bg-noir pt-24">
+      {productJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }} />
+      )}
+      {breadcrumbJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      )}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
-        <motion.div
+        <motion.nav
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
+          aria-label="breadcrumb"
           className="flex items-center gap-2 text-sm text-white/40 font-body mb-8"
         >
           <Link to="/" className="hover:text-white transition-colors">{t('common.home')}</Link>
@@ -112,7 +159,7 @@ export function ProductPage() {
           </Link>
           <span>/</span>
           <span className="text-white">{product.name}</span>
-        </motion.div>
+        </motion.nav>
 
         {/* Main Content */}
         <div className="grid lg:grid-cols-2 gap-12">
