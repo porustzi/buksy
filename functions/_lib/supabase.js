@@ -19,24 +19,25 @@ async function supabaseFetch(env, path, options) {
   const { baseUrl, apiKey } = getConfig(env);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), DB_TIMEOUT);
+  const customHeaders = options.headers || {};
   try {
     const res = await fetch(`${baseUrl}${path}`, {
-      ...options,
+      method: options.method || 'GET',
       signal: controller.signal,
       headers: {
         'apikey': apiKey,
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
-        'Prefer': options.headers?.Prefer || 'return=representation',
-        ...options.headers,
+        'Prefer': 'return=representation',
+        ...customHeaders,
       },
+      body: options.body,
     });
     const text = await res.text();
     if (!res.ok) {
       let errBody;
       try { errBody = JSON.parse(text); } catch { errBody = { message: text }; }
-      const error = { code: errBody.code || '', message: errBody.message || text, status: res.status };
-      throw error;
+      throw { code: errBody.code || '', message: errBody.message || text, status: res.status };
     }
     return text ? JSON.parse(text) : null;
   } finally {
