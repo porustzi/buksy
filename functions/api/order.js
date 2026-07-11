@@ -1,9 +1,9 @@
-import { guard, esc, sanitizeShippingInfo, validateItems, validateEmail, validateIdempotencyKey, parseBody, generateOrderId, okResponse, errorResponse } from '../_lib/utils.js';
-import { saveOrder } from '../_lib/supabase.js';
-import { validateCatalogItems } from '../_lib/catalog.js';
-import { sendEmail, orderConfirmationHtml } from '../_lib/email.js';
-import { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS, PAYMENT, ORDER_STATUS, PAYMENT_METHOD } from '../_lib/constants.js';
-import { DuplicateOrderError, ValidationError } from '../_lib/errors.js';
+import { guard, esc, sanitizeShippingInfo, validateItems, validateEmail, validateIdempotencyKey, parseBody, generateOrderId, okResponse, errorResponse } from '../lib/utils.js';
+import { saveOrder } from '../lib/supabase.js';
+import { validateCatalogItems } from '../lib/catalog.js';
+import { sendEmail, orderConfirmationHtml } from '../lib/email.js';
+import { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS, PAYMENT, ORDER_STATUS, PAYMENT_METHOD } from '../lib/constants.js';
+import { DuplicateOrderError, ValidationError } from '../lib/errors.js';
 
 export async function onRequest(context) {
   const { request, env } = context;

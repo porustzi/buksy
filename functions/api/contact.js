@@ -1,6 +1,6 @@
-import { guard, esc, parseBody, okResponse, errorResponse } from '../_lib/utils.js';
-import { sendEmail } from '../_lib/email.js';
-import { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS } from '../_lib/constants.js';
+import { guard, esc, parseBody, okResponse, errorResponse } from '../lib/utils.js';
+import { sendEmail } from '../lib/email.js';
+import { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS } from '../lib/constants.js';
 
 export async function onRequest(context) {
   const { request, env } = context;

@@ -1,10 +1,10 @@
-import { guard, sanitizeShippingInfo, validateItems, validateEmail, validateIdempotencyKey, parseBody, generateOrderId, okResponse, errorResponse, jsonResponse } from '../_lib/utils.js';
-import { saveOrder, getOrderByIdempotencyKey } from '../_lib/supabase.js';
-import { validateCatalogItems } from '../_lib/catalog.js';
-import { sendEmail, orderConfirmationHtml } from '../_lib/email.js';
-import { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS, PAYMENT, ORDER_STATUS, PAYMENT_METHOD } from '../_lib/constants.js';
-import { DuplicateOrderError, ValidationError } from '../_lib/errors.js';
-import { esc } from '../_lib/utils.js';
+import { guard, sanitizeShippingInfo, validateItems, validateEmail, validateIdempotencyKey, parseBody, generateOrderId, okResponse, errorResponse, jsonResponse } from '../lib/utils.js';
+import { saveOrder, getOrderByIdempotencyKey } from '../lib/supabase.js';
+import { validateCatalogItems } from '../lib/catalog.js';
+import { sendEmail, orderConfirmationHtml } from '../lib/email.js';
+import { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS, PAYMENT, ORDER_STATUS, PAYMENT_METHOD } from '../lib/constants.js';
+import { DuplicateOrderError, ValidationError } from '../lib/errors.js';
+import { esc } from '../lib/utils.js';
 
 export async function onRequest(context) {
   try {

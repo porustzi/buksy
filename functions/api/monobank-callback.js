@@ -1,9 +1,9 @@
-import { rateLimit, parseBody, pemToArrayBuffer, base64ToUint8Array, jsonResponse, errorResponse } from '../_lib/utils.js';
-import { markOrderPaidWithStock, getOrderByRef } from '../_lib/supabase.js';
-import { sendEmail, paymentConfirmedHtml } from '../_lib/email.js';
-import { RATE_LIMIT, PAYMENT, PUBKEY_CACHE_TTL } from '../_lib/constants.js';
-import { OrderNotFoundError, StockInsufficientError, AmountMismatchError } from '../_lib/errors.js';
-import { esc } from '../_lib/utils.js';
+import { rateLimit, parseBody, pemToArrayBuffer, base64ToUint8Array, jsonResponse, errorResponse } from '../lib/utils.js';
+import { markOrderPaidWithStock, getOrderByRef } from '../lib/supabase.js';
+import { sendEmail, paymentConfirmedHtml } from '../lib/email.js';
+import { RATE_LIMIT, PAYMENT, PUBKEY_CACHE_TTL } from '../lib/constants.js';
+import { OrderNotFoundError, StockInsufficientError, AmountMismatchError } from '../lib/errors.js';
+import { esc } from '../lib/utils.js';
 
 let cache = { key: null, ts: 0, raw: null };
 
