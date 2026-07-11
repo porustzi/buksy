@@ -85,6 +85,6 @@ for (const p of products) {
 writeFileSync(catalogPath, JSON.stringify(catalog), 'utf-8');
 console.log(`✅ Generated _catalog.json — ${Object.keys(catalog).length} products`);
 
-const fnCatalogPath = join(root, 'functions', '_lib', '_catalog.json');
+const fnCatalogPath = join(root, 'functions', 'lib', '_catalog.json');
 writeFileSync(fnCatalogPath, JSON.stringify(catalog), 'utf-8');
-console.log(`✅ Copied _catalog.json to functions/_lib/`);
+console.log(`✅ Copied _catalog.json to functions/lib/`);
