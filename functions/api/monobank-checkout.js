@@ -1,22 +1,23 @@
-import { guard, esc, sanitizeShippingInfo, validateItems, validateEmail, validateIdempotencyKey, parseBody, generateOrderId, okResponse, errorResponse, jsonResponse } from '../_lib/utils.js';
+import { guard, sanitizeShippingInfo, validateItems, validateEmail, validateIdempotencyKey, parseBody, generateOrderId, okResponse, errorResponse, jsonResponse } from '../_lib/utils.js';
 import { saveOrder, getOrderByIdempotencyKey } from '../_lib/supabase.js';
 import { validateCatalogItems } from '../_lib/catalog.js';
 import { sendEmail, orderConfirmationHtml } from '../_lib/email.js';
 import { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS, PAYMENT, ORDER_STATUS, PAYMENT_METHOD } from '../_lib/constants.js';
 import { DuplicateOrderError, ValidationError } from '../_lib/errors.js';
+import { esc } from '../_lib/utils.js';
 
 export async function onRequest(context) {
-  const { request, env } = context;
-  if (request.method !== 'POST') return errorResponse(405, 'Method Not Allowed');
-
-  const blocked = guard(request, env, RATE_LIMIT.CHECKOUT);
-  if (blocked) return blocked;
-
-  let parsed = await parseBody(request, ORDER_LIMITS.MAX_BODY_SIZE);
-  if (parsed.error) return errorResponse(400, parsed.error);
-  const body = parsed.data;
-
   try {
+    const { request, env } = context;
+    if (request.method !== 'POST') return errorResponse(405, 'Method Not Allowed');
+
+    const blocked = guard(request, env, RATE_LIMIT.CHECKOUT);
+    if (blocked) return blocked;
+
+    let parsed = await parseBody(request, ORDER_LIMITS.MAX_BODY_SIZE);
+    if (parsed.error) return errorResponse(400, parsed.error);
+    const body = parsed.data;
+
     const { items, shippingInfo, email } = body;
     const idempotencyKey = body.idempotencyKey || ('auto-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2));
 
@@ -28,11 +29,9 @@ export async function onRequest(context) {
     const safeEmail = (typeof email === 'string' ? email : '').replace(/[<>"']/g, '').slice(0, FIELD_LIMITS.EMAIL).trim();
     const orderId = generateOrderId();
 
-    // Validate items
     const validatedItems = await validateCatalogItems(env, items, 'monobank');
     const serverTotal = validatedItems.reduce((s, i) => s + i.price * i.qty, 0);
 
-    // Save order
     const orderRecord = {
       order_id: orderId, idempotency_key: idempotencyKey || null,
       status: ORDER_STATUS.AWAITING_PAYMENT, payment_method: PAYMENT_METHOD.MONOBANK,
@@ -54,15 +53,13 @@ export async function onRequest(context) {
             : errorResponse(409, 'Order already processed');
         }
       }
-      console.error('saveOrder:', err.message);
-      return errorResponse(500, 'Не вдалося створити замовлення');
+      return jsonResponse(500, { error: 'saveOrder failed', detail: String(err.message || err) });
     }
 
-    // Create Monobank invoice
     const TOKEN = env.MONOBANK_TOKEN;
     const SITE_URL = env.URL || env.SITE_URL || '';
-    if (!TOKEN) return errorResponse(500, 'Monobank не налаштовано');
-    if (!SITE_URL) return errorResponse(500, 'SITE_URL not set');
+    if (!TOKEN) return errorResponse(500, 'Monobank token not configured');
+    if (!SITE_URL) return errorResponse(500, 'SITE_URL not configured');
 
     const monoRes = await fetch('https://api.monobank.ua/api/merchant/invoice/create', {
       method: 'POST',
@@ -76,27 +73,26 @@ export async function onRequest(context) {
       }),
     });
 
-    if (!monoRes.ok) return errorResponse(502, 'Монобанк: помилка ' + monoRes.status);
+    if (!monoRes.ok) {
+      const monoErr = await monoRes.text().catch(() => '');
+      return jsonResponse(502, { error: 'Monobank error', detail: monoRes.status + ': ' + monoErr.slice(0, 200) });
+    }
     const monoData = await monoRes.json();
 
-    // Notifications (fire-and-forget)
     const tgToken = env.TELEGRAM_BOT_TOKEN, tgChat = env.TELEGRAM_CHAT_ID;
     if (tgToken && tgChat) {
       const lines = validatedItems.map(i => i.qty + '× ' + i.name + (i.size ? ' (' + i.size + ')' : '') + ' — ' + (i.price * i.qty) + ' ₴').join('\n');
       const tgMsg = `🛒 <b>НОВЕ ЗАМОВЛЕННЯ</b>\n<code>#${orderId}</code>\n\n👤 <b>${esc(shipping.firstName || '-')} ${esc(shipping.lastName || '')}</b>\n📧 ${esc(safeEmail || '-')}\n${shipping.phone ? '📱 ' + esc(shipping.phone) + '\n' : ''}\n📍 ${esc(shipping.city || '-')}, ${esc(shipping.country || '-')}\n🚚 ${esc(shipping.address || '-')}${shipping.apartment ? ', ' + esc(shipping.apartment) : ''}\n${shipping.novaPoshtaBranch ? '📦 НП №' + esc(shipping.novaPoshtaBranch) + '\n' : ''}\n<b>Товари:</b>\n${lines}\n\n━━━━━━━━━━━━\n💰 <b>${serverTotal} ₴</b>  |  💳 Monobank\n⏳ Очікує оплати`;
-      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(e => console.error('[TG]', e.message));
+      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(() => {});
     }
     let emailOk = false;
     if (safeEmail) {
-      emailOk = await sendEmail(env, { to: safeEmail, subject: 'Замовлення #' + orderId + ' отримано — BUKSY', html: orderConfirmationHtml({ orderId, items: validatedItems.map(i => ({ product: { name: i.name, price: i.price }, size: i.size, quantity: i.qty })), total: serverTotal, shippingInfo: shipping }) }).catch(e => { console.error('[EMAIL] send failed:', e.message); return false; });
+      emailOk = await sendEmail(env, { to: safeEmail, subject: 'Замовлення #' + orderId + ' отримано — BUKSY', html: orderConfirmationHtml({ orderId, items: validatedItems.map(i => ({ product: { name: i.name, price: i.price }, size: i.size, quantity: i.qty })), total: serverTotal, shippingInfo: shipping }) }).catch(() => false);
     }
 
     return okResponse({ redirectUrl: monoData.pageUrl, orderId, emailSent: emailOk });
   } catch (e) {
-    if (e instanceof ValidationError) return errorResponse(400, e.message);
-    if (e.statusCode) return new Response(e.body, { status: e.statusCode, headers: { 'Content-Type': 'application/json' } });
-    const detail = e.name + ': ' + e.message + (e.code ? ' [' + e.code + ']' : '');
-    console.error('monobank-checkout:', detail);
+    const detail = (e.name || 'Error') + ': ' + (e.message || String(e)) + (e.code ? ' [' + e.code + ']' : '');
     return jsonResponse(500, { error: 'Internal server error', detail: detail });
   }
 }
