@@ -269,16 +269,6 @@ export function ProductPage() {
             </div>
 
             {/* Stock Status */}
-            {product.stock !== undefined && product.stock > 0 && product.stock <= 10 && (
-              <p className="text-amber-400 font-body text-sm">
-                {t('product.lowStock', { count: product.stock })}
-              </p>
-            )}
-            {product.stock !== undefined && product.stock > 10 && (
-              <p className="text-green-400 font-body text-sm">
-                {t('product.inStock', { count: product.stock })}
-              </p>
-            )}
             {isOutOfStock && (
               <p className="text-red-400 font-body text-sm">{t('product.outOfStock')}</p>
             )}

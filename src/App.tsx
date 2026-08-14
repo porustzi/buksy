@@ -18,7 +18,6 @@ const ContactPage = lazy(() => import('./pages/ContactPage').then(m => ({ defaul
 const CartPage = lazy(() => import('./pages/CartPage').then(m => ({ default: m.CartPage })));
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
 const InfoPage = lazy(() => import('./pages/InfoPage').then(m => ({ default: m.InfoPage })));
-const EditorialPage = lazy(() => import('./pages/EditorialPage').then(m => ({ default: m.EditorialPage })));
 
 function PageWrapper({ children }: { children: React.ReactNode }) {
   return (
@@ -52,7 +51,6 @@ function AppRoutes() {
           <Route path="/shop" element={<PageWrapper><ShopPage /></PageWrapper>} />
           <Route path="/product/:slug" element={<PageWrapper><ProductPage /></PageWrapper>} />
           <Route path="/about" element={<PageWrapper><AboutPage /></PageWrapper>} />
-          <Route path="/editorial" element={<PageWrapper><EditorialPage /></PageWrapper>} />
           <Route path="/contact" element={<PageWrapper><ContactPage /></PageWrapper>} />
           <Route path="/cart" element={<PageWrapper><CartPage /></PageWrapper>} />
           <Route path="/checkout" element={<PageWrapper><CheckoutPage /></PageWrapper>} />

@@ -9,7 +9,6 @@ const navLinks = [
   { nameKey: 'header.home', href: '/' },
   { nameKey: 'header.shop', href: '/shop' },
   { nameKey: 'header.about', href: '/about' },
-  { nameKey: 'header.editorial', href: '/editorial' },
   { nameKey: 'header.contact', href: '/contact' },
 ];
 

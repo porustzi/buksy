@@ -147,12 +147,6 @@ export const ProductCard = memo(function ProductCard({ product, index = 0 }: Pro
               </span>
             )}
           </div>
-          {product.stock !== undefined && product.stock > 0 && product.stock <= 10 && (
-            <p className="text-amber-400/80 font-body text-xs">{t('product.lowStock', { count: product.stock })}</p>
-          )}
-          {product.stock !== undefined && product.stock > 10 && (
-            <p className="text-green-400/80 font-body text-xs">{t('product.inStock', { count: product.stock })}</p>
-          )}
           {isOutOfStock && (
             <p className="text-red-400/80 font-body text-xs">{t('product.outOfStock') || 'Немає в наявності'}</p>
           )}
