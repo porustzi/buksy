@@ -254,7 +254,6 @@ var RAW_URL = 'https://raw.githubusercontent.com/' + REPO + '/' + BRANCH;
   var SECTIONS = [
     { id: 'homepage', label: 'Головна', path: 'content/pages/homepage/homepage.json', type: 'json' },
     { id: 'about', label: 'Про нас', path: 'content/pages/about/about.json', type: 'json' },
-    { id: 'editorial', label: 'Редакція', path: 'content/pages/editorial/editorial.json', type: 'json' },
     { id: 'contact', label: 'Контакти', path: 'content/pages/contact/contact.json', type: 'json' },
     { id: 'footer', label: 'Футер', path: 'content/pages/footer/footer.json', type: 'json' },
     { id: 'catalog', label: 'Каталог', type: 'catalog' },
@@ -771,18 +770,19 @@ function uploadImage(btn, path) {
       btn.disabled = true;
       btn.textContent = '⏳';
 
-      uploadFile(ghPath, base64, 'Upload ' + filename).then(function() {
+      uploadFile(ghPath, base64, 'Upload ' + filename).then(function(res) {
+        var savedPath = (res && res.path) ? res.path.replace(/^public/, '') : ('/uploads/' + filename);
         var inputEl = btn.parentElement.querySelector('input[type="text"]');
         if (inputEl) {
-          inputEl.value = '/uploads/' + filename;
+          inputEl.value = savedPath;
           // Update image preview if exists
           var preview = btn.closest('.field').querySelector('.image-preview');
           if (preview) {
-            preview.innerHTML = '<img src="' + RAW_URL + '/public/uploads/' + filename + '" onerror="this.style.display=\'none\'" />';
+            preview.innerHTML = '<img src="' + RAW_URL + '/public' + savedPath + '" onerror="this.style.display=\'none\'" />';
           } else {
             var p = document.createElement('div');
             p.className = 'image-preview';
-            p.innerHTML = '<img src="' + RAW_URL + '/public/uploads/' + filename + '" onerror="this.style.display=\'none\'" />';
+            p.innerHTML = '<img src="' + RAW_URL + '/public' + savedPath + '" onerror="this.style.display=\'none\'" />';
             btn.closest('.field').appendChild(p);
           }
         }

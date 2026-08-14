@@ -147,12 +147,11 @@ export async function onRequest(context) {
       case 'upload': {
         const { name, content, folder } = body;
         if (!name || !content) return json({ error: 'name and content required' }, 400);
-        const ext = name.split('.').pop();
+        const ext = (name.split('.').pop() || 'jpg').toLowerCase();
         const base = name.slice(0, -(ext.length + 1)).replace(/[^a-zA-Z0-9_\-]/g, '_');
-        const ts = Date.now();
         const dir = folder || 'public/uploads';
         if (!isAllowedPath(dir + '/')) return json({ error: 'Path not allowed' }, 403);
-        const fpath = `${dir}/${base}_${ts}.${ext}`;
+        const fpath = `${dir}/${base || Date.now()}.${ext}`;
         const check = await fetch(
           `https://api.github.com/repos/${REPO}/contents/${encodePath(fpath)}`,
           { headers: ghHeaders(env) }
