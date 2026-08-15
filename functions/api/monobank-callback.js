@@ -75,8 +75,16 @@ export async function onRequest(context) {
 
     const tgToken = env.TELEGRAM_BOT_TOKEN, tgChat = env.TELEGRAM_CHAT_ID;
     if (tgToken && tgChat) {
-      const tgMsg = `✅ <b>ОПЛАЧЕНО (Monobank)</b>\n<code>#${esc(body.reference)}</code>\n\n💳 ${esc(body.invoiceId)}\n💰 <b>${amountPaid.toFixed(2)} UAH</b>\n\n📋 Сума замовлення: ${orderTotal.toFixed(2)} UAH\n\n━━━━━━━━━━━━━━━━\n✅ Оплата підтверджена`;
-      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(() => {});
+      const ship = order.shipping || {};
+      const cust = order.customer || {};
+      const items = order.items || [];
+      const itemsLines = items.map(i => `${i.qty}× ${esc(i.name)}${i.size ? ' (' + esc(i.size) + ')' : ''}`).join('\n');
+      const delivery = ship.deliveryMethod === 'nova'
+        ? '📦 Нова Пошта: №' + esc(ship.novaPoshtaBranch || '—') + (ship.city ? ' (' + esc(ship.city) + ')' : '')
+        : '🏠 Адреса: ' + esc(ship.address || '—') + (ship.apartment ? ', кв. ' + esc(ship.apartment) : '') + ', ' + esc(ship.city || '') + ', ' + esc(ship.country || '');
+
+      const tgMsg = `✅ <b>ОПЛАЧЕНО</b>\n<code>#${esc(body.reference)}</code>\n\n💰 <b>${amountPaid.toFixed(2)} UAH</b> (сума замовлення ${orderTotal.toFixed(2)})\n\n👤 <b>${esc(cust.firstName || '')} ${esc(cust.lastName || '')}</b>\n📞 ${esc(cust.phone || '—')}\n📧 ${esc(cust.email || '—')}\n\n🚚 ${delivery}\n\n🛍 <b>Товари:</b>\n${itemsLines}\n\n━━━━━━━━━━━━━━━━\n✅ Відправляй замовлення`;
+      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(e => console.error('[TG-CALLBACK]', e.message));
     }
     if (order.customer?.email) {
       sendEmail(env, { to: order.customer.email, subject: 'Оплату підтверджено — Замовлення #' + body.reference, html: paymentConfirmedHtml({ orderId: body.reference, amount: amountPaid, currency: 'UAH', paymentId: body.invoiceId, items: (body.basketOrder || []).map(b => ({ qty: b.qty, name: b.name, size: '' })) }) }).catch(() => {});

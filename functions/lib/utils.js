@@ -21,7 +21,9 @@ export function sanitize(s, maxLen) {
 
 export function sanitizeShippingInfo(info) {
   if (!info || typeof info !== 'object') return {};
+  const dm = String(info.deliveryMethod || 'home');
   return {
+    deliveryMethod: dm === 'nova' ? 'nova' : 'home',
     firstName: sanitize(String(info.firstName || ''), FIELD_LIMITS.NAME),
     lastName: sanitize(String(info.lastName || ''), FIELD_LIMITS.NAME),
     email: sanitize(String(info.email || ''), FIELD_LIMITS.EMAIL),

@@ -39,6 +39,7 @@ export function CheckoutPage() {
     lastName: '',
     email: '',
     phone: '',
+    deliveryMethod: 'home' as 'home' | 'nova',
     address: '',
     apartment: '',
     city: '',
@@ -60,12 +61,17 @@ export function CheckoutPage() {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(shippingInfo.email)) newErrors.email = 'Invalid email format';
     if (!shippingInfo.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!shippingInfo.lastName.trim()) newErrors.lastName = 'Last name is required';
-    if (!shippingInfo.address.trim()) newErrors.address = 'Address is required';
-    if (!shippingInfo.city.trim()) newErrors.city = 'City is required';
-    if (!shippingInfo.country.trim()) newErrors.country = 'Country is required';
-    if (!shippingInfo.novaPoshtaBranch.trim()) newErrors.novaPoshtaBranch = 'Відділення НП обов\'язкове';
-    if (shippingInfo.phone.trim() && !/^\+?[\d\s\-()]{6,20}$/.test(shippingInfo.phone.trim()))
-      newErrors.phone = 'Invalid phone format';
+    if (!shippingInfo.phone.trim()) newErrors.phone = 'Номер телефону обов\'язковий';
+    else if (!/^\+?[\d\s\-()]{6,20}$/.test(shippingInfo.phone.trim())) newErrors.phone = 'Invalid phone format';
+
+    if (shippingInfo.deliveryMethod === 'nova') {
+      if (!shippingInfo.city.trim()) newErrors.city = 'Місто обов\'язкове';
+      if (!shippingInfo.novaPoshtaBranch.trim()) newErrors.novaPoshtaBranch = 'Відділення НП обов\'язкове';
+    } else {
+      if (!shippingInfo.address.trim()) newErrors.address = 'Address is required';
+      if (!shippingInfo.city.trim()) newErrors.city = 'City is required';
+      if (!shippingInfo.country.trim()) newErrors.country = 'Country is required';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -280,63 +286,93 @@ export function CheckoutPage() {
                   <h3 className="font-heading text-xl tracking-wider mt-8 mb-6">
                     {t('checkout.shippingAddress')}
                   </h3>
-                  <input
-                    type="text"
-                    placeholder="вул. Хрещатик, 1"
-                    value={shippingInfo.address}
-                    onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, address: e.target.value })
-                    }
-                    className="checkout-input w-full"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Кв. 42"
-                    value={shippingInfo.apartment}
-                    onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, apartment: e.target.value })
-                    }
-                    className="checkout-input w-full"
-                  />
-                   <div className="grid sm:grid-cols-3 gap-4">
-                    <input
-                      type="text"
-                      placeholder="Київ"
-                      value={shippingInfo.city}
-                      onChange={(e) =>
-                        setShippingInfo({ ...shippingInfo, city: e.target.value })
-                      }
-                      className="checkout-input"
-                    />
-                    <input
-                      type="text"
-                      placeholder="Україна"
-                      value={shippingInfo.country}
-                      onChange={(e) =>
-                        setShippingInfo({ ...shippingInfo, country: e.target.value })
-                      }
-                      className="checkout-input"
-                    />
-                    <input
-                      type="text"
-                      placeholder="01001"
-                      value={shippingInfo.postalCode}
-                      onChange={(e) =>
-                        setShippingInfo({ ...shippingInfo, postalCode: e.target.value })
-                      }
-                      className="checkout-input"
-                    />
+
+                  {/* Delivery method selector */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setShippingInfo({ ...shippingInfo, deliveryMethod: 'home' })}
+                      className={`p-4 border text-left transition-colors duration-300 ${
+                        shippingInfo.deliveryMethod === 'home'
+                          ? 'border-blood bg-blood/10'
+                          : 'border-white/10 hover:border-white/30'
+                      }`}
+                    >
+                      <div className="font-heading tracking-wider text-sm mb-1">🏠 Додому</div>
+                      <div className="text-white/40 text-xs">Кур'єрська доставка за адресою</div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShippingInfo({ ...shippingInfo, deliveryMethod: 'nova' })}
+                      className={`p-4 border text-left transition-colors duration-300 ${
+                        shippingInfo.deliveryMethod === 'nova'
+                          ? 'border-blood bg-blood/10'
+                          : 'border-white/10 hover:border-white/30'
+                      }`}
+                    >
+                      <div className="font-heading tracking-wider text-sm mb-1">📦 Нова Пошта</div>
+                      <div className="text-white/40 text-xs">Доставка у відділення</div>
+                    </button>
                   </div>
 
-                  <input
-                    type="text"
-                    placeholder="Відділення Нової Пошти №"
-                    value={shippingInfo.novaPoshtaBranch}
-                    onChange={(e) =>
-                      setShippingInfo({ ...shippingInfo, novaPoshtaBranch: e.target.value })
-                    }
-                    className="checkout-input w-full"
-                  />
+                  {shippingInfo.deliveryMethod === 'home' ? (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="вул. Хрещатик, 1"
+                        value={shippingInfo.address}
+                        onChange={(e) => setShippingInfo({ ...shippingInfo, address: e.target.value })}
+                        className="checkout-input w-full"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Кв. 42"
+                        value={shippingInfo.apartment}
+                        onChange={(e) => setShippingInfo({ ...shippingInfo, apartment: e.target.value })}
+                        className="checkout-input w-full"
+                      />
+                      <div className="grid sm:grid-cols-3 gap-4">
+                        <input
+                          type="text"
+                          placeholder="Київ"
+                          value={shippingInfo.city}
+                          onChange={(e) => setShippingInfo({ ...shippingInfo, city: e.target.value })}
+                          className="checkout-input"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Україна"
+                          value={shippingInfo.country}
+                          onChange={(e) => setShippingInfo({ ...shippingInfo, country: e.target.value })}
+                          className="checkout-input"
+                        />
+                        <input
+                          type="text"
+                          placeholder="01001"
+                          value={shippingInfo.postalCode}
+                          onChange={(e) => setShippingInfo({ ...shippingInfo, postalCode: e.target.value })}
+                          className="checkout-input"
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <input
+                        type="text"
+                        placeholder="Місто"
+                        value={shippingInfo.city}
+                        onChange={(e) => setShippingInfo({ ...shippingInfo, city: e.target.value })}
+                        className="checkout-input w-full"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Відділення Нової Пошти № (наприклад, №45)"
+                        value={shippingInfo.novaPoshtaBranch}
+                        onChange={(e) => setShippingInfo({ ...shippingInfo, novaPoshtaBranch: e.target.value })}
+                        className="checkout-input w-full"
+                      />
+                    </>
+                  )}
 
                   <button
                     onClick={() => {
