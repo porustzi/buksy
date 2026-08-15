@@ -61,12 +61,13 @@ async function verifySignature(rawBody, xSign, pubKeyCache) {
   }
 }
 
-function buildStockItems(basketOrder) {
-  if (!basketOrder || !Array.isArray(basketOrder) || !basketOrder.length) return [];
-  return basketOrder.map(b => {
-    const catStock = PAYMENT.DEFAULT_STOCK;
-    return { slug: b.code, qty: Number(b.qty) || 0, default_stock: catStock };
-  }).filter(i => i.slug && i.qty > 0);
+function buildStockItems(orderItems) {
+  if (!orderItems || !Array.isArray(orderItems) || !orderItems.length) return [];
+  return orderItems.map(i => ({
+    slug: i.slug,
+    qty: Number(i.qty || i.quantity) || 0,
+    default_stock: PAYMENT.DEFAULT_STOCK,
+  })).filter(i => i.slug && i.qty > 0);
 }
 
 export async function onRequest(context) {
@@ -93,12 +94,16 @@ export async function onRequest(context) {
     const amountPaid = Number(body.amount || body.finalAmount) / 100;
     if (!amountPaid || amountPaid <= 0) return errorResponse(400, 'Missing amount');
 
-    const itemsForStock = buildStockItems(body.basketOrder);
-
     const order = await getOrderByRef(env, body.reference);
     const orderTotal = Number(order.total) || 0;
 
-    const wasPaid = await markOrderPaidWithStock(env, body.reference, body.invoiceId, amountPaid, orderTotal, itemsForStock);
+    // Stock items from the ORDER (authoritative), fallback to webhook basketOrder
+    let itemsForStock = buildStockItems(order.items);
+    if (!itemsForStock.length && Array.isArray(body.basketOrder)) {
+      itemsForStock = (body.basketOrder || []).map(b => ({ slug: b.code, qty: Number(b.qty) || 0, default_stock: PAYMENT.DEFAULT_STOCK })).filter(i => i.slug && i.qty > 0);
+    }
+
+    const wasPaid = await markOrderPaidWithStock(env, body.reference, body.invoiceId, amountPaid, orderTotal, itemsForStock.length ? itemsForStock : null);
 
     if (!wasPaid) return jsonResponse(200, { ok: true });
 
