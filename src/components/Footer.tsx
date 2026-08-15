@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
 import { Instagram, Music2, Send } from 'lucide-react';
-import { footerData } from '../data/content';
+import { useContent } from '../hooks/useContent';
 
 export function Footer() {
+  const { footerData } = useContent();
   const f = footerData || {};
   const nl = f.newsletter || {};
   const brand = f.brand || {};

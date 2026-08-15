@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { aboutPage } from '../data/content';
+import { useContent } from '../hooks/useContent';
 import { useSeo } from '../hooks/useSeo';
 
 export function AboutPage() {
+  const { aboutPage } = useContent();
   const hero = aboutPage.hero || {};
   useSeo({ title: hero.tagline || 'Про нас', description: hero.title1 });
   const cta = aboutPage.cta || {};

@@ -2,6 +2,7 @@ import { existsSync, readFileSync, readdirSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import matter from 'gray-matter';
+import { translateDeep, saveCache } from './translate.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
@@ -57,9 +58,25 @@ if (existsSync(homepagePath)) {
   editorialImage = homepage.philosophy?.image || editorialImage;
 }
 
-const content = `import { Product, Review } from '../types';
+async function build() {
+  const enProducts = [];
+  const plProducts = [];
+  for (const p of products) {
+    enProducts.push(await translateDeep(p, 'en'));
+    plProducts.push(await translateDeep(p, 'pl'));
+  }
+
+  saveCache();
+
+  const content = `import { Product, Review } from '../types';
 
 export const products: Product[] = ${JSON.stringify(products, null, 2)};
+
+export const productsByLang: Record<string, Product[]> = {
+  uk: ${JSON.stringify(products)},
+  en: ${JSON.stringify(enProducts)},
+  pl: ${JSON.stringify(plProducts)},
+};
 
 export const reviews: Review[] = products.flatMap(p => (p.reviews || []).map((r: Review) => ({ ...r, productId: p.id, productSlug: p.slug })));
 
@@ -74,17 +91,23 @@ export const heroImage = '${heroImage}';
 export const editorialImage = '${editorialImage}';
 `;
 
-writeFileSync(outPath, content, 'utf-8');
-console.log(`✅ Generated products.ts — ${jsonFiles.length} JSON + ${mdFiles.length} Markdown = ${products.length} products`);
+  writeFileSync(outPath, content, 'utf-8');
+  console.log(`✅ Generated products.ts — ${products.length} products × 3 languages`);
 
-const catalogPath = join(root, '_catalog.json');
-const catalog = {};
-for (const p of products) {
-  catalog[p.slug] = { name: p.name, price: Number(p.price), stock: Number(p.stock ?? 99) };
+  const catalogPath = join(root, '_catalog.json');
+  const catalog = {};
+  for (const p of products) {
+    catalog[p.slug] = { name: p.name, price: Number(p.price), stock: Number(p.stock ?? 99) };
+  }
+  writeFileSync(catalogPath, JSON.stringify(catalog), 'utf-8');
+  console.log(`✅ Generated _catalog.json — ${Object.keys(catalog).length} products`);
+
+  const fnCatalogPath = join(root, 'functions', 'lib', '_catalog.json');
+  writeFileSync(fnCatalogPath, JSON.stringify(catalog), 'utf-8');
+  console.log(`✅ Copied _catalog.json to functions/lib/`);
 }
-writeFileSync(catalogPath, JSON.stringify(catalog), 'utf-8');
-console.log(`✅ Generated _catalog.json — ${Object.keys(catalog).length} products`);
 
-const fnCatalogPath = join(root, 'functions', 'lib', '_catalog.json');
-writeFileSync(fnCatalogPath, JSON.stringify(catalog), 'utf-8');
-console.log(`✅ Copied _catalog.json to functions/lib/`);
+build().catch((e) => {
+  console.error('❌ Products transform failed:', e.message);
+  process.exit(1);
+});

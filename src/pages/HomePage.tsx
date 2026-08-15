@@ -3,16 +3,17 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { products } from '../data/products';
-import { homepage } from '../data/content';
+import { useContent, useProducts } from '../hooks/useContent';
 import { ProductCard } from '../components/ProductCard';
 import { useSeo } from '../hooks/useSeo';
 
 export function HomePage() {
   const { t } = useTranslation();
+  const { homepage } = useContent();
+  const products = useProducts();
   useSeo({ title: 'Преміальний темний стрітвір' });
-  const featuredProducts = useMemo(() => products.filter((p) => p.isFeatured), []);
-  const bestsellers = useMemo(() => products.filter((p) => p.isBestseller), []);
+  const featuredProducts = useMemo(() => products.filter((p) => p.isFeatured), [products]);
+  const bestsellers = useMemo(() => products.filter((p) => p.isBestseller), [products]);
   const hero = homepage.hero || {};
   const feat = homepage.featured || {};
   const phil = homepage.philosophy || {};

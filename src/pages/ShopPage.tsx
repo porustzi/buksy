@@ -2,7 +2,8 @@ import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { SlidersHorizontal, X, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { products, categories } from '../data/products';
+import { categories } from '../data/products';
+import { useProducts } from '../hooks/useContent';
 import { ProductCard } from '../components/ProductCard';
 import { useSearchParams } from 'react-router-dom';
 import { useSeo } from '../hooks/useSeo';
@@ -27,6 +28,7 @@ const categoryKeys: Record<string, string> = {
 
 export function ShopPage() {
   const { t } = useTranslation();
+  const products = useProducts();
   useSeo({ title: t('shop.theShop'), description: t('shop.theCollection') });
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || 'all';
@@ -73,7 +75,7 @@ export function ShopPage() {
     }
 
     return result;
-  }, [selectedCategory, sortBy, searchQuery]);
+  }, [selectedCategory, sortBy, searchQuery, products]);
 
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);

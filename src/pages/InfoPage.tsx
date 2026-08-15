@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { infoPages } from '../data/content';
+import { useContent } from '../hooks/useContent';
 import { NotFoundPage } from './NotFoundPage';
 
 function SizeGuide() {
@@ -139,6 +139,7 @@ function SizeGuide() {
 
 export function InfoPage() {
   const { t } = useTranslation();
+  const { infoPages } = useContent();
   const { slug } = useParams<{ slug: string }>();
   const page = slug ? (infoPages as Record<string, { title: string; content: string }>)[slug] : undefined;
 

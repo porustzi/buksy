@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Mail, MapPin, Phone, Send, Instagram, Music2 } from 'lucide-react';
-import { contactInfo } from '../data/content';
+import { useContent } from '../hooks/useContent';
 import { useSeo } from '../hooks/useSeo';
 import { apiHeaders } from '../data/settings';
 
 export function ContactPage() {
+  const { contactInfo } = useContent();
   const hero = contactInfo.hero || {};
   useSeo({ title: hero.title || 'Контакти', description: hero.tagline });
   const form = contactInfo.form || {};

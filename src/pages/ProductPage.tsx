@@ -15,7 +15,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { products } from '../data/products';
+import { useProducts } from '../hooks/useContent';
 import { ProductCard } from '../components/ProductCard';
 import { useCart } from '../store/CartContext';
 import { useSeo } from '../hooks/useSeo';
@@ -24,6 +24,7 @@ import { createToast } from '../components/Toast';
 
 export function ProductPage() {
   const { t } = useTranslation();
+  const products = useProducts();
   const { slug } = useParams();
   const product = products.find((p) => p.slug === slug);
   const { addItem } = useCart();
@@ -107,7 +108,7 @@ export function ProductPage() {
 
   const relatedProducts = useMemo(() =>
     products.filter((p) => p.category === product?.category && p.id !== product?.id).slice(0, 4),
-    [product?.category, product?.id]
+    [product?.category, product?.id, products]
   );
 
   const productReviews = product.reviews || [];
