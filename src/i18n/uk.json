@@ -96,12 +96,9 @@
     "noSearchResults": "Нічого не знайдено за запитом",
     "viewAllProducts": "Дивитись всі товари",
     "categoryAll": "Всі",
-    "categoryHoodies": "Худі",
     "categoryTShirts": "Футболки",
-    "categoryJackets": "Куртки",
-    "categoryPants": "Штани",
-    "categoryAccessories": "Аксесуари",
-    "categoryFootwear": "Взуття"
+    "categoryShorts": "Шорти",
+    "categoryLongsleeves": "Лонгсліви"
   },
   "product": {
     "size": "РОЗМІР",

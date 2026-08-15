@@ -27,12 +27,9 @@ export interface Product {
 }
 
 export type ProductCategory =
-  | 'hoodies'
   | 't-shirts'
-  | 'jackets'
-  | 'pants'
-  | 'accessories'
-  | 'footwear';
+  | 'shorts'
+  | 'longsleeves';
 
 export interface Size {
   name: string;

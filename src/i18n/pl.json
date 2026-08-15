@@ -96,12 +96,9 @@
     "noSearchResults": "Nie znaleziono nic dla zapytania",
     "viewAllProducts": "Zobacz wszystkie produkty",
     "categoryAll": "Wszystkie",
-    "categoryHoodies": "Bluzy",
     "categoryTShirts": "Koszulki",
-    "categoryJackets": "Kurtki",
-    "categoryPants": "Spodnie",
-    "categoryAccessories": "Akcesoria",
-    "categoryFootwear": "Obuwie"
+    "categoryShorts": "Szorty",
+    "categoryLongsleeves": "Longsleeve"
   },
   "product": {
     "size": "ROZMIAR",

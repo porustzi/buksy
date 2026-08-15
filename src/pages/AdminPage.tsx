@@ -55,11 +55,8 @@ const SECTIONS = [
 
 const CATEGORIES = [
   { id: 't-shirts', label: 'Футболки' },
-  { id: 'hoodies', label: 'Худі' },
-  { id: 'jackets', label: 'Куртки' },
-  { id: 'pants', label: 'Штани' },
-  { id: 'accessories', label: 'Аксесуари' },
-  { id: 'footwear', label: 'Взуття' },
+  { id: 'shorts', label: 'Шорти' },
+  { id: 'longsleeves', label: 'Лонгсліви' },
 ];
 
 const btn = 'px-4 py-2 text-sm font-semibold transition-colors';

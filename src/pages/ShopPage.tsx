@@ -18,12 +18,9 @@ const sortOptions = [
 
 const categoryKeys: Record<string, string> = {
   all: 'shop.categoryAll',
-  hoodies: 'shop.categoryHoodies',
   't-shirts': 'shop.categoryTShirts',
-  jackets: 'shop.categoryJackets',
-  pants: 'shop.categoryPants',
-  accessories: 'shop.categoryAccessories',
-  footwear: 'shop.categoryFootwear',
+  shorts: 'shop.categoryShorts',
+  longsleeves: 'shop.categoryLongsleeves',
 };
 
 export function ShopPage() {

@@ -42,7 +42,7 @@ for (const f of mdFiles) {
 }
 
 const getCatName = (cat) => {
-  const m = { hoodies: 'Hoodies', 't-shirts': 'T-Shirts', jackets: 'Jackets', pants: 'Pants', accessories: 'Accessories', footwear: 'Footwear' };
+  const m = { 't-shirts': 'T-Shirts', shorts: 'Shorts', longsleeves: 'Long Sleeves' };
   return m[cat] || cat;
 };
 

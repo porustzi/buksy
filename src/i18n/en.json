@@ -96,12 +96,9 @@
     "noSearchResults": "No products found for",
     "viewAllProducts": "View all products",
     "categoryAll": "All",
-    "categoryHoodies": "Hoodies",
     "categoryTShirts": "T-Shirts",
-    "categoryJackets": "Jackets",
-    "categoryPants": "Pants",
-    "categoryAccessories": "Accessories",
-    "categoryFootwear": "Footwear"
+    "categoryShorts": "Shorts",
+    "categoryLongsleeves": "Long Sleeves"
   },
   "product": {
     "size": "SIZE",
