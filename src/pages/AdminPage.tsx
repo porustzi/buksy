@@ -47,9 +47,9 @@ function serializeYamlFrontmatter(data: Record<string, any>): string {
 
 const SECTIONS = [
   { id: 'products', label: 'Товари', icon: '📦', url: '/shop' },
-  { id: 'homepage', label: 'Головна', icon: '🏠', url: '/' },
-  { id: 'about', label: 'Про нас', icon: 'ℹ️', url: '/about' },
-  { id: 'contact', label: 'Контакти', icon: '✉️', url: '/contact' },
+  { id: 'homepage', label: 'Головна', icon: '🏠', url: '/', file: 'content/pages/homepage/homepage.json' },
+  { id: 'about', label: 'Про нас', icon: 'ℹ️', url: '/about', file: 'content/pages/about/about.json' },
+  { id: 'contact', label: 'Контакти', icon: '✉️', url: '/contact', file: 'content/pages/contact/contact.json' },
 ];
 
 const CATEGORIES = [
@@ -111,7 +111,7 @@ export function AdminPage() {
         {section === 'products' ? (
           <ProductsView />
         ) : (
-          <PreviewView url={SECTIONS.find((s) => s.id === section)!.url} />
+          <PreviewView url={SECTIONS.find((s) => s.id === section)!.url} sectionFile={SECTIONS.find((s) => s.id === section)!.file || ''} />
         )}
       </main>
     </div>
@@ -167,7 +167,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
 // ============================================================
 // Preview (Elementor-style iframe editing)
 // ============================================================
-function PreviewView({ url }: { url: string }) {
+function PreviewView({ url, sectionFile }: { url: string; sectionFile: string }) {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState('');
@@ -210,6 +210,7 @@ function PreviewView({ url }: { url: string }) {
           <button onClick={toggleEdit} className={editing ? btnGhost : btnPrimary}>{editing ? 'Вийти з редагування' : '✏️ Редагувати'}</button>
         </div>
       </div>
+      {sectionFile && <ImagesPanel sectionFile={sectionFile} />}
       <iframe
         ref={iframeRef}
         src={url}
@@ -221,6 +222,107 @@ function PreviewView({ url }: { url: string }) {
       />
     </div>
   );
+}
+
+function findImageFields(obj: unknown, path = ''): Array<{ path: string; value: string }> {
+  const results: Array<{ path: string; value: string }> = [];
+  if (!obj || typeof obj !== 'object') return results;
+  for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
+    const p = path ? `${path}.${k}` : k;
+    if (typeof v === 'string' && /image|img|photo|photo1|photo2|photo3/i.test(k)) {
+      results.push({ path: p, value: v });
+    } else if (v && typeof v === 'object') {
+      results.push(...findImageFields(v, p));
+    }
+  }
+  return results;
+}
+
+function ImagesPanel({ sectionFile }: { sectionFile: string }) {
+  const [images, setImages] = useState<Array<{ path: string; value: string }>>([]);
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!open) return;
+    api('read', { path: sectionFile }).then((d) => {
+      if (!d) return;
+      let data: Record<string, unknown> = {};
+      try { data = JSON.parse(utf8decode(d.content)); } catch { data = {}; }
+      setImages(findImageFields(data));
+    }).catch((e) => setError(e.message));
+  }, [sectionFile, open]);
+
+  const changeImage = (fieldPath: string) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const b64 = (reader.result as string).split(',')[1];
+        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/jpeg/g, 'jpg');
+        const fname = Date.now() + '_' + Math.random().toString(36).slice(2, 6) + '.' + ext;
+        setBusy(fieldPath);
+        api('upload', { name: fname, content: b64, folder: 'public/uploads' }).then(async (res) => {
+          const saved = (res.path as string).replace(/^public/, '');
+          // read current, set field, write back
+          const d = await api('read', { path: sectionFile });
+          let data: Record<string, unknown> = {};
+          try { data = JSON.parse(utf8decode(d.content)); } catch { data = {}; }
+          setFieldByPath(data, fieldPath, saved);
+          await api('write', { path: sectionFile, content: JSON.stringify(data, null, 2), sha: d.sha, message: 'Update image' });
+          setImages(findImageFields(data));
+          setBusy('');
+        }).catch((e) => { setError(e.message); setBusy(''); });
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
+
+  if (!open) {
+    return (
+      <div className="px-5 py-1.5 border-b border-white/10 bg-[#141414] flex-shrink-0">
+        <button onClick={() => setOpen(true)} className="text-xs text-white/40 hover:text-white">🖼 Змінити зображення</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-5 py-3 border-b border-white/10 bg-[#141414] flex-shrink-0 flex items-center gap-4 overflow-x-auto">
+      <button onClick={() => setOpen(false)} className="text-white/40 hover:text-white text-xs whitespace-nowrap">✕ Закрити</button>
+      {error && <span className="text-[#ff6b6b] text-xs">{error}</span>}
+      {images.length === 0 && <span className="text-white/40 text-xs">Немає зображень</span>}
+      {images.map((img) => (
+        <div key={img.path} className="flex flex-col items-center gap-1 flex-shrink-0">
+          <div className="relative">
+            {img.value ? (
+              <img src={img.value} alt="" className="w-16 h-12 object-cover rounded border border-white/10" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+            ) : (
+              <div className="w-16 h-12 flex items-center justify-center text-white/20 text-xs bg-[#1b1b1b] rounded border border-white/10">пусто</div>
+            )}
+          </div>
+          <span className="text-[10px] text-white/40">{img.path.split('.').pop()}</span>
+          <button onClick={() => changeImage(img.path)} disabled={busy === img.path} className="text-[10px] text-[#e53935] hover:underline">{busy === img.path ? '…' : 'Замінити'}</button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function setFieldByPath(obj: Record<string, unknown>, path: string, value: unknown) {
+  const parts = path.split('.');
+  let cur: Record<string, unknown> = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    const p = parts[i];
+    if (cur[p] === undefined || cur[p] === null) cur[p] = {};
+    cur = cur[p] as Record<string, unknown>;
+  }
+  cur[parts[parts.length - 1]] = value;
 }
 
 // ============================================================
