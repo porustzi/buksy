@@ -10,7 +10,6 @@ import { CartDrawer } from './components/CartDrawer';
 import { LogoAnimation } from './components/LogoAnimation';
 import { ToastContainer } from './components/Toast';
 import { EditProvider } from './components/edit/EditContext';
-import { EditorBar } from './components/EditorBar';
 import { ErrorBoundary } from './components/ErrorBoundary';
 
 const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -21,6 +20,7 @@ const ContactPage = lazy(() => import('./pages/ContactPage').then(m => ({ defaul
 const CartPage = lazy(() => import('./pages/CartPage').then(m => ({ default: m.CartPage })));
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
 const InfoPage = lazy(() => import('./pages/InfoPage').then(m => ({ default: m.InfoPage })));
+const AdminPage = lazy(() => import('./pages/AdminPage').then(m => ({ default: m.AdminPage })));
 
 function PageWrapper({ children }: { children: React.ReactNode }) {
   return (
@@ -57,6 +57,7 @@ function AppRoutes() {
           <Route path="/contact" element={<PageWrapper><ContactPage /></PageWrapper>} />
           <Route path="/cart" element={<PageWrapper><CartPage /></PageWrapper>} />
           <Route path="/checkout" element={<PageWrapper><CheckoutPage /></PageWrapper>} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path=":slug" element={<PageWrapper><InfoPage /></PageWrapper>} />
         </Routes>
       </Suspense>
@@ -89,7 +90,6 @@ function App() {
           <Footer />
           <CartDrawer />
           <ToastContainer />
-          <EditorBar />
         </div>
       </EditProvider>
     </CartProvider>

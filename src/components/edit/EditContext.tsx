@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useRef, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useRef, useEffect, type ReactNode } from 'react';
 
 interface EditContextValue {
   isEditing: boolean;
@@ -49,12 +49,24 @@ export function EditProvider({ children }: { children: ReactNode }) {
       changesRef.current = {};
       setIsEditing(false);
       setIsSaving(false);
-      window.location.reload();
     } catch (e) {
       setIsSaving(false);
       throw e;
     }
   }, []);
+
+  // Expose global control for iframe postMessage (admin preview)
+  useEffect(() => {
+    (window as unknown as Record<string, unknown>).__buksyEdit = {
+      start: startEditing,
+      stop: stopEditing,
+      save,
+      isSaving: () => isSaving,
+    };
+    return () => {
+      (window as unknown as Record<string, unknown>).__buksyEdit = null;
+    };
+  }, [startEditing, stopEditing, save, isSaving]);
 
   return (
     <EditContext.Provider value={{ isEditing, isSaving, startEditing, stopEditing, save, registerChange }}>
