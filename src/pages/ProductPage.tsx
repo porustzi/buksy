@@ -8,7 +8,6 @@ import {
   Share2,
   Truck,
   RotateCcw,
-  Shield,
   Check,
   Star,
   Minus,
@@ -280,12 +279,7 @@ export function ProductPage() {
 
             {/* Size Selector */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-heading text-sm tracking-wider text-white/60">{t('product.size')}</span>
-                <Link to="/size-guide" className="text-blood text-sm hover:underline font-body">
-                  {t('product.sizeGuide')}
-                </Link>
-              </div>
+              <span className="font-heading text-sm tracking-wider text-white/60">{t('product.size')}</span>
               <div className="flex flex-wrap gap-3">
                 {product.sizes.map((size) => (
                   <button
@@ -375,7 +369,7 @@ export function ProductPage() {
             </div>
 
             {/* Info Cards */}
-            <div className="grid grid-cols-3 gap-4 pt-6">
+            <div className="grid grid-cols-2 gap-4 pt-6">
               <div className="p-4 border border-white/5 text-center">
                 <Truck size={20} className="mx-auto mb-2 text-blood" />
                 <p className="text-xs text-white/60 font-body">{t('product.freeShipping')}</p>
@@ -383,10 +377,6 @@ export function ProductPage() {
               <div className="p-4 border border-white/5 text-center">
                 <RotateCcw size={20} className="mx-auto mb-2 text-blood" />
                 <p className="text-xs text-white/60 font-body">{t('product.returns')}</p>
-              </div>
-              <div className="p-4 border border-white/5 text-center">
-                <Shield size={20} className="mx-auto mb-2 text-blood" />
-                <p className="text-xs text-white/60 font-body">{t('product.warranty')}</p>
               </div>
             </div>
 
