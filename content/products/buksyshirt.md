@@ -17,7 +17,7 @@ sizes:
     name: "L"
 inStock: true
 stock: 10
-isNew: true
+isNew: false
 isFeatured: false
 isBestseller: false
 rating: 5
