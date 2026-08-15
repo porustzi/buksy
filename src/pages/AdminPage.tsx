@@ -46,6 +46,7 @@ function serializeYamlFrontmatter(data: Record<string, any>): string {
 }
 
 const SECTIONS = [
+  { id: 'stats', label: 'Статистика', icon: '📊', url: '' },
   { id: 'products', label: 'Товари', icon: '📦', url: '/shop' },
   { id: 'homepage', label: 'Головна', icon: '🏠', url: '/', file: 'content/pages/homepage/homepage.json' },
   { id: 'about', label: 'Про нас', icon: 'ℹ️', url: '/about', file: 'content/pages/about/about.json' },
@@ -111,6 +112,141 @@ function SiteStatusToggle() {
 }
 
 // ============================================================
+// Stats
+// ============================================================
+interface StatsData {
+  totalOrders: number;
+  revenue24h: number;
+  revenueWeek: number;
+  revenueMonth: number;
+  revenueAll: number;
+  items24h: number;
+  countries: Array<{ country: string; orders: number; revenue: number }>;
+  biggestOrder: { orderId: string | null; total: number };
+  topProduct: { name: string; qty: number; revenue: number } | null;
+  topProducts: Array<{ name: string; qty: number; revenue: number }>;
+}
+
+const fmtUah = (n: number) => '₴' + Math.round(n || 0).toLocaleString('uk-UA');
+
+function StatsView() {
+  const [data, setData] = useState<StatsData | null>(null);
+  const [error, setError] = useState('');
+
+  const load = () => {
+    setError('');
+    fetch('/api/stats', { headers: { 'Authorization': 'Bearer ' + (getToken() || '') } })
+      .then((r) => {
+        if (r.status === 401 || r.status === 403) { clearToken(); window.location.reload(); throw new Error('Unauthorized'); }
+        return r.json();
+      })
+      .then((d) => {
+        if (d.error) setError(d.error);
+        else setData(d);
+      })
+      .catch((e) => setError(e.message));
+  };
+
+  useEffect(() => { load(); }, []);
+
+  return (
+    <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-lg font-semibold">Статистика</h2>
+        <button onClick={load} className={btnGhost}>⟳ Оновити</button>
+      </div>
+
+      {error && <div className="text-[#ff6b6b] text-sm mb-4">{error}</div>}
+
+      {!data && !error && <div className="text-white/40 py-10 text-center">Завантаження…</div>}
+
+      {data && (
+        <>
+          {/* Revenue cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            {[
+              { label: 'За 24 години', value: data.revenue24h },
+              { label: 'За тиждень', value: data.revenueWeek },
+              { label: 'За місяць', value: data.revenueMonth },
+              { label: 'За весь час', value: data.revenueAll },
+            ].map((c) => (
+              <div key={c.label} className="bg-[#141414] border border-white/10 p-5">
+                <div className="text-[11px] uppercase tracking-wider text-white/40 mb-2">{c.label}</div>
+                <div className="text-2xl font-bold text-[#e53935]">{fmtUah(c.value)}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="bg-[#141414] border border-white/10 p-5">
+              <div className="text-[11px] uppercase tracking-wider text-white/40 mb-2">Продано за 24 год</div>
+              <div className="text-2xl font-bold text-white">{data.items24h} шт</div>
+            </div>
+            <div className="bg-[#141414] border border-white/10 p-5">
+              <div className="text-[11px] uppercase tracking-wider text-white/40 mb-2">Всього замовлень</div>
+              <div className="text-2xl font-bold text-white">{data.totalOrders}</div>
+            </div>
+            <div className="bg-[#141414] border border-white/10 p-5">
+              <div className="text-[11px] uppercase tracking-wider text-white/40 mb-2">Найбільше замовлення</div>
+              <div className="text-xl font-bold text-white">{fmtUah(data.biggestOrder.total)}</div>
+              {data.biggestOrder.orderId && <div className="text-[11px] text-white/40 mt-1">#{data.biggestOrder.orderId}</div>}
+            </div>
+            <div className="bg-[#141414] border border-white/10 p-5">
+              <div className="text-[11px] uppercase tracking-wider text-white/40 mb-2">Топ товар</div>
+              {data.topProduct ? (
+                <>
+                  <div className="text-sm font-semibold text-white truncate">{data.topProduct.name}</div>
+                  <div className="text-lg font-bold text-[#e53935]">{fmtUah(data.topProduct.revenue)}</div>
+                  <div className="text-[11px] text-white/40">{data.topProduct.qty} шт продано</div>
+                </>
+              ) : (
+                <div className="text-white/40">—</div>
+              )}
+            </div>
+          </div>
+
+          <div className="grid lg:grid-cols-2 gap-6">
+            {/* Countries */}
+            <div className="bg-[#141414] border border-white/10 p-5">
+              <div className="text-xs uppercase tracking-wider text-white/40 mb-4">З якої країни замовляли</div>
+              {data.countries.length === 0 ? (
+                <div className="text-white/40 text-sm">Немає даних</div>
+              ) : (
+                <div className="space-y-2">
+                  {data.countries.slice(0, 10).map((c) => (
+                    <div key={c.country} className="flex items-center justify-between text-sm">
+                      <span className="text-white">{c.country}</span>
+                      <span className="text-white/50">{c.orders} замовл · {fmtUah(c.revenue)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Top products */}
+            <div className="bg-[#141414] border border-white/10 p-5">
+              <div className="text-xs uppercase tracking-wider text-white/40 mb-4">Продано по товарах</div>
+              {data.topProducts.length === 0 ? (
+                <div className="text-white/40 text-sm">Немає даних</div>
+              ) : (
+                <div className="space-y-2">
+                  {data.topProducts.map((p) => (
+                    <div key={p.name} className="flex items-center justify-between text-sm">
+                      <span className="text-white truncate mr-3">{p.name}</span>
+                      <span className="text-white/50 whitespace-nowrap">{p.qty} шт · {fmtUah(p.revenue)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ============================================================
 // Main
 // ============================================================
 export function AdminPage() {
@@ -152,7 +288,9 @@ export function AdminPage() {
       </aside>
 
       <main className="flex-1 flex flex-col overflow-hidden">
-        {section === 'products' ? (
+        {section === 'stats' ? (
+          <StatsView />
+        ) : section === 'products' ? (
           <ProductsView />
         ) : (
           <PreviewView url={SECTIONS.find((s) => s.id === section)!.url} sectionFile={SECTIONS.find((s) => s.id === section)!.file || ''} />
