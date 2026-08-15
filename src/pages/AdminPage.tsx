@@ -210,7 +210,15 @@ function PreviewView({ url }: { url: string }) {
           <button onClick={toggleEdit} className={editing ? btnGhost : btnPrimary}>{editing ? 'Вийти з редагування' : '✏️ Редагувати'}</button>
         </div>
       </div>
-      <iframe ref={iframeRef} src={url} className="flex-1 w-full border-0 bg-white" title="preview" />
+      <iframe
+        ref={iframeRef}
+        src={url}
+        className="flex-1 w-full border-0 bg-white"
+        title="preview"
+        onLoad={() => {
+          if (editing) iframeRef.current?.contentWindow?.postMessage({ type: 'BUKSY_EDIT', active: true }, '*');
+        }}
+      />
     </div>
   );
 }

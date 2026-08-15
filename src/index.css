@@ -192,3 +192,23 @@ select {
   background-position: right 12px center;
   background-size: 16px;
 }
+
+/* Editable (admin edit mode) */
+.buksy-editable {
+  outline: 2px dashed rgba(229, 57, 53, 0.6) !important;
+  outline-offset: 3px;
+  cursor: text;
+  min-width: 1em;
+  transition: outline-color 0.2s, background 0.2s;
+}
+.buksy-editable:hover {
+  outline-color: rgba(229, 57, 53, 0.9) !important;
+  background: rgba(229, 57, 53, 0.06);
+}
+.buksy-editable:focus {
+  outline: 2px solid #e53935 !important;
+  background: rgba(229, 57, 53, 0.08);
+}
+.buksy-editable[data-dirty='true'] {
+  outline: 2px solid #4caf50 !important;
+}
