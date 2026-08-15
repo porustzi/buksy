@@ -13,15 +13,11 @@ export function HomePage() {
   const { homepage } = useContent();
   const products = useProducts();
   useSeo({ title: 'Преміальний темний стрітвір' });
-  const featuredProducts = useMemo(() => products.filter((p) => p.isFeatured), [products]);
   const bestsellers = useMemo(() => products.filter((p) => p.isBestseller), [products]);
   const hero = homepage.hero || {};
-  const feat = homepage.featured || {};
-  const phil = homepage.philosophy || {};
   const best = homepage.bestsellers || {};
   const coll = homepage.collections || {};
   const heroImg = hero.image || 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200';
-  const philImg = phil.image || 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=800';
 
   return (
     <div className="overflow-hidden">
@@ -42,27 +38,6 @@ export function HomePage() {
           <span className="text-white/40 text-xs tracking-[0.2em] font-body">{hero.scroll}</span>
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}><ChevronDown size={20} className="text-blood" /></motion.div>
         </motion.div>
-      </section>
-
-      <section className="py-24 bg-noir">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-12">
-            <div><p className="section-subtitle mb-3">{feat.tagline}</p><h2 className="section-title">{feat.title} <span className="text-blood">.</span></h2></div>
-            <Link to="/shop" className="group flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-300"><span className="font-body text-sm tracking-wider">{feat.viewAll}</span><ArrowRight size={16} className="group-hover:translate-x-1 transition-transform duration-300" /></Link>
-          </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">{featuredProducts.map((p, i) => (<ProductCard key={p.id} product={p} index={i} />))}</div>
-        </div>
-      </section>
-
-      <section className="relative py-32 bg-ash">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
-          <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="relative"><div className="aspect-[4/5] overflow-hidden"><img src={philImg} alt="BUKSY філософія бренду" className="w-full h-full object-cover" /></div><div className="absolute -bottom-6 -right-6 w-48 h-48 border border-blood/30 hidden lg:block" /></motion.div>
-          <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.2 }} className="lg:pl-8">
-            <p className="section-subtitle mb-3"><Editable path="homepage.philosophy.tagline" as="span">{phil.tagline}</Editable></p><h2 className="section-title mb-8"><Editable path="homepage.philosophy.title1" as="span">{phil.title1}</Editable> <br /><Editable path="homepage.philosophy.title2" as="span">{phil.title2}</Editable></h2>
-            <div className="space-y-6 text-white/70 font-body leading-relaxed"><p><Editable path="homepage.philosophy.text1" as="span">{phil.text1}</Editable></p><p><Editable path="homepage.philosophy.text2" as="span">{phil.text2}</Editable></p><p><Editable path="homepage.philosophy.text3" as="span">{phil.text3}</Editable></p></div>
-            <Link to="/about" className="btn-primary inline-flex items-center gap-3 mt-10"><Editable path="homepage.philosophy.button" as="span">{phil.button}</Editable><ArrowRight size={18} /></Link>
-          </motion.div>
-        </div>
       </section>
 
       <section className="py-24 bg-noir">
