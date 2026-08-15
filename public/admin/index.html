@@ -173,6 +173,18 @@
 <div id="toast"></div>
 
 <script>
+window.addEventListener('error', function(e) {
+  try {
+    var el = document.createElement('div');
+    el.style.cssText = 'position:fixed;bottom:10px;left:10px;z-index:99999;background:#2a0000;color:#ff8888;padding:12px;font-family:monospace;font-size:12px;max-width:90%;white-space:pre-wrap;border:1px solid #e53935;border-radius:4px;';
+    el.textContent = 'JS ERROR: ' + (e.message || 'unknown');
+    document.body.appendChild(el);
+    setTimeout(function(){ el.remove(); }, 10000);
+  } catch(_) {}
+});
+</script>
+
+<script>
 var REPO = 'porustzi/buksy';
 var BRANCH = 'main';
 // Images are served from the SAME site, so use relative paths (no raw.githubusercontent)

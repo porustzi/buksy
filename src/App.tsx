@@ -11,6 +11,7 @@ import { LogoAnimation } from './components/LogoAnimation';
 import { ToastContainer } from './components/Toast';
 import { EditProvider } from './components/edit/EditContext';
 import { EditorBar } from './components/EditorBar';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
 const ShopPage = lazy(() => import('./pages/ShopPage').then(m => ({ default: m.ShopPage })));
@@ -81,7 +82,9 @@ function App() {
         <div className="flex flex-col min-h-screen bg-noir">
           <Header />
           <main className="flex-1">
-            <AppRoutes />
+            <ErrorBoundary>
+              <AppRoutes />
+            </ErrorBoundary>
           </main>
           <Footer />
           <CartDrawer />
