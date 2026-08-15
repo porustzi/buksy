@@ -6,7 +6,7 @@ price: 1349
 category: "t-shirts"
 image1: "/uploads/1786799148163_5rhb.png"
 image2: "/uploads/1786798624330_u1jz.jpg"
-image3: "/uploads/1786798681163_u7k2.jpg"
+image3: "/uploads/1786799287680_vwfq.jpg"
 sizes:
   - name: "S"
     available: true
