@@ -22,7 +22,7 @@ isFeatured: false
 isBestseller: true
 rating: 5
 shortDescription: ""
-description: "футболка Buksy🩸 Щільна 100% бавовна 250 г/м²,кропнутий фітпринт шовокодруквишивка"
+description: "футболка Buksy🩸\_ткань 2х кулір"
 details:
   - "Щільна 100% бавовна 250 г/м²"
 care:
