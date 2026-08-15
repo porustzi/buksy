@@ -11,6 +11,7 @@ import { LogoAnimation } from './components/LogoAnimation';
 import { ToastContainer } from './components/Toast';
 import { EditProvider } from './components/edit/EditContext';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ClosedPage } from './pages/ClosedPage';
 
 const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
 const ShopPage = lazy(() => import('./pages/ShopPage').then(m => ({ default: m.ShopPage })));
@@ -65,7 +66,7 @@ function AppRoutes() {
   );
 }
 
-function AppShell() {
+function AppShell({ siteClosed }: { siteClosed: boolean }) {
   const location = useLocation();
   const isAdmin = location.pathname === '/admin';
 
@@ -75,6 +76,10 @@ function AppShell() {
         <AppRoutes />
       </ErrorBoundary>
     );
+  }
+
+  if (siteClosed) {
+    return <ClosedPage />;
   }
 
   return (
@@ -94,6 +99,14 @@ function AppShell() {
 
 function App() {
   const [showIntro, setShowIntro] = useState(() => !sessionStorage.getItem('buksy_intro_seen'));
+  const [siteClosed, setSiteClosed] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/status')
+      .then((r) => r.json())
+      .then((d) => setSiteClosed(!!d.closed))
+      .catch(() => {});
+  }, []);
 
   const handleIntroComplete = () => {
     sessionStorage.setItem('buksy_intro_seen', 'true');
@@ -107,7 +120,7 @@ function App() {
   return (
     <CartProvider>
       <EditProvider>
-        <AppShell />
+        <AppShell siteClosed={siteClosed} />
       </EditProvider>
     </CartProvider>
   );

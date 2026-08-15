@@ -68,6 +68,49 @@ const inputCls = 'w-full px-3 py-2 bg-[#1b1b1b] border border-white/10 text-whit
 const labelCls = 'block text-[11px] uppercase tracking-wider text-white/50 mb-1';
 
 // ============================================================
+// Site status toggle
+// ============================================================
+function SiteStatusToggle() {
+  const [closed, setClosed] = useState<boolean | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/status').then((r) => r.json()).then((d) => setClosed(!!d.closed)).catch(() => setClosed(false));
+  }, []);
+
+  const toggle = async () => {
+    if (closed === null) return;
+    setBusy(true);
+    try {
+      const d = await api('read', { path: 'content/settings.json' });
+      let data: { closed: boolean } = { closed: false };
+      try { data = JSON.parse(utf8decode(d.content)); } catch { data = { closed: false }; }
+      data.closed = !closed;
+      await api('write', { path: 'content/settings.json', content: JSON.stringify(data, null, 2), sha: d.sha, message: 'Toggle site' });
+      setClosed(data.closed);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <button
+      onClick={toggle}
+      disabled={busy || closed === null}
+      className={`w-full py-2 text-xs font-semibold border transition-colors ${
+        closed
+          ? 'border-[#4caf50] text-[#4caf50] hover:bg-[#4caf50]/10'
+          : 'border-[#e53935] text-[#e53935] hover:bg-[#e53935]/10'
+      }`}
+    >
+      {busy ? '…' : closed ? '🔓 Відкрити сайт' : '🔒 Закрити сайт'}
+    </button>
+  );
+}
+
+// ============================================================
 // Main
 // ============================================================
 export function AdminPage() {
@@ -100,7 +143,8 @@ export function AdminPage() {
             </button>
           ))}
         </nav>
-        <div className="p-4 border-t border-white/10">
+        <div className="p-4 border-t border-white/10 flex flex-col gap-2">
+          <SiteStatusToggle />
           <button onClick={() => { clearToken(); window.location.reload(); }} className="w-full py-2 text-xs border border-white/15 text-white/50 hover:text-white">
             Вийти
           </button>
