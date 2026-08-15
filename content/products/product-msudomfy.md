@@ -4,7 +4,7 @@ name: "лонгслів BUKSY"
 slug: "product-msudomfy"
 price: 1349
 category: "t-shirts"
-image1: "/uploads/1786799316327_plee.png"
+image1: "/uploads/1786802808298_xr6i.png"
 image2: "/uploads/1786798624330_u1jz.jpg"
 image3: "/uploads/1786799287680_vwfq.jpg"
 sizes:
