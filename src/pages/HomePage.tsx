@@ -13,7 +13,7 @@ export function HomePage() {
   const { homepage } = useContent();
   const products = useProducts();
   useSeo({ title: 'Преміальний темний стрітвір' });
-  const bestsellers = useMemo(() => products.filter((p) => p.isBestseller), [products]);
+  const hotProducts = useMemo(() => products.filter((p) => p.isHot || p.isBestseller), [products]);
   const hero = homepage.hero || {};
   const best = homepage.bestsellers || {};
   const coll = homepage.collections || {};
@@ -43,7 +43,7 @@ export function HomePage() {
       <section className="py-24 bg-noir">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12"><p className="section-subtitle mb-3">{best.tagline}</p><h2 className="section-title">{best.title} <span className="text-blood">.</span></h2></motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">{bestsellers.map((p, i) => (<ProductCard key={p.id} product={p} index={i} />))}</div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">{hotProducts.map((p, i) => (<ProductCard key={p.id} product={p} index={i} />))}</div>
         </div>
       </section>
 

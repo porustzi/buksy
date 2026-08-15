@@ -15,6 +15,7 @@ export interface Product {
   colors?: string[];
   inStock: boolean;
   isNew?: boolean;
+  isHot?: boolean;
   isFeatured?: boolean;
   isBestseller?: boolean;
   rating: number;

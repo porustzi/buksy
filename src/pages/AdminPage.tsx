@@ -468,7 +468,7 @@ function ProductEditor({ path, onBack }: { path: string; onBack: () => void }) {
         id: String(Date.now()), name: 'Новий товар', slug: 'product-' + Date.now().toString(36), price: 0,
         category: 't-shirts', image1: '', image2: '', image3: '',
         sizes: [{ name: 'S', available: true }, { name: 'M', available: true }, { name: 'L', available: true }],
-        inStock: true, stock: 1, isNew: false, isFeatured: false, isBestseller: false, rating: 0,
+        inStock: true, stock: 1, isNew: false, isHot: false, isFeatured: false, isBestseller: false, rating: 0,
         shortDescription: '', description: '', details: [], care: [],
       });
       return;
@@ -557,7 +557,7 @@ function ProductEditor({ path, onBack }: { path: string; onBack: () => void }) {
             </div>
             <div><label className={labelCls}>Сток (шт)</label><input type="number" className={inputCls} value={data.stock ?? ''} onChange={(e) => set('stock', parseInt(e.target.value))} /></div>
             <div className="flex flex-wrap gap-4 pt-1">
-              {[['inStock', 'В наявності'], ['isNew', 'Новий'], ['isFeatured', 'Обране'], ['isBestseller', 'Бестселер']].map(([k, lbl]) => (
+              {[['inStock', 'В наявності'], ['isHot', '🔥 На головну'], ['isNew', 'Новий'], ['isFeatured', 'Обране'], ['isBestseller', 'Бестселер']].map(([k, lbl]) => (
                 <label key={k} className="flex items-center gap-2 text-sm cursor-pointer">
                   <input type="checkbox" checked={!!data[k]} onChange={(e) => set(k, e.target.checked)} /> {lbl}
                 </label>
