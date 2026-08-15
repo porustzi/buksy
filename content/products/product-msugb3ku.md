@@ -27,4 +27,5 @@ details:
   - "принт дтф"
   - "вишивка"
 care: []
+originalPrice: 1699
 ---
