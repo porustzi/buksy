@@ -21,6 +21,7 @@ import { useCart } from '../store/CartContext';
 import { useSeo } from '../hooks/useSeo';
 import { formatPrice } from '../data/settings';
 import { createToast } from '../components/Toast';
+import { Editable } from '../components/edit/Editable';
 
 export function ProductPage() {
   const { t } = useTranslation();
@@ -241,7 +242,7 @@ export function ProductPage() {
             {/* Title & Price */}
             <div>
               <h1 className="font-heading text-3xl md:text-4xl tracking-wider mb-4">
-                {product.name}
+                <Editable path={`product.${product.slug}.name`} as="span">{product.name}</Editable>
               </h1>
               <div className="flex items-center gap-4">
                 <span className="font-mono text-3xl text-white">{formatPrice(product.price)}</span>
@@ -274,7 +275,7 @@ export function ProductPage() {
               <p className="text-red-400 font-body text-sm">{t('product.outOfStock')}</p>
             )}
             <p className="text-white/70 font-body leading-relaxed">
-              {product.shortDescription}
+              <Editable path={`product.${product.slug}.shortDescription`} as="span">{product.shortDescription}</Editable>
             </p>
 
             {/* Size Selector */}
@@ -410,7 +411,7 @@ export function ProductPage() {
             <div className="py-4">
               {activeTab === 'description' && (
                 <p className="text-white/70 font-body leading-relaxed">
-                  {product.description}
+                  <Editable path={`product.${product.slug}.description`} as="span">{product.description}</Editable>
                 </p>
               )}
               {activeTab === 'details' && product.details && (
@@ -418,7 +419,7 @@ export function ProductPage() {
                   {product.details.map((detail, i) => (
                     <li key={i} className="flex items-start gap-3 text-white/70 font-body">
                       <span className="w-1.5 h-1.5 bg-blood rounded-full mt-2 flex-shrink-0" />
-                      {detail}
+                      <Editable path={`product.${product.slug}.details.${i}`} as="span">{detail}</Editable>
                     </li>
                   ))}
                 </ul>
@@ -428,7 +429,7 @@ export function ProductPage() {
                   {product.care.map((item, i) => (
                     <li key={i} className="flex items-start gap-3 text-white/70 font-body">
                       <span className="w-1.5 h-1.5 bg-blood rounded-full mt-2 flex-shrink-0" />
-                      {item}
+                      <Editable path={`product.${product.slug}.care.${i}`} as="span">{item}</Editable>
                     </li>
                   ))}
                 </ul>

@@ -1,6 +1,26 @@
+import yaml from 'js-yaml';
+
 const REPO = 'porustzi/buksy';
 const BRANCH = 'main';
 const ALLOWED_PATHS = ['content/', 'public/'];
+
+function decodeBase64(b64) {
+  const bin = atob(String(b64).replace(/\n/g, ''));
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder('utf-8').decode(bytes);
+}
+
+function setPath(obj, path, value) {
+  const parts = path.split('.');
+  let cur = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    const p = parts[i];
+    if (cur[p] === undefined || cur[p] === null) cur[p] = /^\d+$/.test(parts[i + 1]) ? [] : {};
+    cur = cur[p];
+  }
+  cur[parts[parts.length - 1]] = value;
+}
 
 const rateMap = new Map();
 function checkRate(ip, max) {
@@ -181,10 +201,72 @@ export async function onRequest(context) {
         return json({ ok: true });
       }
 
+      case 'applyChanges': {
+        const { changes } = body;
+        if (!Array.isArray(changes) || !changes.length) return json({ error: 'changes required' }, 400);
+
+        const SECTION_FILES = {
+          homepage: 'content/pages/homepage/homepage.json',
+          about: 'content/pages/about/about.json',
+          contact: 'content/pages/contact/contact.json',
+          footer: 'content/pages/footer/footer.json',
+        };
+
+        const byFile = {};
+        for (const c of changes) {
+          if (!c || typeof c.path !== 'string' || typeof c.value !== 'string') continue;
+          const parts = c.path.split('.');
+          let file, fieldPath;
+          if (parts[0] === 'product' && parts[1]) {
+            file = `content/products/${parts[1]}.md`;
+            fieldPath = parts.slice(2).join('.');
+          } else {
+            file = SECTION_FILES[parts[0]];
+            if (!file) continue;
+            fieldPath = parts.slice(1).join('.');
+          }
+          if (!file || !fieldPath || !isAllowedPath(file)) continue;
+          if (!byFile[file]) byFile[file] = [];
+          byFile[file].push({ fieldPath, value: c.value });
+        }
+
+        for (const [file, fields] of Object.entries(byFile)) {
+          const res = await fetch(
+            `https://api.github.com/repos/${REPO}/contents/${encodePath(file)}?ref=${BRANCH}`,
+            { headers: ghHeaders(env) }
+          );
+          if (!res.ok) continue;
+          const data = await res.json();
+          const current = decodeBase64(data.content);
+          let next;
+          if (file.endsWith('.md')) {
+            const m = current.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+            let obj = {};
+            let bodyText = '';
+            if (m) { try { obj = yaml.load(m[1]) || {}; } catch (e) { obj = {}; } bodyText = m[2] || ''; }
+            for (const f of fields) setPath(obj, f.fieldPath, f.value);
+            next = '---\n' + yaml.dump(obj, { lineWidth: -1, noRefs: true, quotingType: '"', forceQuotes: true }).trim() + '\n---\n' + bodyText;
+          } else {
+            let obj = {};
+            try { obj = JSON.parse(current); } catch (e) { obj = {}; }
+            for (const f of fields) setPath(obj, f.fieldPath, f.value);
+            next = JSON.stringify(obj, null, 2);
+          }
+          const putRes = await fetch(
+            `https://api.github.com/repos/${REPO}/contents/${encodePath(file)}`,
+            { method: 'PUT', headers: ghHeaders(env),
+              body: JSON.stringify({ message: 'Edit content', content: btoa(unescape(encodeURIComponent(next))), sha: data.sha, branch: BRANCH }) }
+          );
+          if (!putRes.ok) return json({ error: 'Save failed for ' + file }, putRes.status);
+        }
+
+        return json({ ok: true });
+      }
+
       default:
         return json({ error: 'Unknown action' }, 400);
     }
   } catch (e) {
-    return json({ error: 'Internal error' }, 500);
+    return json({ error: 'Internal error: ' + (e.message || '') }, 500);
   }
 }

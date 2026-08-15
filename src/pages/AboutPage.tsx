@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
 import { useSeo } from '../hooks/useSeo';
+import { Editable } from '../components/edit/Editable';
 
 export function AboutPage() {
   const { aboutPage } = useContent();
@@ -16,8 +17,8 @@ export function AboutPage() {
         <div className="absolute inset-0"><img src={hero.image} alt="" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-r from-noir via-noir/60 to-transparent" /><div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-noir/50" /></div>
         <div className="relative z-10 h-full flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <p className="section-subtitle mb-4">{hero.tagline}</p>
-            <h1 className="section-title max-w-2xl">{hero.title1} <br /><span className="text-blood">{hero.title2}</span></h1>
+            <p className="section-subtitle mb-4"><Editable path="about.hero.tagline" as="span">{hero.tagline}</Editable></p>
+            <h1 className="section-title max-w-2xl"><Editable path="about.hero.title1" as="span">{hero.title1}</Editable> <br /><span className="text-blood"><Editable path="about.hero.title2" as="span">{hero.title2}</Editable></span></h1>
           </motion.div>
         </div>
       </section>
@@ -83,9 +84,9 @@ export function AboutPage() {
       <section className="py-24 bg-ash">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
-            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-light mb-6">{cta.title1} <span className="text-blood">{cta.title2}</span></h2>
-            <p className="text-white/60 font-body max-w-xl mx-auto mb-10">{cta.description}</p>
-            <Link to="/shop" className="btn-primary inline-flex items-center gap-3">{cta.button}<ArrowRight size={18} /></Link>
+            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-light mb-6"><Editable path="about.cta.title1" as="span">{cta.title1}</Editable> <span className="text-blood"><Editable path="about.cta.title2" as="span">{cta.title2}</Editable></span></h2>
+            <p className="text-white/60 font-body max-w-xl mx-auto mb-10"><Editable path="about.cta.description" as="span">{cta.description}</Editable></p>
+            <Link to="/shop" className="btn-primary inline-flex items-center gap-3"><Editable path="about.cta.button" as="span">{cta.button}</Editable><ArrowRight size={18} /></Link>
           </motion.div>
         </div>
       </section>

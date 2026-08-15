@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useContent, useProducts } from '../hooks/useContent';
 import { ProductCard } from '../components/ProductCard';
 import { useSeo } from '../hooks/useSeo';
+import { Editable } from '../components/edit/Editable';
 
 export function HomePage() {
   const { t } = useTranslation();
@@ -28,12 +29,12 @@ export function HomePage() {
         <div className="absolute inset-0"><img src={heroImg} alt="BUKSY Dark Luxury Streetwear" fetchPriority="high" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-r from-noir via-noir/80 to-noir/40" /><div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-noir/50" /></div>
         <div className="relative z-10 h-full flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.2 }} className="max-w-2xl">
-            <p className="font-heading text-sm tracking-[0.4em] text-blood mb-4">{hero.tagline}</p>
-            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-light text-white leading-tight mb-6">{hero.title1}<br /><span className="text-blood">{hero.title2}</span></h1>
-            <p className="text-lg text-white/70 leading-relaxed mb-10 max-w-lg">{hero.description}</p>
+            <p className="font-heading text-sm tracking-[0.4em] text-blood mb-4"><Editable path="homepage.hero.tagline" as="span">{hero.tagline}</Editable></p>
+            <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-light text-white leading-tight mb-6"><Editable path="homepage.hero.title1" as="span">{hero.title1}</Editable><br /><span className="text-blood"><Editable path="homepage.hero.title2" as="span">{hero.title2}</Editable></span></h1>
+            <p className="text-lg text-white/70 leading-relaxed mb-10 max-w-lg"><Editable path="homepage.hero.description" as="span">{hero.description}</Editable></p>
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="flex flex-col sm:flex-row gap-4">
-              <Link to="/shop" className="btn-primary flex items-center justify-center gap-3">{hero.shopNow}<ArrowRight size={18} /></Link>
-              <Link to="/about" className="btn-secondary text-center">{hero.ourStory}</Link>
+              <Link to="/shop" className="btn-primary flex items-center justify-center gap-3"><Editable path="homepage.hero.shopNow" as="span">{hero.shopNow}</Editable><ArrowRight size={18} /></Link>
+              <Link to="/about" className="btn-secondary text-center"><Editable path="homepage.hero.ourStory" as="span">{hero.ourStory}</Editable></Link>
             </motion.div>
           </motion.div>
         </div>
@@ -57,9 +58,9 @@ export function HomePage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-12 items-center">
           <motion.div initial={{ opacity: 0, x: -40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8 }} className="relative"><div className="aspect-[4/5] overflow-hidden"><img src={philImg} alt="BUKSY філософія бренду" className="w-full h-full object-cover" /></div><div className="absolute -bottom-6 -right-6 w-48 h-48 border border-blood/30 hidden lg:block" /></motion.div>
           <motion.div initial={{ opacity: 0, x: 40 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.8, delay: 0.2 }} className="lg:pl-8">
-            <p className="section-subtitle mb-3">{phil.tagline}</p><h2 className="section-title mb-8">{phil.title1} <br />{phil.title2}</h2>
-            <div className="space-y-6 text-white/70 font-body leading-relaxed"><p>{phil.text1}</p><p>{phil.text2}</p><p>{phil.text3}</p></div>
-            <Link to="/about" className="btn-primary inline-flex items-center gap-3 mt-10">{phil.button}<ArrowRight size={18} /></Link>
+            <p className="section-subtitle mb-3"><Editable path="homepage.philosophy.tagline" as="span">{phil.tagline}</Editable></p><h2 className="section-title mb-8"><Editable path="homepage.philosophy.title1" as="span">{phil.title1}</Editable> <br /><Editable path="homepage.philosophy.title2" as="span">{phil.title2}</Editable></h2>
+            <div className="space-y-6 text-white/70 font-body leading-relaxed"><p><Editable path="homepage.philosophy.text1" as="span">{phil.text1}</Editable></p><p><Editable path="homepage.philosophy.text2" as="span">{phil.text2}</Editable></p><p><Editable path="homepage.philosophy.text3" as="span">{phil.text3}</Editable></p></div>
+            <Link to="/about" className="btn-primary inline-flex items-center gap-3 mt-10"><Editable path="homepage.philosophy.button" as="span">{phil.button}</Editable><ArrowRight size={18} /></Link>
           </motion.div>
         </div>
       </section>
