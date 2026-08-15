@@ -2,8 +2,8 @@
 id: "1"
 name: "Buksy T-Shirt"
 slug: "buksyshirt"
-price: 1299
-originalPrice: 1599
+price: 899
+originalPrice: 1299
 category: "t-shirts"
 image1: "/uploads/11231321.jpg"
 image2: "/uploads/43424234.jpg"
@@ -16,7 +16,7 @@ sizes:
   - available: true
     name: "L"
 inStock: true
-stock: 100
+stock: 10
 isNew: true
 isFeatured: false
 isBestseller: true
