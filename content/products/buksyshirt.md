@@ -22,7 +22,7 @@ isFeatured: false
 isBestseller: true
 rating: 5
 shortDescription: ""
-description: "футболка Buksy🩸\_ткань: 2х кулір 240г/2мпринт: шокодрук вишивка"
+description: "футболка Buksy🩸\_ткань: 2х кулір 240г/2м принт: шокодрук вишивка"
 details:
   - "Щільна 100% бавовна 240 г/м²"
 care:
