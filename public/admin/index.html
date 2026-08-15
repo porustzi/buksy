@@ -7,197 +7,162 @@
   <script src="https://unpkg.com/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
   <style>
     :root {
-      --bg: #0a0a0a; --surface: #141414; --border: rgba(255,255,255,0.06);
-      --text: #e0e0e0; --text2: rgba(255,255,255,0.45);
-      --accent: #B10006; --accent-hover: #d10008;
-      --input-bg: #1a1a1a; --input-border: #2a2a2a;
-      --sidebar-w: 260px;
+      --bg: #0a0a0a; --surface: #141414; --surface2: #1a1a1a; --border: rgba(255,255,255,0.08);
+      --text: #e8e8e8; --text2: rgba(255,255,255,0.5); --text3: rgba(255,255,255,0.32);
+      --accent: #e53935; --accent-hover: #ff4a45; --ok: #4caf50;
+      --sidebar-w: 240px;
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    button { font-family: inherit; cursor: pointer; }
+    input, textarea, select { font-family: inherit; }
+    a { color: var(--accent); }
 
     /* Login */
-    #login-overlay {
-      position: fixed; inset: 0; z-index: 99999;
-      display: flex; align-items: center; justify-content: center;
-      background: var(--bg);
+    #login-screen {
+      position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(circle at 50% 30%, #1a0a0a, var(--bg));
     }
-    #login-overlay.hidden { display: none !important; }
-    .login-card {
-      background: var(--surface); border: 1px solid var(--border);
-      padding: 48px 40px; width: 360px; text-align: center;
-    }
-    .login-card h1 { font-size: 28px; letter-spacing: 4px; color: var(--accent); margin-bottom: 8px; font-weight: 300; }
+    #login-screen.hidden { display: none; }
+    .login-card { background: var(--surface); border: 1px solid var(--border); padding: 48px 40px; width: 380px; text-align: center; }
+    .login-card h1 { font-size: 30px; letter-spacing: 6px; color: var(--accent); margin-bottom: 8px; font-weight: 300; }
     .login-card p { color: var(--text2); font-size: 13px; margin-bottom: 32px; }
-    .login-card input {
-      width: 100%; padding: 14px 16px; background: var(--input-bg); border: 1px solid var(--input-border);
-      color: #fff; font-size: 14px; outline: none; margin-bottom: 16px; text-align: center;
-    }
+    .login-card input { width: 100%; padding: 14px 16px; background: var(--surface2); border: 1px solid var(--border); color: #fff; font-size: 14px; outline: none; margin-bottom: 14px; text-align: center; }
     .login-card input:focus { border-color: var(--accent); }
-    .login-card button {
-      width: 100%; padding: 14px; background: var(--accent); color: #fff;
-      border: none; font-size: 13px; cursor: pointer; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
-    }
+    .login-card button { width: 100%; padding: 14px; background: var(--accent); color: #fff; border: none; font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
     .login-card button:hover { background: var(--accent-hover); }
-    .login-card button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .login-card .error { color: #e53935; font-size: 13px; margin-bottom: 16px; display: none; }
+    .login-card .error { color: #ff6b6b; font-size: 13px; margin-bottom: 14px; display: none; }
     .login-card .error.show { display: block; }
 
     /* Layout */
-    #admin-layout { display: none; height: 100vh; }
-    #admin-layout.show { display: flex; }
-    #sidebar {
-      width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border);
-      display: flex; flex-direction: column; flex-shrink: 0;
-    }
-    #sidebar .header { padding: 20px 16px 12px; border-bottom: 1px solid var(--border); }
-    #sidebar .header h2 { font-size: 20px; letter-spacing: 3px; color: var(--accent); font-weight: 300; }
-    #sidebar .header .user { font-size: 11px; color: var(--text2); margin-top: 4px; }
-    #sidebar .nav { flex: 1; overflow-y: auto; padding: 8px 0; }
-    #sidebar .nav-item {
-      padding: 8px 16px; font-size: 13px; cursor: pointer; color: var(--text2);
-      transition: all 0.15s; border-left: 2px solid transparent;
-    }
+    #app { display: none; height: 100vh; }
+    #app.show { display: flex; }
+
+    /* Sidebar */
+    #sidebar { width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+    #sidebar .brand { padding: 22px 20px 16px; border-bottom: 1px solid var(--border); }
+    #sidebar .brand h2 { font-size: 20px; letter-spacing: 4px; color: var(--accent); font-weight: 300; }
+    #sidebar .brand .user { font-size: 11px; color: var(--text3); margin-top: 4px; }
+    #sidebar .nav { flex: 1; overflow-y: auto; padding: 10px 0; }
+    #sidebar .nav-title { padding: 14px 20px 6px; font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 2px; }
+    #sidebar .nav-item { padding: 10px 20px; font-size: 14px; cursor: pointer; color: var(--text2); display: flex; align-items: center; gap: 10px; border-left: 2px solid transparent; transition: all 0.15s; }
     #sidebar .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
-    #sidebar .nav-item.active { color: #fff; border-left-color: var(--accent); background: rgba(177,0,6,0.08); }
-    #sidebar .nav-item .badge { font-size: 10px; color: var(--text2); float: right; opacity: 0.5; }
-    #sidebar .footer { padding: 12px 16px; border-top: 1px solid var(--border); }
-    #sidebar .footer button {
-      width: 100%; padding: 8px; background: none; border: 1px solid var(--input-border);
-      color: var(--text2); font-size: 12px; cursor: pointer;
-    }
+    #sidebar .nav-item.active { color: #fff; border-left-color: var(--accent); background: rgba(229,57,53,0.1); }
+    #sidebar .nav-item .ico { font-size: 15px; width: 18px; }
+    #sidebar .footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+    #sidebar .footer button { padding: 9px; background: none; border: 1px solid var(--border); color: var(--text2); font-size: 12px; }
     #sidebar .footer button:hover { color: var(--text); border-color: var(--accent); }
+    #sidebar .footer .preview-btn { background: none; border: 1px solid var(--accent); color: var(--accent); }
 
-    /* Editor */
-    #editor { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    #editor .toolbar {
-      padding: 12px 24px; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-    }
-    #editor .toolbar h3 { font-size: 16px; font-weight: 500; }
-    #editor .toolbar .status { font-size: 12px; color: var(--text2); }
-    #editor .toolbar .actions { display: flex; gap: 8px; }
-    #editor .toolbar button {
-      padding: 8px 20px; background: var(--accent); color: #fff;
-      border: none; font-size: 12px; cursor: pointer; font-weight: 600;
-    }
-    #editor .toolbar button:hover { background: var(--accent-hover); }
-    #editor .toolbar button:disabled { opacity: 0.4; cursor: not-allowed; }
-    #editor .toolbar button.secondary { background: none; border: 1px solid var(--input-border); color: var(--text2); }
-    #editor .toolbar button.secondary:hover { border-color: var(--accent); color: var(--text); }
+    /* Main */
+    #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    #toolbar { padding: 14px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    #toolbar h1 { font-size: 17px; font-weight: 500; }
+    #toolbar .actions { display: flex; gap: 8px; align-items: center; }
+    #toolbar .status { font-size: 12px; color: var(--text3); margin-right: 8px; }
+    .btn { padding: 9px 18px; font-size: 13px; font-weight: 600; border: none; letter-spacing: 0.5px; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-ghost { background: none; border: 1px solid var(--border); color: var(--text2); }
+    .btn-ghost:hover { color: var(--text); border-color: var(--accent); }
 
-    #editor .scroll { flex: 1; overflow-y: auto; padding: 24px; }
-    #editor .empty-state {
-      display: flex; align-items: center; justify-content: center; height: 100%;
-      color: var(--text2); font-size: 14px; flex-direction: column; gap: 8px;
-    }
-    #editor .empty-state span { font-size: 32px; opacity: 0.3; }
-
-    /* Loading */
-    #loading { display: none; text-align: center; padding: 60px; color: var(--text2); }
-    #loading.show { display: block; }
-
-    /* Form */
-    .fieldset { margin-bottom: 20px; }
-    .fieldset-label {
-      font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
-      color: var(--accent); margin-bottom: 12px; padding-bottom: 6px;
-      border-bottom: 1px solid var(--border); font-weight: 600;
-    }
-    .field { margin-bottom: 14px; }
-    .field label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .field input, .field textarea, .field select {
-      width: 100%; padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--input-border);
-      color: #fff; font-size: 13px; outline: none; font-family: inherit;
-    }
-    .field input:focus, .field textarea:focus { border-color: var(--accent); }
-    .field textarea { min-height: 80px; resize: vertical; }
-    .field input[type="checkbox"] { width: auto; margin-right: 8px; }
-    .field .checkbox-wrap { display: flex; align-items: center; gap: 8px; }
-    .field .checkbox-wrap label { margin-bottom: 0; cursor: pointer; }
-    .field .image-preview { margin-top: 8px; }
-    .field .image-preview img { max-width: 200px; max-height: 120px; border-radius: 4px; border: 1px solid var(--border); }
-    .field .url-input-wrap { display: flex; gap: 8px; }
-    .field .url-input-wrap input { flex: 1; }
-    .upload-btn {
-      padding: 10px 14px; background: var(--input-bg); border: 1px solid var(--input-border);
-      color: var(--text2); font-size: 16px; cursor: pointer; flex-shrink: 0;
-    }
-    .upload-btn:hover { border-color: var(--accent); color: var(--text); }
-
-    /* Array list */
-    .array-items { }
-    .array-item {
-      background: rgba(255,255,255,0.02); border: 1px solid var(--border);
-      padding: 12px 14px; margin-bottom: 8px; position: relative;
-    }
-    .array-item .remove-btn {
-      position: absolute; top: 8px; right: 8px; background: none; border: none;
-      color: var(--text2); cursor: pointer; font-size: 16px; line-height: 1; padding: 2px 6px;
-    }
-    .array-item .remove-btn:hover { color: var(--accent); }
-    .add-btn {
-      padding: 6px 14px; background: none; border: 1px dashed var(--input-border);
-      color: var(--text2); font-size: 12px; cursor: pointer; width: 100%;
-    }
-    .add-btn:hover { border-color: var(--accent); color: var(--text); }
+    #content { flex: 1; overflow-y: auto; padding: 28px 32px; }
+    #content .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text3); gap: 10px; font-size: 14px; }
 
     /* Catalog */
-    .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; padding: 0; }
-    .catalog-card { background: var(--surface); border: 1px solid var(--border); overflow: hidden; }
-    .catalog-card .thumb { width: 100%; height: 180px; object-fit: cover; background: #1a1a1a; display: block; }
-    .catalog-card .body { padding: 12px 14px; }
-    .catalog-card .body h4 { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
-    .catalog-card .body .price { font-size: 13px; color: var(--accent); }
-    .catalog-card .body .price s { color: var(--text2); margin-right: 6px; font-size: 12px; }
-    .catalog-card .actions { display: flex; gap: 6px; padding: 0 14px 12px; }
-    .catalog-card .actions button {
-      flex: 1; padding: 6px; font-size: 11px; cursor: pointer; border: 1px solid var(--input-border);
-      background: none; color: var(--text2);
+    .catalog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+    .catalog-header .count { color: var(--text3); font-size: 13px; }
+    .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 18px; }
+    .product-card { background: var(--surface); border: 1px solid var(--border); overflow: hidden; cursor: pointer; transition: all 0.2s; position: relative; }
+    .product-card:hover { border-color: rgba(229,57,53,0.5); transform: translateY(-2px); }
+    .product-card .thumb { width: 100%; aspect-ratio: 3/4; object-fit: cover; background: var(--surface2); display: block; }
+    .product-card .no-thumb { width: 100%; aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center; color: var(--text3); font-size: 30px; background: var(--surface2); }
+    .product-card .body { padding: 14px 16px; }
+    .product-card .body .name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .product-card .body .price { font-size: 14px; color: var(--accent); font-weight: 600; }
+    .product-card .body .price s { color: var(--text3); margin-right: 6px; font-size: 12px; font-weight: 400; }
+    .product-card .stock-badge { position: absolute; top: 10px; right: 10px; padding: 3px 9px; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; }
+    .stock-badge.ok { background: rgba(76,175,80,0.2); color: var(--ok); border: 1px solid rgba(76,175,80,0.4); }
+    .stock-badge.out { background: rgba(229,57,53,0.2); color: var(--accent); border: 1px solid rgba(229,57,53,0.4); }
+    .product-card .badges { display: flex; gap: 4px; margin-top: 6px; flex-wrap: wrap; }
+    .product-card .badges span { font-size: 9px; padding: 2px 6px; border: 1px solid var(--border); color: var(--text3); letter-spacing: 1px; }
+
+    /* Forms */
+    .form-section { margin-bottom: 26px; }
+    .form-section .sec-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent); margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); font-weight: 700; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 11px; color: var(--text2); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+    .field input, .field textarea, .field select {
+      width: 100%; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+      color: #fff; font-size: 13px; outline: none;
     }
-    .catalog-card .actions button:hover { border-color: var(--accent); color: var(--text); }
-    .catalog-card .actions button.danger:hover { border-color: var(--accent); color: var(--accent); }
-    .catalog-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    #toast {
-      position: fixed; bottom: 24px; right: 24px; z-index: 999999;
-      padding: 12px 20px; background: #1a1a1a; border: 1px solid var(--border);
-      color: #fff; font-size: 13px; display: none; max-width: 360px;
-    }
+    .field input:focus, .field textarea:focus, .field select:focus { border-color: var(--accent); }
+    .field textarea { min-height: 80px; resize: vertical; line-height: 1.5; }
+    .field textarea.tall { min-height: 140px; }
+    .field .img-wrap { display: flex; gap: 8px; align-items: stretch; }
+    .field .img-wrap input { flex: 1; }
+    .field .img-wrap button { padding: 0 16px; background: var(--surface2); border: 1px solid var(--border); color: var(--text2); font-size: 18px; }
+    .field .img-wrap button:hover { border-color: var(--accent); color: #fff; }
+    .field .img-preview { margin-top: 8px; }
+    .field .img-preview img { max-width: 160px; max-height: 100px; border: 1px solid var(--border); border-radius: 4px; display: block; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+    .checkbox { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+    .checkbox input { width: auto; }
+    .checkbox label { margin: 0; text-transform: none; letter-spacing: 0; font-size: 13px; color: var(--text); cursor: pointer; }
+    .check-row { display: flex; gap: 20px; flex-wrap: wrap; }
+
+    /* Array (sizes, details, care) */
+    .arr-item { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+    .arr-item input { flex: 1; }
+    .arr-item .del { background: none; border: none; color: var(--text3); font-size: 16px; padding: 4px 8px; }
+    .arr-item .del:hover { color: var(--accent); }
+    .arr-add { padding: 7px 14px; background: none; border: 1px dashed var(--border); color: var(--text2); font-size: 12px; width: 100%; }
+    .arr-add:hover { border-color: var(--accent); color: #fff; }
+    .arr-item .size-avail { display: flex; align-items: center; gap: 6px; }
+    .arr-item .size-avail input { width: auto; flex: none; }
+
+    /* Toast */
+    #toast { position: fixed; bottom: 24px; right: 24px; z-index: 2000; padding: 13px 20px; background: #1a1a1a; border: 1px solid var(--border); color: #fff; font-size: 13px; display: none; max-width: 380px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
     #toast.show { display: block; }
-    #toast.success { border-color: #2e7d32; }
+    #toast.success { border-color: var(--ok); }
     #toast.error { border-color: var(--accent); }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+    /* Preview modal */
+    #preview-modal { display: none; position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,0.85); }
+    #preview-modal.show { display: flex; flex-direction: column; }
+    #preview-modal .p-toolbar { padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    #preview-modal .p-toolbar .p-title { font-size: 14px; }
+    #preview-modal .p-toolbar .p-actions { display: flex; gap: 8px; align-items: center; }
+    #preview-modal iframe { flex: 1; width: 100%; border: none; background: #fff; }
+    .toggle-edit { padding: 7px 14px; font-size: 12px; border: 1px solid var(--border); background: none; color: var(--text2); }
+    .toggle-edit.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-    /* Responsive */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
     @media (max-width: 768px) {
-      #sidebar { width: 200px; position: fixed; left: -200px; top: 0; bottom: 0; z-index: 100; transition: left 0.2s; }
-      #sidebar.open { left: 0; }
-      #sidebar-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 99; }
-      #sidebar-backdrop.show { display: block; }
-      #editor .scroll { padding: 16px; }
-      .catalog-grid { grid-template-columns: 1fr; }
-      #editor .toolbar { padding: 12px 16px; flex-wrap: wrap; gap: 4px; }
-      #editor .toolbar h3 { font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-      .field input, .field textarea { padding: 14px; font-size: 16px; }
-      .field .url-input-wrap input { font-size: 14px; }
-      .upload-btn { padding: 14px; }
-      .login-card { width: 100%; max-width: 360px; padding: 32px 24px; }
-      #editor .toolbar .actions button { padding: 8px 12px; font-size: 11px; }
-      .catalog-header { flex-direction: column; gap: 12px; align-items: stretch; }
-      .catalog-header button { width: 100%; padding: 14px !important; }
+      #app { flex-direction: column; }
+      #sidebar { width: 100%; height: auto; flex-direction: column; border-right: none; border-bottom: 1px solid var(--border); }
+      #sidebar .nav { display: flex; overflow-x: auto; padding: 0; }
+      #sidebar .nav-title { display: none; }
+      #sidebar .nav-item { white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; padding: 12px 16px; }
+      #sidebar .nav-item.active { border-bottom-color: var(--accent); }
+      #sidebar .footer { flex-direction: row; }
+      #content { padding: 16px; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .catalog-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
     }
   </style>
 </head>
 <body>
 
-<div id="login-overlay">
+<div id="login-screen">
   <div class="login-card">
     <h1>BUKSY</h1>
-    <p>Увійдіть для керування сайтом</p>
+    <p>Панель керування</p>
     <div class="error" id="login-error"></div>
     <form id="login-form" autocomplete="off">
       <input type="text" id="login-input" placeholder="Логін" autocomplete="off" />
@@ -207,41 +172,42 @@
   </div>
 </div>
 
-<div id="admin-layout">
+<div id="app">
   <aside id="sidebar">
-    <div class="header">
-      <h2>BUKSY</h2>
-      <div class="user" id="user-info"></div>
-    </div>
+    <div class="brand"><h2>BUKSY</h2><div class="user" id="user-info"></div></div>
     <div class="nav" id="nav-list"></div>
     <div class="footer">
+      <button class="preview-btn" onclick="openPreview()">👁 Переглянути сайт</button>
       <button onclick="logout()">Вийти</button>
     </div>
   </aside>
-  <div id="sidebar-backdrop" onclick="toggleSidebar()"></div>
-  <div id="editor">
-    <div class="toolbar">
-      <button class="secondary" id="menu-btn" onclick="toggleSidebar()" style="font-size:18px;padding:4px 10px;display:none">☰</button>
-      <h3 id="editor-title">Оберіть розділ</h3>
+
+  <div id="main">
+    <div id="toolbar">
+      <h1 id="toolbar-title">Каталог</h1>
       <div class="actions">
-        <span class="status" id="editor-status"></span>
-        <button class="secondary" id="back-btn" style="display:none" onclick="goBackToCatalog()">← Назад</button>
-        <button class="secondary" onclick="reloadSection()" id="reload-btn">↻</button>
-        <button onclick="saveSection()" id="save-btn">Зберегти</button>
+        <span class="status" id="toolbar-status"></span>
+        <button class="btn btn-ghost" id="back-btn" style="display:none" onclick="goBack()">← Назад</button>
+        <button class="btn btn-ghost" onclick="reload()">⟳</button>
+        <button class="btn btn-primary" id="save-btn" onclick="save()">Зберегти</button>
       </div>
     </div>
-    <div class="scroll" id="editor-content">
-      <div class="empty-state" id="empty-state">
-        <span>☰</span>
-        <div>Оберіть розділ зліва для редагування</div>
-      </div>
-      <div id="loading">Завантаження...</div>
-      <div id="form-container"></div>
-    </div>
+    <div id="content"></div>
   </div>
 </div>
 
 <div id="toast"></div>
+
+<div id="preview-modal">
+  <div class="p-toolbar">
+    <span class="p-title">Прев'ю — buksy-shop.pages.dev</span>
+    <div class="p-actions">
+      <button class="toggle-edit" id="edit-toggle" onclick="toggleEditMode()">✏️ Редагувати текст</button>
+      <button class="btn btn-ghost" onclick="closePreview()">Закрити</button>
+    </div>
+  </div>
+  <iframe id="preview-frame" src="https://buksy-shop.pages.dev"></iframe>
+</div>
 
 <script>
 // ============================================================
@@ -251,46 +217,33 @@ var REPO = 'porustzi/buksy';
 var BRANCH = 'main';
 var RAW_URL = 'https://raw.githubusercontent.com/' + REPO + '/' + BRANCH;
 
-  var SECTIONS = [
-    { id: 'homepage', label: 'Головна', path: 'content/pages/homepage/homepage.json', type: 'json' },
-    { id: 'about', label: 'Про нас', path: 'content/pages/about/about.json', type: 'json' },
-    { id: 'contact', label: 'Контакти', path: 'content/pages/contact/contact.json', type: 'json' },
-    { id: 'footer', label: 'Футер', path: 'content/pages/footer/footer.json', type: 'json' },
-    { id: 'catalog', label: 'Каталог', type: 'catalog' },
-  ];
+var SECTIONS = [
+  { id: 'catalog', label: 'Каталог', icon: '📦', type: 'catalog' },
+  { id: 'homepage', label: 'Головна', icon: '🏠', path: 'content/pages/homepage/homepage.json', type: 'json' },
+  { id: 'about', label: 'Про нас', icon: 'ℹ️', path: 'content/pages/about/about.json', type: 'json' },
+  { id: 'contact', label: 'Контакти', icon: '✉️', path: 'content/pages/contact/contact.json', type: 'json' },
+  { id: 'footer', label: 'Футер', icon: '🔗', path: 'content/pages/footer/footer.json', type: 'json' },
+];
 
-var TOKEN_KEYS = ['gh-token', 'admin-token', 'buksy-admin-token'];
+var CATEGORIES = ['hoodies', 't-shirts', 'jackets', 'pants', 'accessories', 'footwear'];
+var CATEGORY_LABELS = { hoodies: 'Худі', 't-shirts': 'Футболки', jackets: 'Куртки', pants: 'Штани', accessories: 'Аксесуари', footwear: 'Взуття' };
+
 var token = null;
 var currentSection = null;
 var currentData = null;
 var currentSha = null;
+var currentProductPath = null;
 var tempIdCounter = 0;
 
 // ============================================================
 // AUTH
 // ============================================================
-function getToken() {
-  for (var i = 0; i < TOKEN_KEYS.length; i++) {
-    var t = localStorage.getItem(TOKEN_KEYS[i]);
-    if (t) return t;
-  }
-  return null;
-}
-
-function storeToken(t) {
-  for (var i = 0; i < TOKEN_KEYS.length; i++) {
-    localStorage.setItem(TOKEN_KEYS[i], t);
-  }
-}
-
-function clearToken() {
-  for (var i = 0; i < TOKEN_KEYS.length; i++) {
-    localStorage.removeItem(TOKEN_KEYS[i]);
-  }
-}
+function getToken() { return localStorage.getItem('buksy-admin-token') || localStorage.getItem('gh-token') || localStorage.getItem('admin-token'); }
+function storeToken(t) { localStorage.setItem('buksy-admin-token', t); localStorage.setItem('gh-token', t); }
+function clearToken() { localStorage.removeItem('buksy-admin-token'); localStorage.removeItem('gh-token'); localStorage.removeItem('admin-token'); }
 
 // ============================================================
-// GITHUB API — via proxy (PAT never leaves server)
+// GITHUB API
 // ============================================================
 function utf8decode(bin) {
   var bytes = new Uint8Array(bin.length);
@@ -302,13 +255,10 @@ function apiPost(action, data) {
   var payload = Object.assign({ action: action }, data || {});
   return fetch('/api/github', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token
-    },
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
     body: JSON.stringify(payload)
   }).then(function(r) {
-    if (r.status === 401 || r.status === 403) { logout(); showToast('Сесія закінчилась. Увійдіть знову.', 'error'); throw new Error('Unauthorized'); }
+    if (r.status === 401 || r.status === 403) { logout(); showToast('Сесія закінчилась', 'error'); throw new Error('Unauthorized'); }
     if (!r.ok) throw new Error('API error: ' + r.status);
     return r.json();
   });
@@ -316,9 +266,8 @@ function apiPost(action, data) {
 
 function fetchFile(path) {
   return apiPost('read', { path: path }).then(function(data) {
-    if (!data) throw new Error('File not found');
-    var content = utf8decode(atob(data.content.replace(/\n/g, '')));
-    return { content: content, sha: data.sha };
+    if (!data) throw new Error('Файл не знайдено');
+    return { content: utf8decode(atob(data.content.replace(/\n/g, ''))), sha: data.sha };
   });
 }
 
@@ -326,428 +275,442 @@ function saveFile(path, content, sha, message) {
   return apiPost('write', { path: path, content: content, sha: sha, message: message || 'Update ' + path });
 }
 
-function uploadFile(path, base64Content, message) {
-  return apiPost('upload', { path: path, name: path.split('/').pop(), content: base64Content, message: message || 'Upload ' + path });
+function uploadFile(name, base64Content) {
+  return apiPost('upload', { name: name, content: base64Content, folder: 'public/uploads' });
 }
 
 // ============================================================
-// YAML HELPERS (for product MD file)
+// YAML (products)
 // ============================================================
 function parseYamlFrontmatter(text) {
   var m = text.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
   if (!m) return { data: {}, body: text };
-  var yamlStr = m[1];
-  var body = (m[2] || '').trim();
-  var data = {};
-  try { data = jsyaml.load(yamlStr); } catch(e) { data = {}; }
-  if (data === null || data === undefined) data = {};
-  return { data: data, body: body };
+  try { return { data: jsyaml.load(m[1]) || {}, body: (m[2] || '').trim() }; } catch(e) { return { data: {}, body: text }; }
 }
-
-function serializeYamlFrontmatter(data, body) {
-  var yamlStr = jsyaml.dump(data, { lineWidth: -1, noRefs: true, quotingType: '"', forceQuotes: true });
-  return '---\n' + yamlStr.trim() + '\n---\n' + (body || '');
+function serializeYamlFrontmatter(data) {
+  return '---\n' + jsyaml.dump(data, { lineWidth: -1, noRefs: true, quotingType: '"', forceQuotes: true }).trim() + '\n---\n';
 }
 
 // ============================================================
-// FORM RENDERER
+// HELPERS
 // ============================================================
+function esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(function() { t.className = ''; }, 3500);
+}
 function genId() { return 'f_' + (++tempIdCounter); }
-
-function isImageUrl(v) {
+function isImageValue(v) {
   return typeof v === 'string' && (v.match(/\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i) || v.match(/^https?:\/\//));
 }
-
-function isLongText(v) {
-  return typeof v === 'string' && v.length > 80;
+function imageSrc(v) {
+  if (!v) return '';
+  if (v.match(/^https?:\/\//)) return v;
+  if (v.match(/^\//)) return RAW_URL + '/public' + v;
+  return v;
 }
 
-function renderForm(obj, path) {
-  path = path || '';
-  var html = '';
-  var keys = Object.keys(obj);
+// ============================================================
+// NAV
+// ============================================================
+function buildNav() {
+  var html = '<div class="nav-title">Магазин</div>';
+  html += '<div class="nav-item" data-section="catalog" onclick="openSection(\'catalog\')"><span class="ico">📦</span> Каталог</div>';
+  html += '<div class="nav-title">Сторінки</div>';
+  for (var i = 1; i < SECTIONS.length; i++) {
+    var s = SECTIONS[i];
+    html += '<div class="nav-item" data-section="' + s.id + '" onclick="openSection(\'' + s.id + '\')"><span class="ico">' + s.icon + '</span> ' + s.label + '</div>';
+  }
+  document.getElementById('nav-list').innerHTML = html;
+}
 
+function setActiveNav(id) {
+  document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
+  var el = document.querySelector('[data-section="' + id + '"]');
+  if (el) el.classList.add('active');
+}
+
+// ============================================================
+// SECTION OPEN
+// ============================================================
+function openSection(id) {
+  currentSection = null; currentData = null; currentSha = null; currentProductPath = null;
+  setActiveNav(id);
+  document.getElementById('back-btn').style.display = 'none';
+  document.getElementById('save-btn').style.display = 'none';
+  document.getElementById('toolbar-status').textContent = '';
+
+  var section = SECTIONS.find(function(s) { return s.id === id; });
+  if (!section) return;
+  currentSection = section;
+  document.getElementById('toolbar-title').textContent = section.label;
+
+  if (section.type === 'catalog') { loadCatalog(); return; }
+  loadJsonSection(section);
+}
+
+function loadJsonSection(section) {
+  document.getElementById('content').innerHTML = '<div class="empty">Завантаження…</div>';
+  document.getElementById('save-btn').style.display = '';
+  document.getElementById('save-btn').disabled = true;
+  document.getElementById('toolbar-status').textContent = 'Завантаження…';
+  fetchFile(section.path).then(function(result) {
+    currentSha = result.sha;
+    currentData = JSON.parse(result.content);
+    document.getElementById('content').innerHTML = renderJsonForm(currentData);
+    document.getElementById('save-btn').disabled = false;
+    document.getElementById('toolbar-status').textContent = '';
+  }).catch(function(err) {
+    document.getElementById('content').innerHTML = '<div class="empty">⚠ Помилка: ' + esc(err.message) + '</div>';
+    document.getElementById('toolbar-status').textContent = 'Помилка';
+  });
+}
+
+// ============================================================
+// GENERIC JSON FORM RENDERER
+// ============================================================
+function renderJsonForm(obj) {
+  return renderObject(obj, '');
+}
+
+function renderObject(obj, path) {
+  var html = '';
+  var keys = Object.keys(obj || {});
   for (var i = 0; i < keys.length; i++) {
     var key = keys[i];
     var val = obj[key];
     var fullPath = path ? path + '.' + key : key;
-    var id = genId();
-
-    if (typeof val === 'string') {
-      var isLong = val.length > 80 || val.indexOf('\n') !== -1;
-      if (isImageUrl(val)) {
-        html += '<div class="field">';
-        html += '<label for="' + id + '">' + key + '</label>';
-        html += '<div class="url-input-wrap">';
-        html += '<input type="text" id="' + id + '" value="' + esc(val) + '" data-path="' + fullPath + '" />';
-        html += '<button type="button" class="upload-btn" onclick="uploadImage(this, \'' + fullPath + '\')">📁</button>';
-        html += '</div>';
-        if (val.match(/^https?:\/\//)) {
-          html += '<div class="image-preview"><img src="' + esc(val) + '" onerror="this.style.display=\'none\'" /></div>';
-        } else if (val.match(/^\//)) {
-          html += '<div class="image-preview"><img src="' + esc(RAW_URL + '/public' + val) + '" onerror="this.style.display=\'none\'" /></div>';
-        }
-        html += '</div>';
-      } else if (isLong) {
-        html += '<div class="field">';
-        html += '<label for="' + id + '">' + key + '</label>';
-        html += '<textarea id="' + id + '" data-path="' + fullPath + '">' + esc(val) + '</textarea>';
-        html += '</div>';
-      } else {
-        html += '<div class="field">';
-        html += '<label for="' + id + '">' + key + '</label>';
-        html += '<input type="text" id="' + id + '" value="' + esc(val) + '" data-path="' + fullPath + '" />';
-        html += '</div>';
-      }
+    if (val === null || val === undefined) {
+      html += fieldInput(key, fullPath, '', '');
+    } else if (typeof val === 'string') {
+      if (isImageValue(val)) html += fieldImage(key, fullPath, val);
+      else if (val.length > 120 || val.indexOf('\n') !== -1) html += fieldTextarea(key, fullPath, val, false);
+      else html += fieldInput(key, fullPath, val, 'text');
     } else if (typeof val === 'number') {
-      html += '<div class="field">';
-      html += '<label for="' + id + '">' + key + '</label>';
-      html += '<input type="number" id="' + id + '" value="' + val + '" data-path="' + fullPath + '" step="any" />';
-      html += '</div>';
+      html += fieldInput(key, fullPath, String(val), 'number');
     } else if (typeof val === 'boolean') {
-      html += '<div class="field">';
-      html += '<div class="checkbox-wrap">';
-      html += '<input type="checkbox" id="' + id + '" data-path="' + fullPath + '"' + (val ? ' checked' : '') + ' />';
-      html += '<label for="' + id + '">' + key + '</label>';
-      html += '</div></div>';
-    } else if (val === null || val === undefined) {
-      html += '<div class="field">';
-      html += '<label for="' + id + '">' + key + '</label>';
-      html += '<input type="text" id="' + id + '" data-path="' + fullPath + '" placeholder="(пусто)" />';
-      html += '</div>';
+      html += fieldCheckbox(key, fullPath, val);
     } else if (Array.isArray(val)) {
-      html += '<div class="fieldset">';
-      html += '<div class="fieldset-label">' + key + '</div>';
-      html += '<div class="array-items" data-array-path="' + fullPath + '">';
-      for (var j = 0; j < val.length; j++) {
-        html += renderArrayItem(val[j], fullPath + '.' + j);
-      }
-      html += '</div>';
-      html += '<button class="add-btn" onclick="addArrayItem(\'' + fullPath + '\')">+ Додати</button>';
-      html += '</div>';
+      html += renderArrayField(key, fullPath, val);
     } else if (typeof val === 'object') {
-      html += '<div class="fieldset">';
-      html += '<div class="fieldset-label">' + key + '</div>';
-      html += renderForm(val, fullPath);
-      html += '</div>';
+      html += '<div class="form-section"><div class="sec-title">' + esc(key) + '</div>' + renderObject(val, fullPath) + '</div>';
     }
   }
   return html;
 }
 
-function renderArrayItem(item, path) {
-  if (typeof item === 'object' && item !== null) {
-    var html = '<div class="array-item" data-path="' + path + '">';
-    html += '<button class="remove-btn" onclick="removeArrayItem(this)">✕</button>';
-    html += renderForm(item, path);
-    html += '</div>';
-    return html;
-  }
+function fieldInput(label, path, value, type) {
   var id = genId();
-  var html = '<div class="array-item">';
-  html += '<button class="remove-btn" onclick="removeArrayItem(this)">✕</button>';
-  html += '<input type="text" value="' + esc(String(item)) + '" data-path="' + path + '" />';
+  return '<div class="field"><label>' + esc(label) + '</label><input type="' + (type || 'text') + '" id="' + id + '" value="' + esc(value) + '" data-path="' + path + '"' + (type === 'number' ? ' step="any"' : '') + ' /></div>';
+}
+function fieldTextarea(label, path, value, tall) {
+  var id = genId();
+  return '<div class="field"><label>' + esc(label) + '</label><textarea id="' + id + '" class="' + (tall ? 'tall' : '') + '" data-path="' + path + '">' + esc(value) + '</textarea></div>';
+}
+function fieldCheckbox(label, path, checked) {
+  var id = genId();
+  return '<div class="field"><div class="checkbox"><input type="checkbox" id="' + id + '" data-path="' + path + '"' + (checked ? ' checked' : '') + ' /><label>' + esc(label) + '</label></div></div>';
+}
+function fieldImage(label, path, value) {
+  var id = genId();
+  var html = '<div class="field"><label>' + esc(label) + '</label><div class="img-wrap">';
+  html += '<input type="text" id="' + id + '" value="' + esc(value) + '" data-path="' + path + '" />';
+  html += '<button type="button" onclick="uploadImage(this, \'' + path + '\')">📁</button></div>';
+  if (value) html += '<div class="img-preview"><img src="' + esc(imageSrc(value)) + '" onerror="this.style.display=\'none\'" /></div>';
   html += '</div>';
   return html;
 }
 
+function renderArrayField(label, path, arr) {
+  var html = '<div class="form-section"><div class="sec-title">' + esc(label) + '</div><div data-array="' + path + '">';
+  for (var i = 0; i < arr.length; i++) {
+    html += renderArrayItem(arr[i], path + '.' + i);
+  }
+  html += '</div><button type="button" class="arr-add" onclick="addArrayItem(\'' + path + '\')">+ Додати</button></div>';
+  return html;
+}
+
+function renderArrayItem(item, path) {
+  var id = genId();
+  if (typeof item === 'object' && item !== null) {
+    var html = '<div class="arr-item" data-path="' + path + '" style="flex-direction:column;align-items:stretch;border:1px solid var(--border);padding:12px;border-radius:4px;margin-bottom:10px;">';
+    html += '<button type="button" class="del" onclick="removeArrayItem(this)" style="align-self:flex-end;">✕</button>';
+    html += renderObject(item, path);
+    html += '</div>';
+    return html;
+  }
+  return '<div class="arr-item" data-path="' + path + '"><input type="text" value="' + esc(String(item)) + '" data-path="' + path + '" /><button type="button" class="del" onclick="removeArrayItem(this)">✕</button></div>';
+}
+
+function addArrayItem(path) {
+  var container = document.querySelector('[data-array="' + path + '"]');
+  if (!container) return;
+  var count = container.querySelectorAll('[data-path^="' + path + '."]').length;
+  var existing = container.querySelector('.arr-item');
+  var sample = '';
+  if (existing) {
+    var inp = existing.querySelector('input[data-path], textarea[data-path]');
+    if (inp && inp.getAttribute('data-path') !== path + '.0') sample = '';
+  }
+  // Determine type by looking at first item
+  var firstInp = container.querySelector('[data-path^="' + path + '."] input[type="text"], [data-path^="' + path + '."] textarea');
+  if (firstInp) {
+    container.insertAdjacentHTML('beforeend', '<div class="arr-item" data-path="' + path + '"><input type="text" value="" data-path="' + path + '.' + (count) + '" /><button type="button" class="del" onclick="removeArrayItem(this)">✕</button></div>');
+  } else {
+    // object array
+    var sampleObj = {};
+    var inputs = container.querySelectorAll('[data-path^="' + path + '."]');
+    inputs.forEach(function(inp) {
+      var p = inp.getAttribute('data-path');
+      var parts = p.split('.');
+      var key = parts[parts.length - 1];
+      if (key.match(/^\d+$/)) return;
+      if (inp.type === 'checkbox') sampleObj[key] = false;
+      else sampleObj[key] = '';
+    });
+    var div = document.createElement('div');
+    div.className = 'arr-item';
+    div.setAttribute('data-path', path);
+    div.style.cssText = 'flex-direction:column;align-items:stretch;border:1px solid var(--border);padding:12px;border-radius:4px;margin-bottom:10px;';
+    div.innerHTML = '<button type="button" class="del" onclick="removeArrayItem(this)" style="align-self:flex-end;">✕</button>' + renderObject(sampleObj, path + '.' + count);
+    container.appendChild(div);
+  }
+}
+
+function removeArrayItem(btn) {
+  btn.closest('.arr-item').remove();
+}
+
 // ============================================================
-// FORM DATA COLLECTOR
+// DATA COLLECTION
 // ============================================================
-function collectFormData(container) {
+function collectData() {
   var obj = {};
-  var inputs = container.querySelectorAll('[data-path]');
-  for (var i = 0; i < inputs.length; i++) {
-    var el = inputs[i];
+  var inputs = document.querySelectorAll('#content [data-path]');
+  inputs.forEach(function(el) {
     var path = el.getAttribute('data-path');
     var parts = path.split('.');
     var parent = obj;
     for (var j = 0; j < parts.length - 1; j++) {
       var p = parts[j];
       if (p.match(/^\d+$/)) {
-        if (!parent[parseInt(p)]) parent[parseInt(p)] = {};
-        parent = parent[parseInt(p)];
+        var idx = parseInt(p);
+        if (!parent[idx]) parent[idx] = {};
+        parent = parent[idx];
       } else {
-        if (!parent[p]) {
-          var nextPart = parts[j + 1];
-          parent[p] = nextPart.match(/^\d+$/) ? [] : {};
+        if (parent[p] === undefined) {
+          var next = parts[j + 1];
+          parent[p] = next.match(/^\d+$/) ? [] : {};
         }
         parent = parent[p];
       }
     }
-    var lastKey = parts[parts.length - 1];
-    if (lastKey.match(/^\d+$/)) {
-      var idx = parseInt(lastKey);
-      var val = getInputValue(el);
-      var arr = parent;
-      while (arr.length <= idx) arr.push(null);
-      arr[idx] = val;
-    } else {
-      if (el.type === 'checkbox') {
-        parent[lastKey] = el.checked;
-      } else if (el.type === 'number') {
-        parent[lastKey] = el.value === '' ? null : parseFloat(el.value);
-      } else {
-        parent[lastKey] = el.value;
-      }
-    }
-  }
+    var last = parts[parts.length - 1];
+    if (el.type === 'checkbox') parent[last] = el.checked;
+    else if (el.type === 'number') parent[last] = el.value === '' ? null : parseFloat(el.value);
+    else parent[last] = el.value;
+  });
   return obj;
 }
 
-function getInputValue(el) {
-  if (el.type === 'checkbox') return el.checked;
-  if (el.type === 'number') return el.value === '' ? null : parseFloat(el.value);
-  return el.value;
-}
-
 // ============================================================
-// ARRAY ITEM MANAGEMENT
+// CATALOG
 // ============================================================
-function addArrayItem(path) {
-  var items = document.querySelector('[data-array-path="' + path + '"]');
-  if (!items) return;
-  var count = items.querySelectorAll(':scope > .array-item').length;
-  var firstItem = items.querySelector(':scope > .array-item');
-  var sample = {};
-  if (firstItem) {
-    firstItem.querySelectorAll('[data-path]').forEach(function(inp) {
-      var p = inp.getAttribute('data-path');
-      var key = p.split('.').pop();
-      if (key.match(/^\d+$/)) return;
-      if (inp.type === 'checkbox') sample[key] = false;
-      else if (inp.type === 'number') sample[key] = null;
-      else sample[key] = '';
-    });
-  }
-  var newPath = path + '.' + count;
-  var div = document.createElement('div');
-  div.className = 'array-item';
-  div.setAttribute('data-path', newPath);
-  div.innerHTML = '<button class="remove-btn" onclick="removeArrayItem(this)">✕</button>' + renderForm(sample, newPath);
-  items.appendChild(div);
-}
-
-function removeArrayItem(btn) {
-  if (btn.closest('.array-item').querySelectorAll('[data-path]').length > 0) {
-    if (!confirm('Видалити цей елемент?')) return;
-  }
-  btn.closest('.array-item').remove();
-  // Renumber remaining items
-  var items = btn.closest('.array-items');
-  if (items) renumberItems(items);
-}
-
-function renumberItems(container) {
-  var items = container.querySelectorAll(':scope > .array-item');
-  items.forEach(function(item, idx) {
-    var inputs = item.querySelectorAll('[data-path]');
-    inputs.forEach(function(inp) {
-      var path = inp.getAttribute('data-path');
-      var parts = path.split('.');
-      var last = parts[parts.length - 1];
-      if (last.match(/^\d+$/)) {
-        parts[parts.length - 1] = String(idx);
-        inp.setAttribute('data-path', parts.join('.'));
-      }
-    });
-  });
-}
-
-// ============================================================
-// ESCAPE
-// ============================================================
-function esc(s) {
-  if (s === null || s === undefined) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-// ============================================================
-// TOAST
-// ============================================================
-function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'show' + (type ? ' ' + type : '');
-  clearTimeout(t._timer);
-  t._timer = setTimeout(function() { t.className = ''; }, 4000);
-}
-
-var currentProductPath = null;
-
-// ============================================================
-// SECTION LOADING
-// ============================================================
-function loadSection(sectionId) {
-  currentSection = null;
-  currentData = null;
-  currentSha = null;
-  currentProductPath = null;
-  document.getElementById('empty-state').style.display = 'none';
-  document.getElementById('form-container').innerHTML = '';
-  document.getElementById('reload-btn').style.display = '';
-  document.getElementById('save-btn').style.display = '';
-  document.getElementById('loading').classList.add('show');
-  document.getElementById('save-btn').disabled = true;
-  document.getElementById('editor-status').textContent = 'Завантаження...';
-
-  var section = SECTIONS.find(function(s) { return s.id === sectionId; });
-  if (!section) return;
-  currentSection = section;
-  document.getElementById('editor-title').textContent = section.label;
-  document.getElementById('back-btn').style.display = 'none';
-
-  document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
-  var navEl = document.querySelector('[data-section="' + sectionId + '"]');
-  if (navEl) navEl.classList.add('active');
-
-  if (section.type === 'catalog') {
-    loadCatalogList();
-    return;
-  }
-
-  fetchFile(section.path).then(function(result) {
-    currentSha = result.sha;
-    var data;
-    if (section.type === 'yaml') {
-      var parsed = parseYamlFrontmatter(result.content);
-      data = parsed.data;
-    } else {
-      data = JSON.parse(result.content);
-    }
-    currentData = data;
-    document.getElementById('loading').classList.remove('show');
-    document.getElementById('form-container').innerHTML = renderForm(data);
-    document.getElementById('save-btn').disabled = false;
-    document.getElementById('editor-status').textContent = 'Збережено';
-  }).catch(function(err) {
-    document.getElementById('loading').classList.remove('show');
-    document.getElementById('form-container').innerHTML = '<div class="empty-state"><span>⚠</span><div>Помилка завантаження: ' + esc(err.message) + '</div></div>';
-    document.getElementById('editor-status').textContent = 'Помилка';
-    showToast('Помилка: ' + err.message, 'error');
-  });
-}
-
-function loadCatalogList() {
-  document.getElementById('reload-btn').style.display = 'none';
+function loadCatalog() {
+  document.getElementById('toolbar-title').textContent = 'Каталог';
   document.getElementById('save-btn').style.display = 'none';
-  document.getElementById('back-btn').style.display = 'none';
-  document.getElementById('loading').classList.remove('show');
-  document.getElementById('editor-title').textContent = 'Каталог';
+  document.getElementById('content').innerHTML = '<div class="empty">Завантаження…</div>';
 
   apiPost('list', { folder: 'content/products' }).then(function(files) {
-    var html = '<div class="catalog-header"><div style="color:var(--text2);font-size:13px;">' + files.length + ' товарів</div><button onclick="addProduct()" style="padding:8px 20px;background:var(--accent);color:#fff;border:none;font-size:12px;cursor:pointer;font-weight:600;">+ Додати товар</button></div>';
-    html += '<div class="catalog-grid">';
-
+    files = (files || []).filter(function(f) { return f.name !== '.gitkeep'; });
+    if (files.length === 0) {
+      document.getElementById('content').innerHTML = '<div class="empty"><span style="font-size:40px">📦</span><div>Немає товарів</div><button class="btn btn-primary" onclick="addProduct()">+ Додати товар</button></div>';
+      return;
+    }
+    var html = '<div class="catalog-header"><span class="count">' + files.length + ' товарів</span><button class="btn btn-primary" onclick="addProduct()">+ Додати товар</button></div><div class="catalog-grid">';
     var loaded = 0;
-    files.forEach(function(file) {
-      if (file.name === '.gitkeep') { loaded++; if (loaded === files.length) finish(); return; }
-      // Fetch each product to show preview
+    var cards = new Array(files.length);
+    files.forEach(function(file, i) {
       fetchFile('content/products/' + file.name).then(function(result) {
+        var data = {};
+        try { data = parseYamlFrontmatter(result.content).data || {}; } catch(e) {}
+        cards[i] = renderProductCard(data, file.name);
         loaded++;
-        var data;
-        try {
-          var parsed = parseYamlFrontmatter(result.content);
-          data = parsed.data;
-        } catch(e) { data = {}; }
-        var img = data.image1 || (data.images && data.images[0]) || '';
-        var price = data.price || '';
-        var origPrice = data.originalPrice || '';
-        var name = data.name || file.name.replace('.md','');
-        html += '<div class="catalog-card">';
-        if (img) {
-          var src = img.match(/^\//) ? RAW_URL + '/public' + img : img;
-          html += '<img class="thumb" src="' + esc(src) + '" onerror="this.style.display=\'none\'" />';
-        } else {
-          html += '<div class="thumb" style="display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:24px;">📷</div>';
+        if (loaded === files.length) {
+          html += cards.filter(Boolean).join('');
+          html += '</div>';
+          document.getElementById('content').innerHTML = html;
         }
-        html += '<div class="body"><h4>' + esc(name) + '</h4>';
-        html += '<div class="price">' + (origPrice ? '<s>₴' + origPrice + '</s>' : '') + (price ? '₴' + price : '') + '</div>';
-        var stock = data.stock;
-        if (stock !== undefined) {
-          html += '<div style="font-size:11px;margin-top:4px;' + (stock <= 0 ? 'color:var(--accent);' : 'color:var(--text2);') + '">' + (stock <= 0 ? 'Немає в наявності' : 'В наявності: ' + stock + ' шт.') + '</div>';
-        }
-        html += '</div>';
-        html += '<div class="actions">';
-        html += '<button onclick="loadProduct(\'content/products/' + esc(file.name) + '\')">✏️ Редагувати</button>';
-        html += '<button class="danger" onclick="deleteProduct(\'content/products/' + esc(file.name) + '\', \'' + esc(file.name) + '\')">🗑️</button>';
-        html += '</div></div>';
-        if (loaded === files.length) finish();
-      }).catch(function(e) {
+      }).catch(function() {
         loaded++;
-        if (loaded === files.length) finish();
+        if (loaded === files.length) {
+          html += cards.filter(Boolean).join('');
+          html += '</div>';
+          document.getElementById('content').innerHTML = html;
+        }
       });
     });
-    function finish() {
-      html += '</div>';
-      document.getElementById('form-container').innerHTML = html;
-    }
-    if (files.length === 0) {
-      document.getElementById('form-container').innerHTML = '<div class="empty-state"><span>📦</span><div>Немає товарів</div><button onclick="addProduct()" style="margin-top:12px;padding:8px 20px;background:var(--accent);color:#fff;border:none;font-size:12px;cursor:pointer;font-weight:600;">+ Додати товар</button></div>';
-    }
   }).catch(function(err) {
-    document.getElementById('loading').classList.remove('show');
-    document.getElementById('form-container').innerHTML = '<div class="empty-state"><span>⚠</span><div>Помилка: ' + esc(err.message) + '</div></div>';
-    document.getElementById('editor-status').textContent = 'Помилка';
+    document.getElementById('content').innerHTML = '<div class="empty">⚠ Помилка: ' + esc(err.message) + '</div>';
   });
 }
 
-function loadProduct(path) {
-  currentSection = { id: 'product', label: 'Товар', path: path, type: 'yaml' };
-  currentProductPath = path;
-  document.getElementById('empty-state').style.display = 'none';
-  document.getElementById('form-container').innerHTML = '';
-  document.getElementById('reload-btn').style.display = '';
-  document.getElementById('save-btn').style.display = '';
-  document.getElementById('loading').classList.add('show');
-  document.getElementById('save-btn').disabled = true;
-  document.getElementById('editor-status').textContent = 'Завантаження...';
-  document.getElementById('editor-title').textContent = 'Каталог / ' + path.split('/').pop();
-  document.getElementById('back-btn').style.display = '';
+function renderProductCard(data, fileName) {
+  var img = data.image1 || (data.images && data.images[0]) || '';
+  var name = data.name || fileName.replace('.md', '');
+  var price = data.price != null ? data.price : '';
+  var orig = data.originalPrice || '';
+  var stock = data.stock;
+  var isOut = stock !== undefined && stock <= 0;
+  var html = '<div class="product-card" onclick="editProduct(\'content/products/' + esc(fileName) + '\')">';
+  if (img) html += '<img class="thumb" src="' + esc(imageSrc(img)) + '" onerror="this.parentElement.insertAdjacentHTML(\'afterbegin\',\'<div class=no-thumb>📷</div>\');this.remove();" />';
+  else html += '<div class="no-thumb">📷</div>';
+  if (stock !== undefined) html += '<span class="stock-badge ' + (isOut ? 'out' : 'ok') + '">' + (isOut ? 'Немає' : stock + ' шт') + '</span>';
+  html += '<div class="body"><div class="name">' + esc(name) + '</div>';
+  html += '<div class="price">' + (orig ? '<s>₴' + esc(orig) + '</s>' : '') + (price !== '' ? '₴' + esc(price) : '—') + '</div>';
+  var badges = '';
+  if (data.isNew) badges += '<span>НОВЕ</span>';
+  if (data.isBestseller) badges += '<span>БЕСТСЕЛЕР</span>';
+  if (data.isFeatured) badges += '<span>ОБРАНЕ</span>';
+  if (badges) html += '<div class="badges">' + badges + '</div>';
+  html += '</div></div>';
+  return html;
+}
 
-  document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
-  var navEl = document.querySelector('[data-section="catalog"]');
-  if (navEl) navEl.classList.add('active');
+function editProduct(path) {
+  currentProductPath = path;
+  document.getElementById('toolbar-title').textContent = 'Редагування товару';
+  document.getElementById('back-btn').style.display = '';
+  document.getElementById('save-btn').style.display = '';
+  document.getElementById('save-btn').disabled = true;
+  document.getElementById('content').innerHTML = '<div class="empty">Завантаження…</div>';
 
   fetchFile(path).then(function(result) {
     currentSha = result.sha;
     var parsed = parseYamlFrontmatter(result.content);
-    currentData = parsed.data;
-    document.getElementById('loading').classList.remove('show');
-    document.getElementById('form-container').innerHTML = renderForm(parsed.data);
+    currentData = parsed.data || {};
+    document.getElementById('content').innerHTML = renderProductForm(currentData);
     document.getElementById('save-btn').disabled = false;
-    document.getElementById('editor-status').textContent = 'Збережено';
   }).catch(function(err) {
-    document.getElementById('loading').classList.remove('show');
-    document.getElementById('form-container').innerHTML = '<div class="empty-state"><span>⚠</span><div>Помилка завантаження: ' + esc(err.message) + '</div></div>';
-    document.getElementById('editor-status').textContent = 'Помилка';
-    showToast('Помилка: ' + err.message, 'error');
+    document.getElementById('content').innerHTML = '<div class="empty">⚠ Помилка: ' + esc(err.message) + '</div>';
   });
+}
+
+function renderProductForm(p) {
+  var html = '<div class="grid-2">';
+  html += '<div class="form-section"><div class="sec-title">Основне</div>';
+  html += fieldInput('Назва', 'name', p.name || '', 'text');
+  html += fieldInput('Slug', 'slug', p.slug || '', 'text');
+  html += '<div class="grid-2">';
+  html += fieldInput('Ціна (₴)', 'price', p.price != null ? p.price : '', 'number');
+  html += fieldInput('Стара ціна (₴)', 'originalPrice', p.originalPrice || '', 'number');
+  html += '</div>';
+  html += '<div class="field"><label>Категорія</label><select data-path="category">';
+  CATEGORIES.forEach(function(c) { html += '<option value="' + c + '"' + (p.category === c ? ' selected' : '') + '>' + CATEGORY_LABELS[c] + '</option>'; });
+  html += '</select></div>';
+  html += fieldInput('Сток (шт)', 'stock', p.stock != null ? p.stock : '', 'number');
+  html += '<div class="check-row">';
+  html += fieldCheckbox('В наявності', 'inStock', p.inStock !== false);
+  html += fieldCheckbox('Новий', 'isNew', !!p.isNew);
+  html += fieldCheckbox('Обране', 'isFeatured', !!p.isFeatured);
+  html += fieldCheckbox('Бестселер', 'isBestseller', !!p.isBestseller);
+  html += '</div>';
+  html += fieldInput('Рейтинг', 'rating', p.rating != null ? p.rating : '', 'number');
+  html += '</div>';
+
+  html += '<div class="form-section"><div class="sec-title">Зображення</div>';
+  html += fieldImage('Зображення 1', 'image1', p.image1 || '');
+  html += fieldImage('Зображення 2', 'image2', p.image2 || '');
+  html += fieldImage('Зображення 3', 'image3', p.image3 || '');
+  html += '</div>';
+  html += '</div>';
+
+  html += '<div class="form-section"><div class="sec-title">Розміри</div>';
+  var sizes = p.sizes || [];
+  var sizesHtml = '<div data-array="sizes">';
+  sizes.forEach(function(s, i) {
+    sizesHtml += '<div class="arr-item" style="border:1px solid var(--border);padding:10px;border-radius:4px;margin-bottom:8px;">';
+    sizesHtml += '<input type="text" value="' + esc(s.name || '') + '" data-path="sizes.' + i + '.name" placeholder="Розмір (S, M, L)" style="max-width:120px;" />';
+    sizesHtml += '<div class="size-avail"><input type="checkbox" data-path="sizes.' + i + '.available"' + (s.available !== false ? ' checked' : '') + ' /><label>доступний</label></div>';
+    sizesHtml += '<button type="button" class="del" onclick="removeArrayItem(this)">✕</button>';
+    sizesHtml += '</div>';
+  });
+  sizesHtml += '</div><button type="button" class="arr-add" onclick="addSize()">+ Додати розмір</button>';
+  html += sizesHtml;
+  html += '</div>';
+
+  html += '<div class="form-section"><div class="sec-title">Короткий опис</div>';
+  html += fieldTextarea('', 'shortDescription', p.shortDescription || '', true);
+  html += '</div>';
+
+  html += '<div class="form-section"><div class="sec-title">Повний опис</div>';
+  html += fieldTextarea('', 'description', p.description || '', true);
+  html += '</div>';
+
+  html += '<div class="grid-2">';
+  html += '<div class="form-section"><div class="sec-title">Деталі</div><div data-array="details">';
+  (p.details || []).forEach(function(d, i) { html += '<div class="arr-item"><input type="text" value="' + esc(d) + '" data-path="details.' + i + '" /><button type="button" class="del" onclick="removeArrayItem(this)">✕</button></div>'; });
+  html += '</div><button type="button" class="arr-add" onclick="addSimpleArrayItem(\'details\')">+ Додати</button></div>';
+
+  html += '<div class="form-section"><div class="sec-title">Догляд</div><div data-array="care">';
+  (p.care || []).forEach(function(c, i) { html += '<div class="arr-item"><input type="text" value="' + esc(c) + '" data-path="care.' + i + '" /><button type="button" class="del" onclick="removeArrayItem(this)">✕</button></div>'; });
+  html += '</div><button type="button" class="arr-add" onclick="addSimpleArrayItem(\'care\')">+ Додати</button></div>';
+  html += '</div>';
+
+  html += '<div class="form-section"><div class="sec-title">Небезпечна зона</div>';
+  html += '<button class="btn btn-ghost" style="color:var(--accent);border-color:var(--accent);" onclick="deleteCurrentProduct()">🗑 Видалити товар</button>';
+  html += '</div>';
+
+  return html;
+}
+
+function addSize() {
+  var container = document.querySelector('[data-array="sizes"]');
+  if (!container) return;
+  var count = container.querySelectorAll('.arr-item').length;
+  container.insertAdjacentHTML('beforeend', '<div class="arr-item" style="border:1px solid var(--border);padding:10px;border-radius:4px;margin-bottom:8px;"><input type="text" value="" data-path="sizes.' + count + '.name" placeholder="Розмір" style="max-width:120px;" /><div class="size-avail"><input type="checkbox" data-path="sizes.' + count + '.available" checked /><label>доступний</label></div><button type="button" class="del" onclick="removeArrayItem(this)">✕</button></div>');
+}
+
+function addSimpleArrayItem(path) {
+  var container = document.querySelector('[data-array="' + path + '"]');
+  if (!container) return;
+  var count = container.querySelectorAll('.arr-item').length;
+  container.insertAdjacentHTML('beforeend', '<div class="arr-item"><input type="text" value="" data-path="' + path + '.' + count + '" /><button type="button" class="del" onclick="removeArrayItem(this)">✕</button></div>');
 }
 
 function addProduct() {
   var slug = 'product-' + Date.now().toString(36) + '-' + Math.random().toString(36).substr(2, 4);
-  var name = 'Новий товар';
-  var content = '---\nid: "' + Date.now() + '"\nname: "' + name + '"\nslug: "' + slug + '"\nprice: 0\ncategory: "t-shirts"\nimage1: ""\nimage2: ""\nimage3: ""\n' +
-    'sizes:\n  - { name: "S", available: true }\n  - { name: "M", available: true }\n  - { name: "L", available: true }\ninStock: true\nstock: 1\nisNew: false\nisFeatured: false\nisBestseller: false\n' +
-    'rating: 0\nshortDescription: ""\ndescription: ""\ndetails: []\ncare: []\nreviews: []\n---\n';
+  var data = {
+    id: String(Date.now()), name: 'Новий товар', slug: slug, price: 0, category: 't-shirts',
+    image1: '', image2: '', image3: '',
+    sizes: [{ name: 'S', available: true }, { name: 'M', available: true }, { name: 'L', available: true }],
+    inStock: true, stock: 1, isNew: false, isFeatured: false, isBestseller: false, rating: 0,
+    shortDescription: '', description: '', details: [], care: [], reviews: []
+  };
   var path = 'content/products/' + slug + '.md';
-  apiPost('write', { path: path, content: content, message: 'Add product ' + slug }).then(function() {
+  apiPost('write', { path: path, content: serializeYamlFrontmatter(data), message: 'Add product ' + slug }).then(function() {
     showToast('Товар створено', 'success');
-    loadProduct(path);
-  }).catch(function(err) {
-    showToast('Помилка: ' + err.message, 'error');
-  });
+    editProduct(path);
+  }).catch(function(err) { showToast('Помилка: ' + err.message, 'error'); });
 }
 
-function deleteProduct(path, name) {
-  if (!confirm('Видалити товар "' + name.replace('.md','') + '"?')) return;
-  apiPost('delete', { path: path }).then(function() {
+function deleteCurrentProduct() {
+  if (!currentProductPath) return;
+  if (!confirm('Видалити цей товар?')) return;
+  apiPost('delete', { path: currentProductPath }).then(function() {
     showToast('Товар видалено', 'success');
-    loadCatalogList();
-  }).catch(function(err) {
-    showToast('Помилка: ' + err.message, 'error');
-  });
+    openSection('catalog');
+  }).catch(function(err) { showToast('Помилка: ' + err.message, 'error'); });
+}
+
+function goBack() {
+  if (currentProductPath) { openSection('catalog'); return; }
 }
 
 // ============================================================
@@ -763,35 +726,21 @@ function uploadImage(btn, path) {
     var reader = new FileReader();
     reader.onload = function(ev) {
       var base64 = ev.target.result.split(',')[1];
-      var ext = file.name.split('.').pop().toLowerCase().replace(/jpeg/g, 'jpg');
+      var ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/jpeg/g, 'jpg');
       var filename = Date.now() + '_' + Math.random().toString(36).substr(2, 4) + '.' + ext;
-      var ghPath = 'public/uploads/' + filename;
-
-      btn.disabled = true;
-      btn.textContent = '⏳';
-
-      uploadFile(ghPath, base64, 'Upload ' + filename).then(function(res) {
+      btn.disabled = true; btn.textContent = '⏳';
+      uploadFile(filename, base64).then(function(res) {
         var savedPath = (res && res.path) ? res.path.replace(/^public/, '') : ('/uploads/' + filename);
         var inputEl = btn.parentElement.querySelector('input[type="text"]');
-        if (inputEl) {
-          inputEl.value = savedPath;
-          // Update image preview if exists
-          var preview = btn.closest('.field').querySelector('.image-preview');
-          if (preview) {
-            preview.innerHTML = '<img src="' + RAW_URL + '/public' + savedPath + '" onerror="this.style.display=\'none\'" />';
-          } else {
-            var p = document.createElement('div');
-            p.className = 'image-preview';
-            p.innerHTML = '<img src="' + RAW_URL + '/public' + savedPath + '" onerror="this.style.display=\'none\'" />';
-            btn.closest('.field').appendChild(p);
-          }
-        }
-        btn.disabled = false;
-        btn.textContent = '📁';
+        if (inputEl) inputEl.value = savedPath;
+        var field = btn.closest('.field');
+        var prev = field.querySelector('.img-preview');
+        if (prev) prev.innerHTML = '<img src="' + esc(RAW_URL + '/public' + savedPath) + '" />';
+        else btn.parentElement.insertAdjacentHTML('afterend', '<div class="img-preview"><img src="' + esc(RAW_URL + '/public' + savedPath) + '" /></div>');
+        btn.disabled = false; btn.textContent = '📁';
         showToast('Зображення завантажено', 'success');
       }).catch(function(err) {
-        btn.disabled = false;
-        btn.textContent = '📁';
+        btn.disabled = false; btn.textContent = '📁';
         showToast('Помилка: ' + err.message, 'error');
       });
     };
@@ -800,100 +749,75 @@ function uploadImage(btn, path) {
   input.click();
 }
 
-function reloadSection() {
-  if (!currentSection) return;
-  if (!confirm('Скасувати зміни та завантажити останню версію?')) return;
-  if (currentSection.type === 'catalog') {
-    loadCatalogList();
-  } else if (currentProductPath) {
-    loadProduct(currentProductPath);
-  } else {
-    loadSection(currentSection.id);
-  }
-}
-
-function goBackToCatalog() {
-  loadSection('catalog');
-}
-
-function toggleSidebar() {
-  var s = document.getElementById('sidebar');
-  var b = document.getElementById('sidebar-backdrop');
-  s.classList.toggle('open');
-  b.classList.toggle('show');
-}
-
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebar-backdrop').classList.remove('show');
-}
-
-function showMobileMenuBtn() {
-  var btn = document.getElementById('menu-btn');
-  if (window.innerWidth <= 768) btn.style.display = ''; else btn.style.display = 'none';
-}
-
 // ============================================================
 // SAVE
 // ============================================================
-function saveSection() {
-  if (!currentSection || !currentSha || !currentData) return;
+function save() {
+  if (!currentSection && !currentProductPath) return;
   var btn = document.getElementById('save-btn');
-  btn.disabled = true;
-  btn.textContent = 'Збереження...';
-  document.getElementById('editor-status').textContent = 'Збереження...';
+  btn.disabled = true; btn.textContent = 'Збереження…';
+  document.getElementById('toolbar-status').textContent = 'Збереження…';
 
-  var container = document.getElementById('form-container');
-  var newData = collectFormData(container);
+  var newData = collectData();
 
-  // For YAML files, also get the body
-  if (currentSection.type === 'yaml') {
-    var body = ''; // No body for product
-    var content = serializeYamlFrontmatter(newData, body);
-    saveFile(currentSection.path, content, currentSha, 'Update ' + currentSection.label).then(function() {
-      btn.disabled = false;
-      btn.textContent = 'Зберегти';
-      document.getElementById('editor-status').textContent = 'Збережено ✓';
-      showToast('Збережено!', 'success');
-      // Reload to get new SHA
-      loadSection(currentSection.id);
-    }).catch(function(err) {
-      btn.disabled = false;
-      btn.textContent = 'Зберегти';
-      document.getElementById('editor-status').textContent = 'Помилка';
-      showToast('Помилка: ' + err.message, 'error');
-    });
+  var isProduct = !!currentProductPath;
+  var content, path;
+  if (isProduct) {
+    path = currentProductPath;
+    content = serializeYamlFrontmatter(newData);
   } else {
-    var content = JSON.stringify(newData, null, 2);
-    saveFile(currentSection.path, content, currentSha, 'Update ' + currentSection.label).then(function() {
-      btn.disabled = false;
-      btn.textContent = 'Зберегти';
-      document.getElementById('editor-status').textContent = 'Збережено ✓';
-      showToast('Збережено!', 'success');
-      // Reload to get new SHA
-      loadSection(currentSection.id);
-    }).catch(function(err) {
-      btn.disabled = false;
-      btn.textContent = 'Зберегти';
-      document.getElementById('editor-status').textContent = 'Помилка';
-      showToast('Помилка: ' + err.message, 'error');
-    });
+    path = currentSection.path;
+    content = JSON.stringify(newData, null, 2);
   }
+
+  saveFile(path, content, currentSha, 'Update ' + path).then(function() {
+    btn.disabled = false; btn.textContent = 'Зберегти';
+    document.getElementById('toolbar-status').textContent = 'Збережено ✓';
+    showToast('Збережено!', 'success');
+    setTimeout(function() { document.getElementById('toolbar-status').textContent = ''; }, 2500);
+    // refresh sha
+    fetchFile(path).then(function(r) { currentSha = r.sha; });
+  }).catch(function(err) {
+    btn.disabled = false; btn.textContent = 'Зберегти';
+    document.getElementById('toolbar-status').textContent = 'Помилка';
+    showToast('Помилка: ' + err.message, 'error');
+  });
+}
+
+function reload() {
+  if (currentProductPath) { editProduct(currentProductPath); return; }
+  if (currentSection) { openSection(currentSection.id); }
 }
 
 // ============================================================
-// NAV SIDEBAR
+// PREVIEW
 // ============================================================
-function buildNav() {
-  var html = '<div style="padding:12px 16px 4px;font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;">Сторінки</div>';
-  for (var i = 0; i < SECTIONS.length; i++) {
-    var s = SECTIONS[i];
-    if (s.type === 'catalog') continue;
-    html += '<div class="nav-item" data-section="' + s.id + '" onclick="loadSection(\'' + s.id + '\');closeSidebar()">' + esc(s.label) + '</div>';
-  }
-  html += '<div style="padding:12px 16px 4px;font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-top:8px;">Магазин</div>';
-  html += '<div class="nav-item" data-section="catalog" onclick="loadSection(\'catalog\');closeSidebar()">📦 Каталог</div>';
-  document.getElementById('nav-list').innerHTML = html;
+function openPreview() {
+  document.getElementById('preview-modal').classList.add('show');
+}
+function closePreview() {
+  document.getElementById('preview-modal').classList.remove('show');
+  disableEditMode();
+}
+function toggleEditMode() {
+  var btn = document.getElementById('edit-toggle');
+  var frame = document.getElementById('preview-frame');
+  if (btn.classList.contains('active')) { disableEditMode(); return; }
+  btn.classList.add('active');
+  btn.textContent = '👁 Вийти з редагування';
+  try {
+    frame.contentWindow.postMessage({ type: 'BUKSY_EDIT_MODE', active: true }, '*');
+  } catch(e) {}
+  showToast('Режим редагування — клікни на текст на сайті', 'success');
+}
+function disableEditMode() {
+  var btn = document.getElementById('edit-toggle');
+  var frame = document.getElementById('preview-frame');
+  btn.classList.remove('active');
+  btn.textContent = '✏️ Редагувати текст';
+  try {
+    frame.contentWindow.postMessage({ type: 'BUKSY_EDIT_MODE', active: false }, '*');
+  } catch(e) {}
 }
 
 // ============================================================
@@ -909,64 +833,39 @@ function login(username, password) {
     return r.json();
   });
 }
-
-function showAdmin() {
-  document.getElementById('login-overlay').classList.add('hidden');
-  document.getElementById('admin-layout').classList.add('show');
+function showApp() {
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.add('show');
   document.getElementById('user-info').textContent = 'porustzi';
   buildNav();
-  showMobileMenuBtn();
-  window.addEventListener('resize', showMobileMenuBtn);
+  openSection('catalog');
 }
-
 function logout() {
-  clearToken();
-  token = null;
-  currentSection = null;
-  currentData = null;
-  currentSha = null;
-  document.getElementById('admin-layout').classList.remove('show');
-  document.getElementById('login-overlay').classList.remove('hidden');
-  document.getElementById('form-container').innerHTML = '';
+  clearToken(); token = null;
+  document.getElementById('app').classList.remove('show');
+  document.getElementById('login-screen').classList.remove('hidden');
 }
-
-function showLoginError(msg) {
-  var el = document.getElementById('login-error');
-  el.textContent = msg;
-  el.classList.add('show');
-}
-
-function hideLoginError() {
-  document.getElementById('login-error').classList.remove('show');
-}
+function showLoginError(msg) { var el = document.getElementById('login-error'); el.textContent = msg; el.classList.add('show'); }
+function hideLoginError() { document.getElementById('login-error').classList.remove('show'); }
 
 // ============================================================
 // INIT
 // ============================================================
 (function init() {
   var stored = getToken();
-  if (stored) {
-    token = stored;
-    showAdmin();
-    return;
-  }
-
+  if (stored) { token = stored; showApp(); return; }
   document.getElementById('login-form').onsubmit = function(e) {
     e.preventDefault();
-    var loginVal = document.getElementById('login-input').value;
-    var passVal = document.getElementById('password-input').value;
-    if (!loginVal || !passVal) { showLoginError('Введіть логін та пароль'); return; }
+    var l = document.getElementById('login-input').value;
+    var p = document.getElementById('password-input').value;
+    if (!l || !p) { showLoginError('Введіть логін та пароль'); return; }
     hideLoginError();
     var btn = document.getElementById('login-btn');
-    btn.disabled = true;
-    btn.textContent = 'Завантаження...';
-    login(loginVal, passVal).then(function(data) {
-      storeToken(data.token);
-      token = data.token;
-      showAdmin();
+    btn.disabled = true; btn.textContent = 'Завантаження…';
+    login(l, p).then(function(data) {
+      storeToken(data.token); token = data.token; showApp();
     }).catch(function(err) {
-      btn.disabled = false;
-      btn.textContent = 'Увійти';
+      btn.disabled = false; btn.textContent = 'Увійти';
       showLoginError(err.message);
     });
   };
