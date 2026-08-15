@@ -21,15 +21,44 @@ async function getPubKey(env) {
   } catch { return cache.key ? cache : null; }
 }
 
+function derToRaw(derBytes) {
+  // Monobank signs in DER (ASN.1 SEQUENCE { INTEGER r, INTEGER s }).
+  // WebCrypto expects raw r||s (64 bytes for P-256). Convert.
+  if (!derBytes || derBytes.length < 8 || derBytes[0] !== 0x30) return derBytes;
+  try {
+    let idx = 2;
+    if (derBytes[1] & 0x80) idx += derBytes[1] & 0x7f;
+    if (derBytes[idx] !== 0x02) return derBytes;
+    const rLen = derBytes[idx + 1];
+    idx += 2;
+    const r = Array.from(derBytes.slice(idx, idx + rLen));
+    idx += rLen;
+    if (derBytes[idx] !== 0x02) return derBytes;
+    const sLen = derBytes[idx + 1];
+    idx += 2;
+    const s = Array.from(derBytes.slice(idx, idx + sLen));
+    const norm = (a) => {
+      while (a.length > 0 && a[0] === 0) a.shift();
+      while (a.length < 32) a.unshift(0);
+      return a.slice(0, 32);
+    };
+    return new Uint8Array([...norm(r), ...norm(s)]);
+  } catch { return derBytes; }
+}
+
 async function verifySignature(rawBody, xSign, pubKeyCache) {
   if (!xSign || !pubKeyCache || !pubKeyCache.raw) return false;
   try {
     const keyData = pemToArrayBuffer(pubKeyCache.raw);
     const key = await crypto.subtle.importKey('spki', keyData, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
     const sig = base64ToUint8Array(xSign);
+    const rawSig = derToRaw(sig);
     const data = new TextEncoder().encode(rawBody);
-    return crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, sig, data);
-  } catch { return false; }
+    return crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, rawSig, data);
+  } catch (e) {
+    console.error('[CALLBACK] verify error:', e.message);
+    return false;
+  }
 }
 
 function buildStockItems(basketOrder) {
@@ -92,6 +121,7 @@ export async function onRequest(context) {
 
     return jsonResponse(200, { ok: true });
   } catch (err) {
+    console.error('[CALLBACK] error:', err.name, err.message, err.code || '');
     if (err instanceof OrderNotFoundError) return errorResponse(404, 'Order not found');
     if (err instanceof AmountMismatchError) return errorResponse(400, 'Amount mismatch');
     if (err instanceof StockInsufficientError) return errorResponse(409, 'Insufficient stock');
