@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Menu, X, Search, User } from 'lucide-react';
+import { ShoppingBag, Menu, X, Search, User, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useCart } from '../store/CartContext';
 
@@ -12,15 +12,28 @@ const navLinks = [
   { nameKey: 'header.contact', href: '/contact' },
 ];
 
+const languages = [
+  { code: 'uk', label: 'UA' },
+  { code: 'en', label: 'EN' },
+  { code: 'pl', label: 'PL' },
+];
+
 export function Header() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLangOpen, setIsLangOpen] = useState(false);
   const { toggleCart, totalItems } = useCart();
   const navigate = useNavigate();
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const changeLanguage = (code: string) => {
+    i18n.changeLanguage(code);
+    localStorage.setItem('buksy_lang', code);
+    setIsLangOpen(false);
+  };
 
   useEffect(() => {
     if (isSearchOpen && searchInputRef.current) {
@@ -111,6 +124,41 @@ export function Header() {
 
             {/* Right Icons */}
             <div className="flex items-center gap-2">
+              {/* Language Switcher */}
+              <div className="relative hidden md:block">
+                <button
+                  onClick={() => setIsLangOpen(!isLangOpen)}
+                  className="p-2 text-white/70 hover:text-white transition-colors duration-300 flex items-center gap-1"
+                >
+                  <Globe size={18} />
+                  <span className="font-body text-xs tracking-wider">{languages.find((l) => l.code === i18n.language)?.label || 'UA'}</span>
+                </button>
+                <AnimatePresence>
+                  {isLangOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -5 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -5 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-full mt-2 bg-noir border border-white/10 shadow-xl z-50 min-w-[80px]"
+                    >
+                      {languages.map((lang) => (
+                        <button
+                          key={lang.code}
+                          onClick={() => changeLanguage(lang.code)}
+                          className={`w-full px-4 py-2 text-left font-body text-xs tracking-wider transition-colors duration-200 ${
+                            i18n.language === lang.code
+                              ? 'text-blood bg-white/5'
+                              : 'text-white/70 hover:text-white hover:bg-white/5'
+                          }`}
+                        >
+                          {lang.label}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
                 className="p-2 text-white/70 hover:text-white transition-colors duration-300 hidden md:block"
@@ -192,6 +240,21 @@ export function Header() {
                   <Link to="/contact" className="p-3 text-white/70">
                     <User size={24} />
                   </Link>
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => changeLanguage(lang.code)}
+                      className={`px-4 py-2 font-body text-sm tracking-wider border transition-colors duration-200 ${
+                        i18n.language === lang.code
+                          ? 'border-blood text-blood'
+                          : 'border-white/10 text-white/60 hover:text-white'
+                      }`}
+                    >
+                      {lang.label}
+                    </button>
+                  ))}
                 </div>
               </motion.div>
             </div>
