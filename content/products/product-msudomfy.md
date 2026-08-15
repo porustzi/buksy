@@ -1,6 +1,6 @@
 ---
 id: "1786798484638"
-name: "лонгслів BUKSY"
+name: "LONSGLEEVE BUKSY"
 slug: "product-msudomfy"
 price: 1349
 category: "t-shirts"
