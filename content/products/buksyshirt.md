@@ -17,9 +17,9 @@ sizes:
     name: "L"
 inStock: true
 stock: 10
-isNew: true
+isNew: false
 isFeatured: false
-isBestseller: true
+isBestseller: false
 rating: 5
 shortDescription: ""
 description: "футболка Buksy🩸\_ткань: 2х кулір 240г/2м принт: шокодрук вишивка"
