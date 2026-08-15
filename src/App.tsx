@@ -65,6 +65,33 @@ function AppRoutes() {
   );
 }
 
+function AppShell() {
+  const location = useLocation();
+  const isAdmin = location.pathname === '/admin';
+
+  if (isAdmin) {
+    return (
+      <ErrorBoundary>
+        <AppRoutes />
+      </ErrorBoundary>
+    );
+  }
+
+  return (
+    <div className="flex flex-col min-h-screen bg-noir">
+      <Header />
+      <main className="flex-1">
+        <ErrorBoundary>
+          <AppRoutes />
+        </ErrorBoundary>
+      </main>
+      <Footer />
+      <CartDrawer />
+      <ToastContainer />
+    </div>
+  );
+}
+
 function App() {
   const [showIntro, setShowIntro] = useState(() => !sessionStorage.getItem('buksy_intro_seen'));
 
@@ -80,17 +107,7 @@ function App() {
   return (
     <CartProvider>
       <EditProvider>
-        <div className="flex flex-col min-h-screen bg-noir">
-          <Header />
-          <main className="flex-1">
-            <ErrorBoundary>
-              <AppRoutes />
-            </ErrorBoundary>
-          </main>
-          <Footer />
-          <CartDrawer />
-          <ToastContainer />
-        </div>
+        <AppShell />
       </EditProvider>
     </CartProvider>
   );
