@@ -1,5 +1,5 @@
 import { rateLimit, parseBody, pemToArrayBuffer, base64ToUint8Array, jsonResponse, errorResponse } from '../lib/utils.js';
-import { markOrderPaidWithStock, getOrderByRef } from '../lib/supabase.js';
+import { markOrderPaidWithStock, getOrderByRef, updateOrderStatus } from '../lib/supabase.js';
 import { sendEmail, paymentConfirmedHtml } from '../lib/email.js';
 import { RATE_LIMIT, PAYMENT, PUBKEY_CACHE_TTL } from '../lib/constants.js';
 import { OrderNotFoundError, StockInsufficientError, AmountMismatchError } from '../lib/errors.js';
@@ -79,6 +79,17 @@ export async function onRequest(context) {
 
   const rawBody = await request.text();
   const xSign = request.headers.get('x-sign') || '';
+
+  // Diagnostic: record EVERY webhook hit on the order (before signature check)
+  let bodyDiag = null;
+  try { bodyDiag = JSON.parse(rawBody); } catch {}
+  if (bodyDiag && bodyDiag.reference) {
+    try {
+      const o = await getOrderByRef(env, bodyDiag.reference);
+      const ship = { ...(o.shipping || {}), _cb: { hit: new Date().toISOString(), status: bodyDiag.status || '?', invoiceId: bodyDiag.invoiceId || '', amount: bodyDiag.amount || bodyDiag.finalAmount || '' } };
+      await updateOrderStatus(env, bodyDiag.reference, { shipping: ship });
+    } catch (e) { console.error('[DIAG]', e.message); }
+  }
 
   const pubKeyCache = await getPubKey(env);
   if (!pubKeyCache || !pubKeyCache.key) return jsonResponse(500, { error: 'Signature verification unavailable' });
