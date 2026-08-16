@@ -244,5 +244,11 @@
   "en:Double belt shorts Buksy🩸\nМатеріал: Футер 3х нитка 320/м2\nпринт дтф\nвишивка": "Double belt shorts Buksy 🩸\nMaterial: Footer 3x thread 320/m2\ndtf print\nembroidery",
   "en:вишивка": "embroidery",
   "pl:Double belt shorts Buksy🩸\nМатеріал: Футер 3х нитка 320/м2\nпринт дтф\nвишивка": "Spodenki z podwójnym paskiem Buksy 🩸\nMateriał: Stopka 3x gwint 320/m2\nwydruk dtf\nhaft",
-  "pl:вишивка": "haft"
+  "pl:вишивка": "haft",
+  "en:Тестовий товар 5 грн": "Test product UAH 5",
+  "en:Тестовий товар за 5 грн для перевірки оплати": "Test product for UAH 5 to check payment",
+  "en:Тестовий товар для перевірки оплати Monobank": "Test product for Monobank payment verification",
+  "pl:Тестовий товар 5 грн": "Testuj produkt 5 UAH",
+  "pl:Тестовий товар за 5 грн для перевірки оплати": "Przetestuj produkt za 5 UAH, aby sprawdzić płatność",
+  "pl:Тестовий товар для перевірки оплати Monobank": "Produkt testowy do weryfikacji płatności Monobank"
 }
