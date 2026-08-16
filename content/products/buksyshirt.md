@@ -2,7 +2,7 @@
 id: "1"
 name: "Buksy T-Shirt"
 slug: "buksyshirt"
-price: 10
+price: 100
 originalPrice: 1299
 category: "t-shirts"
 image1: "/uploads/11231321.jpg"
