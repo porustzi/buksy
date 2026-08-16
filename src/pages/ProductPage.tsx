@@ -281,22 +281,28 @@ export function ProductPage() {
             <div className="space-y-3">
               <span className="font-heading text-sm tracking-wider text-white/60">{t('product.size')}</span>
               <div className="flex flex-wrap gap-3">
-                {product.sizes.map((size) => (
-                  <button
-                    key={size.name}
-                    onClick={() => size.available && setSelectedSize(size.name)}
-                    disabled={!size.available}
-                    className={`min-w-[48px] h-12 border font-mono text-sm transition-all duration-300 ${
-                      !size.available
-                        ? 'border-white/10 text-white/20 cursor-not-allowed'
-                        : selectedSize === size.name
-                          ? 'border-blood bg-blood/20 text-blood'
-                          : 'border-white/20 text-white hover:border-blood hover:text-blood'
-                    }`}
-                  >
-                    {size.name}
-                  </button>
-                ))}
+                {product.sizes.map((size) => {
+                  const outOfStock = !size.available || (size.stock !== undefined && size.stock <= 0);
+                  return (
+                    <button
+                      key={size.name}
+                      onClick={() => !outOfStock && setSelectedSize(size.name)}
+                      disabled={outOfStock}
+                      className={`relative min-w-[48px] h-12 border font-mono text-sm transition-all duration-300 ${
+                        outOfStock
+                          ? 'border-white/10 text-white/20 cursor-not-allowed line-through'
+                          : selectedSize === size.name
+                            ? 'border-blood bg-blood/20 text-blood'
+                            : 'border-white/20 text-white hover:border-blood hover:text-blood'
+                      }`}
+                    >
+                      {size.name}
+                      {size.stock !== undefined && size.stock <= 3 && !outOfStock && (
+                        <span className="absolute -top-2 -right-2 w-4 h-4 bg-blood text-white text-[9px] rounded-full flex items-center justify-center">{size.stock}</span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

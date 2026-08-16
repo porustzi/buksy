@@ -10,10 +10,13 @@ image3: "/uploads/1786799287680_vwfq.jpg"
 sizes:
   - name: "S"
     available: true
+    stock: 4
   - name: "M"
     available: true
+    stock: 4
   - name: "L"
     available: true
+    stock: 4
 inStock: true
 stock: 12
 isNew: true

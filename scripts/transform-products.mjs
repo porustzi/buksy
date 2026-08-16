@@ -21,6 +21,21 @@ function processEntry(rawData) {
   if (Array.isArray(p.details)) p.details = p.details.map(d => typeof d === 'object' ? (d.detail || '') : d);
   if (Array.isArray(p.care)) p.care = p.care.map(c => typeof c === 'object' ? (c.instruction || '') : c);
   p.reviewCount = (p.reviews || []).length;
+
+  // Per-size stock
+  if (Array.isArray(p.sizes) && p.sizes.length) {
+    let anySizeStock = false;
+    for (const s of p.sizes) {
+      if (s && s.stock !== undefined && s.stock !== null) anySizeStock = true;
+    }
+    if (anySizeStock) {
+      p.stock = p.sizes.reduce((sum, s) => sum + (Number(s && s.stock) || 0), 0);
+    } else {
+      const per = Math.max(1, Math.floor((Number(p.stock) || 0) / p.sizes.length));
+      for (const s of p.sizes) s.stock = per;
+      p.stock = per * p.sizes.length;
+    }
+  }
   if (p.stock === undefined || p.stock === null) p.stock = 99;
   return p;
 }
@@ -97,7 +112,11 @@ export const editorialImage = '${editorialImage}';
   const catalogPath = join(root, '_catalog.json');
   const catalog = {};
   for (const p of products) {
-    catalog[p.slug] = { name: p.name, price: Number(p.price), stock: Number(p.stock ?? 99) };
+    const sizeMap = {};
+    for (const s of (p.sizes || [])) {
+      if (s && s.name) sizeMap[s.name] = Number(s.stock ?? 0);
+    }
+    catalog[p.slug] = { name: p.name, price: Number(p.price), stock: Number(p.stock ?? 99), sizes: sizeMap };
   }
   writeFileSync(catalogPath, JSON.stringify(catalog), 'utf-8');
   console.log(`✅ Generated _catalog.json — ${Object.keys(catalog).length} products`);

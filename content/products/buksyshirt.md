@@ -11,10 +11,13 @@ image3: "/uploads/12313123133.jpg"
 sizes:
   - available: true
     name: "S"
+    stock: 4
   - available: true
     name: "M"
+    stock: 3
   - available: true
     name: "L"
+    stock: 3
 inStock: true
 stock: 10
 isNew: false

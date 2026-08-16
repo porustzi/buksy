@@ -10,10 +10,13 @@ image3: ""
 sizes:
   - name: "S"
     available: true
+    stock: 30
   - name: "M"
     available: true
+    stock: 30
   - name: "L"
     available: true
+    stock: 30
 inStock: true
 stock: 100
 isNew: false

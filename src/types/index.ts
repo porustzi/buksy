@@ -34,6 +34,7 @@ export type ProductCategory =
 export interface Size {
   name: string;
   available: boolean;
+  stock?: number;
 }
 
 export interface CartItem {

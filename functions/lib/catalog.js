@@ -35,13 +35,19 @@ export async function validateCatalogItems(env, items, shape) {
       throw { statusCode: 400, body: JSON.stringify({ error: 'Invalid qty for ' + slug }) };
     }
 
-    const catStock = Number(entry.stock) || 0;
-    if (catStock < qty) throw { statusCode: 400, body: JSON.stringify({ error: 'Insufficient stock for ' + entry.name + ': ' + catStock }) };
+    const sizeVal = item.size ? sanitize(String(item.size), FIELD_LIMITS.PRODUCT_SIZE) : '';
+
+    // Per-size stock (fallback to total)
+    const sizeStock = entry.sizes && entry.sizes[sizeVal] !== undefined
+      ? Number(entry.sizes[sizeVal])
+      : Number(entry.stock) || 0;
+    if (sizeStock < qty) {
+      throw { statusCode: 400, body: JSON.stringify({ error: 'Розмір ' + (sizeVal || '?') + ' — залишилось ' + sizeStock + ' шт' }) };
+    }
 
     const dbStock = await getStock(env, slug);
     if (dbStock !== null && dbStock < qty) throw { statusCode: 400, body: JSON.stringify({ error: 'Insufficient stock (DB): ' + dbStock }) };
 
-    const sizeVal = item.size ? sanitize(String(item.size), FIELD_LIMITS.PRODUCT_SIZE) : '';
     const price = Number(entry.price) || 0;
 
     if (shape === 'order') {

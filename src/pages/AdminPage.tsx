@@ -716,17 +716,23 @@ function ProductEditor({ path, onBack }: { path: string; onBack: () => void }) {
             ))}
           </div>
 
-          <h3 className="text-xs uppercase tracking-widest text-[#e53935] font-bold mb-4 mt-6">Розміри</h3>
-          {(data.sizes || []).map((s: { name: string; available: boolean }, i: number) => (
+          <h3 className="text-xs uppercase tracking-widest text-[#e53935] font-bold mb-4 mt-6">Розміри та сток</h3>
+          <div className="flex items-center gap-2 mb-2 text-[10px] uppercase tracking-wider text-white/30 px-1">
+            <span className="w-24">Розмір</span>
+            <span className="w-20">Сток (шт)</span>
+            <span>В наявності</span>
+          </div>
+          {(data.sizes || []).map((s: { name: string; available: boolean; stock?: number }, i: number) => (
             <div key={i} className="flex items-center gap-2 mb-2">
               <input className={inputCls + ' !w-24'} value={s.name || ''} onChange={(e) => { const sizes = [...data.sizes]; sizes[i] = { ...sizes[i], name: e.target.value }; set('sizes', sizes); }} placeholder="S/M/L" />
+              <input type="number" className={inputCls + ' !w-20'} value={s.stock ?? ''} onChange={(e) => { const sizes = [...data.sizes]; sizes[i] = { ...sizes[i], stock: parseInt(e.target.value) || 0 }; set('sizes', sizes); }} placeholder="0" />
               <label className="flex items-center gap-1 text-xs text-white/60 cursor-pointer">
                 <input type="checkbox" checked={s.available !== false} onChange={(e) => { const sizes = [...data.sizes]; sizes[i] = { ...sizes[i], available: e.target.checked }; set('sizes', sizes); }} /> є
               </label>
               <button onClick={() => set('sizes', data.sizes.filter((_: unknown, j: number) => j !== i))} className="text-white/30 hover:text-[#e53935]">✕</button>
             </div>
           ))}
-          <button onClick={() => set('sizes', [...(data.sizes || []), { name: '', available: true }])} className={btnGhost + ' w-full'}>+ Розмір</button>
+          <button onClick={() => set('sizes', [...(data.sizes || []), { name: '', available: true, stock: 0 }])} className={btnGhost + ' w-full'}>+ Розмір</button>
         </div>
       </div>
 
