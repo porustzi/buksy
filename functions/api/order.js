@@ -52,12 +52,6 @@ export async function onRequest(context) {
       return errorResponse(500, 'Не вдалося створити замовлення');
     }
 
-    const tgToken = env.TELEGRAM_BOT_TOKEN, tgChat = env.TELEGRAM_CHAT_ID;
-    if (tgToken && tgChat) {
-      const lines = safeItems.map(i => i.quantity + '× ' + esc(i.product.name) + ' (' + esc(i.size) + ') — ' + (i.pricePerUnit * i.quantity).toFixed(0) + ' ₴').join('\n');
-      const tgMsg = `🛒 <b>НОВЕ ЗАМОВЛЕННЯ</b>\n<code>#${orderId}</code>\n\n👤 <b>${esc(shipping.firstName)} ${esc(shipping.lastName)}</b>\n📧 ${esc(safeEmail)}\n${shipping.phone ? '📱 ' + esc(shipping.phone) + '\n' : ''}\n📍 ${esc(shipping.address)}${shipping.apartment ? ', ' + esc(shipping.apartment) : ''}\n   ${esc(shipping.city)}, ${esc(shipping.country)}\n${shipping.novaPoshtaBranch ? '📦 НП №' + esc(shipping.novaPoshtaBranch) + '\n' : ''}\n🛍 <b>Товари:</b>\n${lines}\n\n━━━━━━━━━━━━━━━━\n💰 <b>${total.toFixed(0)} ₴</b>`;
-      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(e => console.error('[TG]', e.message));
-    }
     let emailOk = false;
     if (safeEmail) {
       emailOk = await sendEmail(env, { to: safeEmail, subject: 'Замовлення #' + orderId + ' підтверджено — BUKSY', html: orderConfirmationHtml({ orderId, items: safeItems, total, shippingInfo: shipping }) }).catch(e => { console.error('[EMAIL] send failed:', e.message); return false; });

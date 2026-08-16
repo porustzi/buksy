@@ -79,12 +79,6 @@ export async function onRequest(context) {
     }
     const monoData = await monoRes.json();
 
-    const tgToken = env.TELEGRAM_BOT_TOKEN, tgChat = env.TELEGRAM_CHAT_ID;
-    if (tgToken && tgChat) {
-      const lines = validatedItems.map(i => i.qty + '× ' + i.name + (i.size ? ' (' + i.size + ')' : '') + ' — ' + (i.price * i.qty) + ' ₴').join('\n');
-      const tgMsg = `🛒 <b>НОВЕ ЗАМОВЛЕННЯ</b>\n<code>#${orderId}</code>\n\n👤 <b>${esc(shipping.firstName || '-')} ${esc(shipping.lastName || '')}</b>\n📧 ${esc(safeEmail || '-')}\n${shipping.phone ? '📱 ' + esc(shipping.phone) + '\n' : ''}\n📍 ${esc(shipping.city || '-')}, ${esc(shipping.country || '-')}\n🚚 ${esc(shipping.address || '-')}${shipping.apartment ? ', ' + esc(shipping.apartment) : ''}\n${shipping.novaPoshtaBranch ? '📦 НП №' + esc(shipping.novaPoshtaBranch) + '\n' : ''}\n<b>Товари:</b>\n${lines}\n\n━━━━━━━━━━━━\n💰 <b>${serverTotal} ₴</b>  |  💳 Monobank\n⏳ Очікує оплати`;
-      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(() => {});
-    }
     let emailOk = false;
     if (safeEmail) {
       emailOk = await sendEmail(env, { to: safeEmail, subject: 'Замовлення #' + orderId + ' отримано — BUKSY', html: orderConfirmationHtml({ orderId, items: validatedItems.map(i => ({ product: { name: i.name, price: i.price }, size: i.size, quantity: i.qty })), total: serverTotal, shippingInfo: shipping }) }).catch(() => false);
