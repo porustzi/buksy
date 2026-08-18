@@ -129,3 +129,35 @@ export async function getStock(env, slug) {
   if (error) classifyRpcError(error);
   return data;
 }
+
+// ============================================================================
+// Visitor Operations (online counter)
+// ============================================================================
+const VISITOR_ID_RE = /^[A-Za-z0-9_-]{8,64}$/;
+
+export async function touchVisitor(env, id) {
+  if (!VISITOR_ID_RE.test(id || '')) throw new ValidationError('Invalid visitor id', 'id');
+  const supabase = getClient(env);
+  const { error } = await withTimeout(supabase.from('visitors').upsert(
+    { id, last_seen: new Date().toISOString() },
+    { onConflict: 'id' }
+  ));
+  if (error) classifyRpcError(error);
+  return true;
+}
+
+export async function countOnlineVisitors(env, minutes = 2) {
+  const supabase = getClient(env);
+  const cutoff = new Date(Date.now() - minutes * 60 * 1000).toISOString();
+  const { count, error } = await withTimeout(supabase.from('visitors').select('id', { count: 'exact', head: true }).gte('last_seen', cutoff));
+  if (error) classifyRpcError(error);
+  return count || 0;
+}
+
+export async function purgeVisitors(env, minutes = 10) {
+  const supabase = getClient(env);
+  const cutoff = new Date(Date.now() - minutes * 60 * 1000).toISOString();
+  const { error } = await withTimeout(supabase.from('visitors').delete().lt('last_seen', cutoff));
+  if (error) classifyRpcError(error);
+  return true;
+}

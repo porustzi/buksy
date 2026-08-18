@@ -61,6 +61,14 @@ CREATE TABLE IF NOT EXISTS inventory (
 
 DROP INDEX IF EXISTS idx_inventory_slug;
 
+-- Online visitors counter (heartbeat table; rows expire via periodic purge)
+CREATE TABLE IF NOT EXISTS visitors (
+  id TEXT PRIMARY KEY,
+  last_seen TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_visitors_last_seen ON visitors(last_seen);
+
 -- ============================================================================
 -- RPC FUNCTIONS
 -- ============================================================================
@@ -196,6 +204,7 @@ $$ LANGUAGE plpgsql STABLE SECURITY DEFINER;
 -- ============================================================================
 ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE inventory ENABLE ROW LEVEL SECURITY;
+ALTER TABLE visitors ENABLE ROW LEVEL SECURITY;
 
 -- DO NOT CREATE POLICIES — service_role bypasses RLS.
 -- Anon/authenticated keys get empty result sets (intentional).

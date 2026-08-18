@@ -1,7 +1,7 @@
 import { guard, esc, sanitizeShippingInfo, validateItems, validateEmail, validateIdempotencyKey, parseBody, generateOrderId, okResponse, errorResponse } from '../lib/utils.js';
 import { saveOrder } from '../lib/supabase.js';
 import { validateCatalogItems } from '../lib/catalog.js';
-import { sendEmail, orderConfirmationHtml } from '../lib/email.js';
+import { getSettings } from '../lib/settings.js';
 import { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS, PAYMENT, ORDER_STATUS, PAYMENT_METHOD } from '../lib/constants.js';
 import { DuplicateOrderError, ValidationError } from '../lib/errors.js';
 
@@ -35,7 +35,10 @@ export async function onRequest(context) {
 
     const safeItems = await validateCatalogItems(env, items, 'order');
     const orderId = generateOrderId();
-    const total = safeItems.reduce((s, i) => s + i.pricePerUnit * i.quantity, 0);
+    const subtotal = safeItems.reduce((s, i) => s + i.pricePerUnit * i.quantity, 0);
+    const settings = await getSettings(env);
+    const deliveryCost = Number(settings.deliveryCost) || 0;
+    const total = subtotal + deliveryCost;
 
     try {
       await saveOrder(env, {
@@ -44,7 +47,7 @@ export async function onRequest(context) {
         customer: { firstName: shipping.firstName, lastName: shipping.lastName, email: safeEmail, phone: shipping.phone },
         shipping: { address: shipping.address, apartment: shipping.apartment, city: shipping.city, country: shipping.country, postalCode: shipping.postalCode, novaPoshtaBranch: shipping.novaPoshtaBranch },
         items: safeItems.map(i => ({ slug: i.product.slug, name: i.product.name, size: i.size, price: i.pricePerUnit, qty: i.quantity })),
-        subtotal: total, shipping_cost: 0, tax: 0, total, created_at: new Date().toISOString(),
+        subtotal, shipping_cost: deliveryCost, tax: 0, total, created_at: new Date().toISOString(),
       });
     } catch (err) {
       if (err instanceof DuplicateOrderError) return errorResponse(409, 'Order already processed');
@@ -52,12 +55,7 @@ export async function onRequest(context) {
       return errorResponse(500, 'Не вдалося створити замовлення');
     }
 
-    let emailOk = false;
-    if (safeEmail) {
-      emailOk = await sendEmail(env, { to: safeEmail, subject: 'Замовлення #' + orderId + ' підтверджено — BUKSY', html: orderConfirmationHtml({ orderId, items: safeItems, total, shippingInfo: shipping }) }).catch(e => { console.error('[EMAIL] send failed:', e.message); return false; });
-    }
-
-    return okResponse({ success: true, orderId, total, message: 'Order placed!', emailSent: emailOk });
+    return okResponse({ success: true, orderId, total, message: 'Order placed!' });
   } catch (e) {
     if (e instanceof ValidationError) return errorResponse(400, e.message);
     if (e.statusCode) return new Response(e.body, { status: e.statusCode, headers: { 'Content-Type': 'application/json' } });

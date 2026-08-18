@@ -51,6 +51,7 @@ const SECTIONS = [
   { id: 'homepage', label: 'Головна', icon: '🏠', url: '/', file: 'content/pages/homepage/homepage.json' },
   { id: 'about', label: 'Про нас', icon: 'ℹ️', url: '/about', file: 'content/pages/about/about.json' },
   { id: 'contact', label: 'Контакти', icon: '✉️', url: '/contact', file: 'content/pages/contact/contact.json' },
+  { id: 'settings', label: 'Налаштування', icon: '⚙️', url: '' },
 ];
 
 const CATEGORIES = [
@@ -128,6 +129,7 @@ const fmtUah = (n: number) => '₴' + Math.round(n || 0).toLocaleString('uk-UA')
 
 function StatsView() {
   const [data, setData] = useState<StatsData | null>(null);
+  const [online, setOnline] = useState<number | null>(null);
   const [error, setError] = useState('');
 
   const load = () => {
@@ -142,6 +144,10 @@ function StatsView() {
         else setData(d);
       })
       .catch((e) => setError(e.message));
+    fetch('/api/online', { headers: { 'Authorization': 'Bearer ' + (getToken() || '') } })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setOnline(d && typeof d.onlineVisitors === 'number' ? d.onlineVisitors : null))
+      .catch(() => {});
   };
 
   useEffect(() => { load(); }, []);
@@ -202,6 +208,11 @@ function StatsView() {
             </div>
           </div>
 
+          <div className="bg-[#141414] border border-white/10 p-5 mb-6">
+            <div className="text-[11px] uppercase tracking-wider text-white/40 mb-2">Зараз на сайті</div>
+            <div className="text-2xl font-bold text-[#4caf50]">{online === null ? '—' : online} <span className="text-sm font-normal text-white/40">за останні 2 хв</span></div>
+          </div>
+
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Countries */}
             <div className="bg-[#141414] border border-white/10 p-5">
@@ -239,6 +250,61 @@ function StatsView() {
           </div>
         </>
       )}
+    </div>
+  );
+}
+
+// ============================================================
+// Settings
+// ============================================================
+function SettingsView() {
+  const [deliveryCost, setDeliveryCost] = useState<string>('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    api('read', { path: 'content/settings.json' }).then((d) => {
+      if (!d) return;
+      let data: Record<string, any> = {};
+      try { data = JSON.parse(utf8decode(d.content)); } catch { data = {}; }
+      setDeliveryCost(String(data.deliveryCost ?? ''));
+    }).catch((e) => setError(e.message));
+  }, []);
+
+  const save = async () => {
+    setBusy(true);
+    setError('');
+    setSaved(false);
+    try {
+      const d = await api('read', { path: 'content/settings.json' });
+      let data: Record<string, any> = {};
+      try { data = JSON.parse(utf8decode(d.content)); } catch { data = {}; }
+      data.deliveryCost = Math.max(0, parseInt(deliveryCost) || 0);
+      await api('write', { path: 'content/settings.json', content: JSON.stringify(data, null, 2), sha: d.sha, message: 'Update delivery cost' });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="flex-1 overflow-y-auto p-6">
+      <h2 className="text-lg font-semibold mb-6">Налаштування</h2>
+      {error && <div className="text-[#ff6b6b] text-sm mb-4">{error}</div>}
+      <div className="max-w-md">
+        <div className="bg-[#141414] border border-white/10 p-5 space-y-4">
+          <div>
+            <label className={labelCls}>Вартість доставки, ₴</label>
+            <input type="number" className={inputCls} value={deliveryCost} onChange={(e) => setDeliveryCost(e.target.value)} placeholder="0 = безкоштовно" />
+            <div className="text-[11px] text-white/30 mt-1">Додається до суми замовлення, потрапляє в платіж та чек.</div>
+          </div>
+          <button onClick={save} disabled={busy} className={btnPrimary}>{busy ? 'Збереження…' : saved ? 'Збережено ✓' : 'Зберегти'}</button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -289,6 +355,8 @@ export function AdminPage() {
           <StatsView />
         ) : section === 'products' ? (
           <ProductsView />
+        ) : section === 'settings' ? (
+          <SettingsView />
         ) : (
           <PreviewView url={SECTIONS.find((s) => s.id === section)!.url} sectionFile={SECTIONS.find((s) => s.id === section)!.file || ''} />
         )}

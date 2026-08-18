@@ -52,8 +52,13 @@ export function CheckoutPage() {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState('');
+  const [deliveryCost, setDeliveryCost] = useState<number | null>(null);
 
-  const total = totalPrice;
+  useEffect(() => {
+    fetch('/api/status').then((r) => r.json()).then((d) => setDeliveryCost(typeof d.deliveryCost === 'number' ? d.deliveryCost : 0)).catch(() => setDeliveryCost(0));
+  }, []);
+
+  const total = totalPrice + (deliveryCost || 0);
 
   const validateInformation = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -458,6 +463,10 @@ export function CheckoutPage() {
                 ))}
               </div>
               <div className="space-y-3 pt-4 mt-4 border-t border-white/5">
+                <div className="flex justify-between text-sm">
+                  <span className="font-heading tracking-wider text-white/50">Доставка</span>
+                  <span className="font-mono">{deliveryCost === null ? '…' : deliveryCost > 0 ? formatPrice(deliveryCost) : t('common.free')}</span>
+                </div>
                 <div className="flex justify-between text-lg">
                   <span className="font-heading tracking-wider">{t('checkout.total')}</span>
                   <span className="font-mono text-xl">{formatPrice(total)}</span>

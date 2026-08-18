@@ -1,7 +1,7 @@
 import { guard, sanitizeShippingInfo, validateItems, validateEmail, validateIdempotencyKey, parseBody, generateOrderId, okResponse, errorResponse, jsonResponse } from '../lib/utils.js';
 import { saveOrder, getOrderByIdempotencyKey } from '../lib/supabase.js';
 import { validateCatalogItems } from '../lib/catalog.js';
-import { sendEmail, orderConfirmationHtml } from '../lib/email.js';
+import { getSettings } from '../lib/settings.js';
 import { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS, PAYMENT, ORDER_STATUS, PAYMENT_METHOD } from '../lib/constants.js';
 import { DuplicateOrderError, ValidationError } from '../lib/errors.js';
 import { esc } from '../lib/utils.js';
@@ -32,13 +32,17 @@ export async function onRequest(context) {
     const validatedItems = await validateCatalogItems(env, items, 'monobank');
     const serverTotal = validatedItems.reduce((s, i) => s + i.price * i.qty, 0);
 
+    const settings = await getSettings(env);
+    const deliveryCost = Number(settings.deliveryCost) || 0;
+    const total = serverTotal + deliveryCost;
+
     const orderRecord = {
       order_id: orderId, idempotency_key: idempotencyKey || null,
       status: ORDER_STATUS.AWAITING_PAYMENT, payment_method: PAYMENT_METHOD.MONOBANK,
       customer: { email: safeEmail, firstName: shipping.firstName, lastName: shipping.lastName, phone: shipping.phone },
       shipping: { address: shipping.address, apartment: shipping.apartment, city: shipping.city, country: shipping.country, postalCode: shipping.postalCode, novaPoshtaBranch: shipping.novaPoshtaBranch },
       items: validatedItems.map(i => ({ slug: i.slug, name: i.name, size: i.size, price: i.price, qty: i.qty })),
-      shipping_cost: 0, tax: 0, subtotal: serverTotal, total: serverTotal, created_at: new Date().toISOString(),
+      shipping_cost: deliveryCost, tax: 0, subtotal: serverTotal, total: total, created_at: new Date().toISOString(),
     };
 
     try {
@@ -65,7 +69,7 @@ export async function onRequest(context) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Token': TOKEN },
       body: JSON.stringify({
-        amount: Math.round(serverTotal * 100), ccy: PAYMENT.CCY,
+        amount: Math.round(total * 100), ccy: PAYMENT.CCY,
         merchantPaymInfo: { reference: orderId, destination: 'Замовлення #' + orderId + ' — BUKSY', basketOrder: validatedItems.map(i => ({ name: i.name + (i.size ? ' (' + i.size + ')' : ''), qty: i.qty, sum: Math.round(i.price * i.qty * 100), icon: '', unit: 'шт.', code: i.slug })) },
         redirectUrl: SITE_URL + '/checkout?orderId=' + orderId,
         webHookUrl: SITE_URL + '/api/monobank-callback',
@@ -80,9 +84,6 @@ export async function onRequest(context) {
     const monoData = await monoRes.json();
 
     let emailOk = false;
-    if (safeEmail) {
-      emailOk = await sendEmail(env, { to: safeEmail, subject: 'Замовлення #' + orderId + ' отримано — BUKSY', html: orderConfirmationHtml({ orderId, items: validatedItems.map(i => ({ product: { name: i.name, price: i.price }, size: i.size, quantity: i.qty })), total: serverTotal, shippingInfo: shipping }) }).catch(() => false);
-    }
 
     return okResponse({ redirectUrl: monoData.pageUrl, orderId, emailSent: emailOk });
   } catch (e) {

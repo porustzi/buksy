@@ -70,6 +70,25 @@ function AppShell({ siteClosed }: { siteClosed: boolean }) {
   const location = useLocation();
   const isAdmin = location.pathname === '/admin';
 
+  useEffect(() => {
+    if (isAdmin) return;
+    let vid = localStorage.getItem('buksy_visitor_id');
+    if (!vid) {
+      vid = 'v' + Math.random().toString(36).slice(2, 12) + Date.now().toString(36).slice(-6);
+      localStorage.setItem('buksy_visitor_id', vid);
+    }
+    const beat = () => {
+      fetch('/api/heartbeat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: vid }),
+      }).catch(() => {});
+    };
+    beat();
+    const t = setInterval(beat, 60000);
+    return () => clearInterval(t);
+  }, [isAdmin]);
+
   if (isAdmin) {
     return (
       <ErrorBoundary>

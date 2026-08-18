@@ -128,11 +128,11 @@ export async function onRequest(context) {
         ? '📦 Нова Пошта: №' + esc(ship.novaPoshtaBranch || '—') + (ship.city ? ' (' + esc(ship.city) + ')' : '')
         : '🏠 Адреса: ' + esc(ship.address || '—') + (ship.apartment ? ', кв. ' + esc(ship.apartment) : '') + ', ' + esc(ship.city || '') + ', ' + esc(ship.country || '');
 
-      const tgMsg = `✅ <b>ОПЛАЧЕНО</b>\n<code>#${esc(body.reference)}</code>\n\n💰 <b>${amountPaid.toFixed(2)} UAH</b> (сума замовлення ${orderTotal.toFixed(2)})\n\n👤 <b>${esc(cust.firstName || '')} ${esc(cust.lastName || '')}</b>\n📞 ${esc(cust.phone || '—')}\n📧 ${esc(cust.email || '—')}\n\n🚚 ${delivery}\n\n🛍 <b>Товари:</b>\n${itemsLines}\n\n━━━━━━━━━━━━━━━━\n✅ Відправляй замовлення`;
+      const tgMsg = `✅ <b>ОПЛАЧЕНО</b>\n<code>#${esc(body.reference)}</code>\n\n💰 <b>${amountPaid.toFixed(2)} UAH</b> (сума замовлення ${orderTotal.toFixed(2)})\n\n👤 <b>${esc(cust.firstName || '')} ${esc(cust.lastName || '')}</b>\n📞 ${esc(cust.phone || '—')}\n📧 ${esc(cust.email || '—')}\n\n🚚 ${delivery}\n💸 Доставка: ${(Number(order.shipping_cost) || 0).toFixed(0)} ₴\n\n🛍 <b>Товари:</b>\n${itemsLines}\n\n━━━━━━━━━━━━━━━━\n✅ Відправляй замовлення`;
       fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(e => console.error('[TG-CALLBACK]', e.message));
     }
     if (order.customer?.email) {
-      sendEmail(env, { to: order.customer.email, subject: 'Оплату підтверджено — Замовлення #' + body.reference, html: paymentConfirmedHtml({ orderId: body.reference, amount: amountPaid, currency: 'UAH', paymentId: body.invoiceId, items: (body.basketOrder || []).map(b => ({ qty: b.qty, name: b.name, size: '' })) }) }).catch(() => {});
+      sendEmail(env, { to: order.customer.email, subject: 'Оплату підтверджено — Замовлення #' + body.reference, html: paymentConfirmedHtml({ orderId: body.reference, amount: amountPaid, currency: 'UAH', paymentId: body.invoiceId, shippingCost: Number(order.shipping_cost) || 0, subtotal: Number(order.subtotal) || 0, items: (body.basketOrder || []).map(b => ({ qty: b.qty, name: b.name, size: '' })) }) }).catch(() => {});
     }
 
     return jsonResponse(200, { ok: true });
