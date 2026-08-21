@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, Phone, Send, Instagram, Music2 } from 'lucide-react';
+import { Mail, MapPin, Phone, Send, Instagram, Music2, MessageSquare } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
 import { useSeo } from '../hooks/useSeo';
 import { apiHeaders } from '../data/settings';
@@ -73,7 +73,7 @@ export function ContactPage() {
             <div className="flex items-start gap-4"><div className="w-12 h-12 border border-blood/30 flex items-center justify-center flex-shrink-0"><Phone className="w-5 h-5 text-blood" /></div><div><h3 className="font-heading text-sm tracking-wider mb-1">{info.phoneLabel}</h3><p className="text-white/70 font-body">{info.phone}</p></div></div>
             <div className="flex items-start gap-4"><div className="w-12 h-12 border border-blood/30 flex items-center justify-center flex-shrink-0"><MapPin className="w-5 h-5 text-blood" /></div><div><h3 className="font-heading text-sm tracking-wider mb-1">{info.studioLabel}</h3><p className="text-white/70 font-body whitespace-pre-line">{info.studio}</p></div></div>
           </div>
-          <div className="mt-12"><h3 className="font-heading text-sm tracking-wider mb-4 text-white/40">{soc.title}</h3><div className="flex gap-4"><a href={soc.instagram} target="_blank" rel="noopener noreferrer" className="w-12 h-12 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Instagram size={20} /></a><a href={soc.tiktok} target="_blank" rel="noopener noreferrer" className="w-12 h-12 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Music2 size={20} /></a><a href={soc.telegram} target="_blank" rel="noopener noreferrer" className="w-12 h-12 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Send size={20} /></a></div></div>
+          <div className="mt-12"><h3 className="font-heading text-sm tracking-wider mb-4 text-white/40">{soc.title}</h3><div className="flex gap-4"><a href={soc.instagram} target="_blank" rel="noopener noreferrer" className="w-12 h-12 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Instagram size={20} /></a><a href={soc.tiktok} target="_blank" rel="noopener noreferrer" className="w-12 h-12 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Music2 size={20} /></a><a href={soc.telegram} target="_blank" rel="noopener noreferrer" className="w-12 h-12 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Send size={20} /></a></div><div className="mt-4"><a href={`https://t.me/${(soc.telegramHandle || '@buk_shop1').replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-white/60 hover:text-blood transition-colors duration-300 font-body text-sm"><MessageSquare size={16} />{soc.telegramHandle || '@buk_shop1'}</a></div></div>
         </motion.div>
       </div></div></section>
 

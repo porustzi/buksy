@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Instagram, Music2, Send } from 'lucide-react';
+import { Instagram, Music2, Send, MessageSquare } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
 import { Editable } from './edit/Editable';
 
@@ -33,6 +33,9 @@ export function Footer() {
               <a href={f.social?.instagram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Instagram size={18} /></a>
               <a href={f.social?.tiktok} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Music2 size={18} /></a>
               <a href={f.social?.telegram} target="_blank" rel="noopener noreferrer" className="w-10 h-10 border border-white/10 flex items-center justify-center text-white/60 hover:border-blood hover:text-blood transition-all duration-300"><Send size={18} /></a>
+            </div>
+            <div className="mt-3">
+              <a href={`https://t.me/${(f.social?.telegramHandle || '@buk_shop1').replace('@', '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-white/50 hover:text-blood transition-colors duration-300 font-body text-xs"><MessageSquare size={12} />{f.social?.telegramHandle || '@buk_shop1'}</a>
             </div>
           </div>
           <div><h4 className="font-heading text-sm tracking-[0.3em] mb-6 text-white/40">{f.navigation?.title}</h4><ul className="space-y-3">{(f.navigation?.links || []).map((l: { name: string; href: string }) => (<li key={l.href}><Link to={l.href} className="text-white/70 hover:text-blood transition-colors duration-300 font-body">{l.name}</Link></li>))}</ul></div>

@@ -43,6 +43,7 @@ export async function onRequest(context) {
       shipping: { address: shipping.address, apartment: shipping.apartment, city: shipping.city, country: shipping.country, postalCode: shipping.postalCode, novaPoshtaBranch: shipping.novaPoshtaBranch },
       items: validatedItems.map(i => ({ slug: i.slug, name: i.name, size: i.size, price: i.price, qty: i.qty })),
       shipping_cost: deliveryCost, tax: 0, subtotal: serverTotal, total: total, created_at: new Date().toISOString(),
+      payment_on_delivery: true,
     };
 
     try {
@@ -69,7 +70,7 @@ export async function onRequest(context) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Token': TOKEN },
       body: JSON.stringify({
-        amount: Math.round(total * 100), ccy: PAYMENT.CCY,
+        amount: Math.round(serverTotal * 100), ccy: PAYMENT.CCY,
         merchantPaymInfo: { reference: orderId, destination: 'Замовлення #' + orderId + ' — BUKSY', basketOrder: validatedItems.map(i => ({ name: i.name + (i.size ? ' (' + i.size + ')' : ''), qty: i.qty, sum: Math.round(i.price * i.qty * 100), icon: '', unit: 'шт.', code: i.slug })) },
         redirectUrl: SITE_URL + '/checkout?orderId=' + orderId,
         webHookUrl: SITE_URL + '/api/monobank-callback',

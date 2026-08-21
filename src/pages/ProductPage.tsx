@@ -9,7 +9,6 @@ import {
   Truck,
   RotateCcw,
   Check,
-  Star,
   Minus,
   Plus,
 } from 'lucide-react';
@@ -62,11 +61,7 @@ export function ProductPage() {
         availability: isOutOfStock ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
         url: window.location.href,
       },
-      aggregateRating: product.rating > 0 ? {
-        '@type': 'AggregateRating',
-        ratingValue: product.rating,
-        reviewCount: product.reviewCount || 1,
-      } : undefined,
+      aggregateRating: undefined,
     };
   }, [product, isOutOfStock]);
 
@@ -110,8 +105,6 @@ export function ProductPage() {
     products.filter((p) => p.category === product?.category && p.id !== product?.id).slice(0, 4),
     [product?.category, product?.id, products]
   );
-
-  const productReviews = product.reviews || [];
 
   const handleAddToCart = () => {
     if (isOutOfStock) return;
@@ -251,22 +244,6 @@ export function ProductPage() {
                   </span>
                 )}
               </div>
-            </div>
-
-            {/* Rating */}
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    size={16}
-                    className={i < Math.floor(product.rating) ? 'fill-blood text-blood' : 'text-white/20'}
-                  />
-                ))}
-              </div>
-              <span className="text-white/60 font-body text-sm">
-                {product.rating} ({product.reviewCount} reviews)
-              </span>
             </div>
 
             {/* Stock Status */}
@@ -433,60 +410,6 @@ export function ProductPage() {
             </div>
           </motion.div>
         </div>
-
-        {/* Reviews */}
-        <section className="mt-24">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="font-heading text-2xl tracking-wider">
-              {t('product.reviews')} <span className="text-blood">.</span>
-            </h2>
-            <button
-              onClick={() => {
-                const reviewSection = document.getElementById('reviews');
-                reviewSection?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="btn-secondary text-sm px-4 py-2"
-            >
-              {t('product.writeReview')}
-            </button>
-          </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {productReviews.map((review) => (
-              <motion.div
-                key={review.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="p-6 border border-white/5 bg-ash"
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-heading text-sm tracking-wider">{review.author}</span>
-                      {review.verified && (
-                        <span className="text-xs text-blood font-body">{t('product.verified')}</span>
-                      )}
-                    </div>
-                    <div className="flex gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          size={12}
-                          className={i < review.rating ? 'fill-blood text-blood' : 'text-white/20'}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <span className="text-xs text-white/40 font-body">{review.date}</span>
-                </div>
-                <h3 className="font-heading text-sm tracking-wider mb-2">{review.title}</h3>
-                <p className="text-white/70 font-body text-sm leading-relaxed">
-                  {review.content}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </section>
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
