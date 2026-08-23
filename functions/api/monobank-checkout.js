@@ -52,7 +52,7 @@ export async function onRequest(context) {
       if (err instanceof DuplicateOrderError) {
         const existing = await getOrderByIdempotencyKey(env, idempotencyKey);
         if (existing) {
-          const SITE_URL = env.URL || env.SITE_URL || '';
+          const SITE_URL = env.SITE_URL || env.URL || '';
           return existing.status === ORDER_STATUS.AWAITING_PAYMENT
             ? okResponse({ redirectUrl: SITE_URL + '/checkout?orderId=' + existing.order_id, orderId: existing.order_id })
             : errorResponse(409, 'Order already processed');
@@ -62,7 +62,7 @@ export async function onRequest(context) {
     }
 
     const TOKEN = env.MONOBANK_TOKEN;
-    const SITE_URL = env.URL || env.SITE_URL || '';
+    const SITE_URL = env.SITE_URL || env.URL || '';
     if (!TOKEN) return errorResponse(500, 'Monobank token not configured');
     if (!SITE_URL) return errorResponse(500, 'SITE_URL not configured');
 

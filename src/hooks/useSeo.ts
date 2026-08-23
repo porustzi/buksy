@@ -67,6 +67,21 @@ export function useSeo({ title, description, image, url }: SeoMeta = {}) {
     setMeta('name', 'twitter:description', desc);
     setMeta('name', 'twitter:image', ogImage);
 
+    // Hreflang
+    const setHreflang = (lang: string, href: string) => {
+      let el = document.querySelector(`link[rel="alternate"][hreflang="${lang}"]`) as HTMLLinkElement | null;
+      if (!el) {
+        el = document.createElement('link');
+        el.setAttribute('rel', 'alternate');
+        el.setAttribute('hreflang', lang);
+        document.head.appendChild(el);
+      }
+      el.setAttribute('href', href);
+      prevRef.current[`hreflang:${lang}`] = el;
+    };
+    setHreflang('uk', canonicalUrl);
+    setHreflang('x-default', canonicalUrl);
+
     return () => {
       document.title = DEFAULT_TITLE;
       Object.values(prevRef.current).forEach((el) => {

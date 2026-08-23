@@ -90,6 +90,17 @@ export function ShopPage() {
 
   return (
     <div className="min-h-screen bg-noir pt-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://buksy.shop/" },
+            { "@type": "ListItem", "position": 2, "name": "Shop", "item": "https://buksy.shop/shop" }
+          ]
+        }) }}
+      />
       {/* Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <motion.div

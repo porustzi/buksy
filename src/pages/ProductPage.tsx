@@ -49,7 +49,7 @@ export function ProductPage() {
     return {
       '@context': 'https://schema.org',
       '@type': 'Product',
-      name: product.name,
+      name: 'BUKSY ' + product.name,
       description: product.shortDescription,
       image: product.images?.[0],
       sku: product.id,
@@ -219,7 +219,7 @@ export function ProductPage() {
                       : 'ring-1 ring-white/10 hover:ring-white/30'
                   }`}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <img src={img} alt={`${product.name} thumbnail ${selectedImage + 1}`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>

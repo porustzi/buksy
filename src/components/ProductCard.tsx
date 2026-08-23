@@ -42,6 +42,28 @@ export const ProductCard = memo(function ProductCard({ product, index = 0 }: Pro
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": "BUKSY " + product.name,
+          "image": product.images.slice(0, 3),
+          "description": product.description || "BUKSY " + product.name + " — dark luxury streetwear",
+          "brand": { "@type": "Brand", "name": "BUKSY" },
+          "url": "https://buksy.shop/product/" + product.slug,
+          "offers": {
+            "@type": "Offer",
+            "price": product.price,
+            "priceCurrency": "UAH",
+            "availability": product.stock !== undefined && product.stock <= 0
+              ? "https://schema.org/OutOfStock"
+              : "https://schema.org/InStock",
+            "url": "https://buksy.shop/product/" + product.slug
+          },
+          ...(product.rating > 0 ? { "aggregateRating": { "@type": "AggregateRating", "ratingValue": product.rating, "reviewCount": product.reviewCount || 1 } } : {})
+        }) }}
+      />
       <Link to={`/product/${product.slug}`} className="group block">
         {/* Image Container */}
         <div className="relative aspect-[3/4] overflow-hidden bg-ash mb-4">

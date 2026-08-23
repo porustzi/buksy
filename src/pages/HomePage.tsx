@@ -21,6 +21,21 @@ export function HomePage() {
 
   return (
     <div className="overflow-hidden">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          "name": "BUKSY Bestsellers",
+          "url": "https://buksy.shop/shop",
+          "itemListElement": hotProducts.slice(0, 5).map((p, i) => ({
+            "@type": "ListItem",
+            "position": i + 1,
+            "url": "https://buksy.shop/product/" + p.slug,
+            "name": "BUKSY " + p.name
+          }))
+        }) }}
+      />
       <section className="relative h-screen">
         <div className="absolute inset-0"><img src={heroImg} alt="BUKSY Dark Luxury Streetwear" fetchPriority="high" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-r from-noir via-noir/80 to-noir/40" /><div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-noir/50" /></div>
         <div className="relative z-10 h-full flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

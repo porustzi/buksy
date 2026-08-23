@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useContent } from '../hooks/useContent';
+import { useSeo } from '../hooks/useSeo';
 import { NotFoundPage } from './NotFoundPage';
 
 export function InfoPage() {
@@ -11,12 +12,25 @@ export function InfoPage() {
   const { slug } = useParams<{ slug: string }>();
   const page = slug ? (infoPages as Record<string, { title: string; content: string }>)[slug] : undefined;
 
+  useSeo({ title: page?.title, description: page?.title });
+
   if (!page) {
     return <NotFoundPage />;
   }
 
   return (
     <div className="min-h-screen bg-noir pt-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://buksy.shop/" },
+            { "@type": "ListItem", "position": 2, "name": page.title, "item": window.location.href }
+          ]
+        }) }}
+      />
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <Link
           to="/"
