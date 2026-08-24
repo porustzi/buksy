@@ -254,6 +254,18 @@ export function ProductPage() {
               <Editable path={`product.${product.slug}.shortDescription`} as="span">{product.shortDescription}</Editable>
             </p>
 
+            {/* Care Instructions */}
+            <div className="border border-white/10 p-4">
+              <h4 className="font-heading text-sm tracking-wider text-white/60 mb-2">{t('product.care') || 'CARE INSTRUCTIONS'}</h4>
+              <ul className="text-white/50 font-body text-sm space-y-1 list-disc list-inside">
+                <li>{t('product.careWash') || 'Machine wash cold with like colors'}</li>
+                <li>{t('product.careBleach') || 'Do not bleach'}</li>
+                <li>{t('product.careDry') || 'Tumble dry low'}</li>
+                <li>{t('product.careIron') || 'Iron on low heat if needed'}</li>
+                <li>{t('product.careDryClean') || 'Do not dry clean'}</li>
+              </ul>
+            </div>
+
             {/* Size Selector */}
             <div className="space-y-3">
               <span className="font-heading text-sm tracking-wider text-white/60">{t('product.size')}</span>

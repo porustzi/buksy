@@ -121,7 +121,13 @@
     "share": "Share",
     "lowStock": "Only {{count}} left in stock",
     "outOfStock": "Out of stock",
-    "inStock": "In stock: {{count}}"
+    "inStock": "In stock: {{count}}",
+    "care": "CARE INSTRUCTIONS",
+    "careWash": "Machine wash cold with like colors",
+    "careBleach": "Do not bleach",
+    "careDry": "Tumble dry low",
+    "careIron": "Iron on low heat if needed",
+    "careDryClean": "Do not dry clean"
   },
   "cart": {
     "yourCart": "Your Cart",
