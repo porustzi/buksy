@@ -24,8 +24,8 @@ isHot: true
 isFeatured: false
 isBestseller: false
 rating: 0
-shortDescription: ""
-description: "лонгслів \nткань кулір 250гм2\nпринт дтф\nдістрес по всьому лонгсліві"
+shortDescription: "BUKSY LONGSLEEVE 🩸\n"
+description: "\nткань кулір 250гм2\nпринт дтф\nдістрес по всьому лонгсліві\nНа виробі жаккардова бірка\nБрендований пакет"
 details:
   - "дістрес"
   - "принт дтф"
