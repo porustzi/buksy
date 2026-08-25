@@ -14,10 +14,10 @@ sizes:
     stock: 0
   - available: true
     name: "M"
-    stock: 0
+    stock: 5
   - available: true
     name: "L"
-    stock: 0
+    stock: 5
 inStock: true
 stock: 10
 isNew: false
