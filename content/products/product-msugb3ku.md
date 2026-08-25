@@ -24,11 +24,16 @@ isHot: false
 isFeatured: true
 isBestseller: false
 rating: 0
-shortDescription: ""
-description: "Double belt shorts Buksy🩸\nМатеріал: Футер 3х нитка 320/м2\nпринт дтф\nвишивка"
+shortDescription: "Double belt shorts Buksy🩸"
+description: "\nМатеріал: Футер 3х нитка 320/м2\n\n\n\nпринт на дабл поясі дтф\n\n\n\nвишивка\n\n\n\nБрендований зіп пакет\n\n\nКартонна бірка\n\n\n\nЖаккардова бірка\n\n\n"
 details:
   - "принт дтф"
   - "вишивка"
-care: []
+  - "Картонна бірка"
+  - "Брендований зіп пакет"
+  - "Жаккардова бірка"
+care:
+  - "прати на делікатному режимі за температури 30–40 °C на низьких обертах (до 600–800 обертів)"
+  - "не сушити в сушильній машині, бо може сісти"
 originalPrice: 1699
 ---
