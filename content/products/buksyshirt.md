@@ -14,10 +14,10 @@ sizes:
     stock: 0
   - available: true
     name: "M"
-    stock: 3
+    stock: 0
   - available: true
     name: "L"
-    stock: 3
+    stock: 0
 inStock: true
 stock: 10
 isNew: false
@@ -25,7 +25,7 @@ isFeatured: false
 isBestseller: false
 rating: 5
 shortDescription: "T shirt Buksy🩸"
-description: "\_ткань: кулір 250г/2м 100% бавовна\nпринт: шокодрук \nВишивка\nНа виробі жаккардова бірка\nБрендований пакет\nКартонна бірка"
+description: "\_ткань: кулір 250г/2м 100% бавовна,\n\n\nпринт: шокодрук \n\n\nВишивка\n\n\nНа виробі жаккардова бірка\n\n\nБрендований пакет\n\n\nКартонна бірка"
 details:
   - "Щільна 100% бавовна 250г/м²"
   - "Вишивка "
