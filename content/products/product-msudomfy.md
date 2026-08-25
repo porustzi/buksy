@@ -2,11 +2,11 @@
 id: "1786798484638"
 name: "Longsleeve BUKSY"
 slug: "product-msudomfy"
-price: 10
+price: 1349
 category: "longsleeves"
 image1: "/uploads/1786802808298_xr6i.png"
 image2: "/uploads/1786798624330_u1jz.jpg"
-image3: "/uploads/1786799287680_vwfq.jpg"
+image3: "/uploads/1787651791790_zk7n.jpg"
 sizes:
   - name: "S"
     available: true
