@@ -9,9 +9,9 @@ image1: "/uploads/11231321.jpg"
 image2: "/uploads/43424234.jpg"
 image3: "/uploads/12313123133.jpg"
 sizes:
-  - available: true
+  - available: false
     name: "S"
-    stock: 4
+    stock: 0
   - available: true
     name: "M"
     stock: 3
@@ -24,12 +24,17 @@ isNew: false
 isFeatured: false
 isBestseller: false
 rating: 5
-shortDescription: "Футболка Buksy🩸"
-description: "\_ткань: кулір 250г/2м 100% бавовна\nпринт: шокодрук \nВишивка\nНа виробі жаккардова бірка\nБрендований пакет"
+shortDescription: "T shirt Buksy🩸"
+description: "\_ткань: кулір 250г/2м 100% бавовна\nпринт: шокодрук \nВишивка\nНа виробі жаккардова бірка\nБрендований пакет\nКартонна бірка"
 details:
   - "Щільна 100% бавовна 250г/м²"
   - "Вишивка "
   - "Принт шовкодрук"
-care: []
+  - "Брендований зіп пакет"
+  - "Картонна бірка"
+  - "Жаккаррдова бірка"
+care:
+  - "прати на делікатному режимі за температури 30–40 °C на низьких обертах (до 600–800 обертів)"
+  - "   не сушити в сушильній машині"
 reviews: []
 ---
