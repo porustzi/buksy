@@ -10,13 +10,13 @@ image3: "/uploads/1786802978421_5euu.jpg"
 sizes:
   - name: "S"
     available: true
-    stock: 10
+    stock: 12
   - name: "M"
     available: true
-    stock: 10
+    stock: 12
   - name: "L"
     available: true
-    stock: 10
+    stock: 12
 inStock: true
 stock: 30
 isNew: false
