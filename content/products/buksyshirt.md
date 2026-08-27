@@ -9,15 +9,15 @@ image1: "/uploads/11231321.jpg"
 image2: "/uploads/43424234.jpg"
 image3: "/uploads/12313123133.jpg"
 sizes:
-  - available: false
+  - available: true
     name: "S"
-    stock: 0
+    stock: 1
   - available: true
     name: "M"
     stock: 5
   - available: true
     name: "L"
-    stock: 5
+    stock: 4
 inStock: true
 stock: 10
 isNew: false
