@@ -10,13 +10,13 @@ image3: "/uploads/1787651791790_zk7n.jpg"
 sizes:
   - name: "S"
     available: true
-    stock: 4
+    stock: 3
   - name: "M"
     available: true
     stock: 4
   - name: "L"
     available: true
-    stock: 4
+    stock: 3
 inStock: true
 stock: 12
 isNew: true
