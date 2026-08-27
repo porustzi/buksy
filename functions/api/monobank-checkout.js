@@ -43,7 +43,6 @@ export async function onRequest(context) {
       shipping: { address: shipping.address, apartment: shipping.apartment, city: shipping.city, country: shipping.country, postalCode: shipping.postalCode, novaPoshtaBranch: shipping.novaPoshtaBranch },
       items: validatedItems.map(i => ({ slug: i.slug, name: i.name, size: i.size, price: i.price, qty: i.qty })),
       shipping_cost: deliveryCost, tax: 0, subtotal: serverTotal, total: total, created_at: new Date().toISOString(),
-      payment_on_delivery: true,
     };
 
     try {
@@ -58,7 +57,7 @@ export async function onRequest(context) {
             : errorResponse(409, 'Order already processed');
         }
       }
-      return jsonResponse(500, { error: 'saveOrder failed', detail: String(err.message || err) });
+      return jsonResponse(500, { error: 'saveOrder failed', detail: String(err.message || err), code: err.code || '', type: err.constructor?.name || '' });
     }
 
     const TOKEN = env.MONOBANK_TOKEN;

@@ -2,6 +2,35 @@ import { Link } from 'react-router-dom';
 import { Instagram, Music2, Send, MessageSquare } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
 import { Editable } from './edit/Editable';
+import { useState, useEffect } from 'react';
+
+function OnlineCounter() {
+  const [online, setOnline] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchOnline = () => {
+      fetch('/api/online-public')
+        .then((r) => r.json())
+        .then((d) => setOnline(typeof d.online === 'number' ? d.online : null))
+        .catch(() => {});
+    };
+    fetchOnline();
+    const t = setInterval(fetchOnline, 30000);
+    return () => clearInterval(t);
+  }, []);
+
+  if (online === null || online === 0) return null;
+
+  return (
+    <div className="inline-flex items-center gap-1.5 text-white/40 font-body text-xs">
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+      </span>
+      {online} online
+    </div>
+  );
+}
 
 export function Footer() {
   const { footerData } = useContent();
@@ -52,6 +81,7 @@ export function Footer() {
               <a href="https://krvtsvcorp.pp.ua" target="_blank" rel="noopener noreferrer" className="relative block text-center text-rose-600 font-bold text-[11px] md:text-[10px] uppercase tracking-widest whitespace-nowrap hover:text-rose-500 transition-colors">Сайт зроблений KRVTSV CORP</a>
             </div>
             <div className="text-center text-sm text-white/40 font-body"><p>&copy; {new Date().getFullYear()} BUKSY. {f.copyright?.allRights}</p></div>
+            <OnlineCounter />
           </div>
         </div>
       </div>
