@@ -1,14 +1,13 @@
-import { guard, sanitizeShippingInfo, validateItems, validateEmail, validateIdempotencyKey, parseBody, generateOrderId, okResponse, errorResponse, jsonResponse } from '../lib/utils.js';
+import { guard, esc, sanitizeShippingInfo, validateItems, validateEmail, validateIdempotencyKey, parseBody, generateOrderId, okResponse, errorResponse, jsonResponse, sendTg } from '../lib/utils.js';
 import { saveOrder, getOrderByIdempotencyKey } from '../lib/supabase.js';
 import { validateCatalogItems } from '../lib/catalog.js';
 import { getSettings } from '../lib/settings.js';
 import { RATE_LIMIT, FIELD_LIMITS, ORDER_LIMITS, PAYMENT, ORDER_STATUS, PAYMENT_METHOD } from '../lib/constants.js';
 import { DuplicateOrderError, ValidationError } from '../lib/errors.js';
-import { esc } from '../lib/utils.js';
 
 export async function onRequest(context) {
   try {
-    const { request, env } = context;
+    const { request, env, waitUntil } = context;
     if (request.method !== 'POST') return errorResponse(405, 'Method Not Allowed');
 
     const blocked = guard(request, env, RATE_LIMIT.CHECKOUT);
@@ -83,9 +82,15 @@ export async function onRequest(context) {
     }
     const monoData = await monoRes.json();
 
-    let emailOk = false;
+    const tgToken = env.TELEGRAM_BOT_TOKEN;
+    if (tgToken) {
+      const cust = orderRecord.customer || {};
+      const items = orderRecord.items || [];
+      const itemsLines = items.map(i => `${i.qty}× ${i.name}${i.size ? ' (' + i.size + ')' : ''} — ${i.price}₴`).join('\n');
+      waitUntil(sendTg(env, `🆕 <b>НОВЕ ЗАМОВЛЕННЯ</b>\n<code>#${orderId}</code>\n\n👤 <b>${esc(cust.firstName || '')} ${esc(cust.lastName || '')}</b>\n📞 ${esc(cust.phone || '—')}\n📧 ${esc(cust.email || '—')}\n\n💰 Очікує оплату: <b>${total.toFixed(0)} UAH</b>\n💸 Доставка: ${deliveryCost} ₴\n\n🛍 <b>Товари:</b>\n${itemsLines}`));
+    }
 
-    return okResponse({ redirectUrl: monoData.pageUrl, orderId, emailSent: emailOk });
+    return okResponse({ redirectUrl: monoData.pageUrl, orderId });
   } catch (e) {
     const detail = (e.name || 'Error') + ': ' + (e.message || String(e)) + (e.code ? ' [' + e.code + ']' : '');
     return jsonResponse(500, { error: 'Internal server error', detail: detail });

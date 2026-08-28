@@ -187,3 +187,17 @@ export function base64ToUint8Array(b64) {
   for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
   return bytes;
 }
+
+export async function sendTg(env, text) {
+  const token = env.TELEGRAM_BOT_TOKEN;
+  const chats = (env.TELEGRAM_CHAT_ID || '').split(',').map(s => s.trim()).filter(Boolean);
+  if (!token || !chats.length) return;
+  const results = await Promise.allSettled(chats.map(chatId =>
+    fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text }),
+    }).then(r => { if (!r.ok) r.text().then(t => console.error('[TG]', chatId, r.status, t)); return r; })
+  ));
+  results.forEach((r, i) => { if (r.status === 'rejected') console.error('[TG]', chats[i], r.reason?.message || r.reason); });
+}

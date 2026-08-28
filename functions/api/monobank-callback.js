@@ -1,4 +1,4 @@
-import { rateLimit, parseBody, pemToArrayBuffer, base64ToUint8Array, jsonResponse, errorResponse } from '../lib/utils.js';
+import { rateLimit, parseBody, pemToArrayBuffer, base64ToUint8Array, jsonResponse, errorResponse, sendTg } from '../lib/utils.js';
 import { markOrderPaidWithStock, getOrderByRef, updateOrderStatus } from '../lib/supabase.js';
 import { sendEmail, paymentConfirmedHtml } from '../lib/email.js';
 import { RATE_LIMIT, PAYMENT, PUBKEY_CACHE_TTL } from '../lib/constants.js';
@@ -71,7 +71,7 @@ function buildStockItems(orderItems) {
 }
 
 export async function onRequest(context) {
-  const { request, env } = context;
+  const { request, env, waitUntil } = context;
   if (request.method !== 'POST') return jsonResponse(405, { error: 'Method Not Allowed' });
 
   const ip = request.headers.get('cf-connecting-ip') || 'unknown';
@@ -118,8 +118,8 @@ export async function onRequest(context) {
 
     if (!wasPaid) return jsonResponse(200, { ok: true });
 
-    const tgToken = env.TELEGRAM_BOT_TOKEN, tgChat = env.TELEGRAM_CHAT_ID;
-    if (tgToken && tgChat) {
+    const tgToken = env.TELEGRAM_BOT_TOKEN;
+    if (tgToken) {
       const ship = order.shipping || {};
       const cust = order.customer || {};
       const items = order.items || [];
@@ -128,11 +128,10 @@ export async function onRequest(context) {
         ? '📦 Нова Пошта: №' + esc(ship.novaPoshtaBranch || '—') + (ship.city ? ' (' + esc(ship.city) + ')' : '')
         : '🏠 Адреса: ' + esc(ship.address || '—') + (ship.apartment ? ', кв. ' + esc(ship.apartment) : '') + ', ' + esc(ship.city || '') + ', ' + esc(ship.country || '');
 
-      const tgMsg = `✅ <b>ОПЛАЧЕНО</b>\n<code>#${esc(body.reference)}</code>\n\n💰 <b>${amountPaid.toFixed(2)} UAH</b> (сума замовлення ${orderTotal.toFixed(2)})\n\n👤 <b>${esc(cust.firstName || '')} ${esc(cust.lastName || '')}</b>\n📞 ${esc(cust.phone || '—')}\n📧 ${esc(cust.email || '—')}\n\n🚚 ${delivery}\n💸 Доставка: ${(Number(order.shipping_cost) || 0).toFixed(0)} ₴\n\n🛍 <b>Товари:</b>\n${itemsLines}\n\n━━━━━━━━━━━━━━━━\n✅ Відправляй замовлення`;
-      fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ chat_id: tgChat, text: tgMsg, parse_mode: 'HTML' }) }).catch(e => console.error('[TG-CALLBACK]', e.message));
+      waitUntil(sendTg(env, `✅ <b>ОПЛАЧЕНО</b>\n<code>#${esc(body.reference)}</code>\n\n💰 <b>${amountPaid.toFixed(2)} UAH</b> (сума замовлення ${orderTotal.toFixed(2)})\n\n👤 <b>${esc(cust.firstName || '')} ${esc(cust.lastName || '')}</b>\n📞 ${esc(cust.phone || '—')}\n📧 ${esc(cust.email || '—')}\n\n🚚 ${delivery}\n💸 Доставка: ${(Number(order.shipping_cost) || 0).toFixed(0)} ₴\n\n🛍 <b>Товари:</b>\n${itemsLines}\n\n━━━━━━━━━━━━━━━━\n✅ Відправляй замовлення`));
     }
     if (order.customer?.email) {
-      sendEmail(env, { to: order.customer.email, subject: 'Оплату підтверджено — Замовлення #' + body.reference, html: paymentConfirmedHtml({ orderId: body.reference, amount: amountPaid, currency: 'UAH', paymentId: body.invoiceId, shippingCost: Number(order.shipping_cost) || 0, subtotal: Number(order.subtotal) || 0, items: (body.basketOrder || []).map(b => ({ qty: b.qty, name: b.name, size: '' })) }) }).catch(() => {});
+      waitUntil(sendEmail(env, { to: order.customer.email, subject: 'Оплату підтверджено — Замовлення #' + body.reference, html: paymentConfirmedHtml({ orderId: body.reference, amount: amountPaid, currency: 'UAH', paymentId: body.invoiceId, shippingCost: Number(order.shipping_cost) || 0, subtotal: Number(order.subtotal) || 0, items: (body.basketOrder || []).map(b => ({ qty: b.qty, name: b.name, size: '' })) }) }).catch(e => console.error('[EMAIL-CALLBACK]', e.message)));
     }
 
     return jsonResponse(200, { ok: true });
