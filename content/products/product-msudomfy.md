@@ -6,7 +6,7 @@ price: 1349
 category: "longsleeves"
 image1: "/uploads/1786802808298_xr6i.png"
 image2: "/uploads/1786798624330_u1jz.jpg"
-image3: "/uploads/1787651791790_zk7n.jpg"
+image3: "/uploads/1787940897773_unnd.jpg"
 sizes:
   - name: "S"
     available: true
