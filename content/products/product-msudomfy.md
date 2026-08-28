@@ -10,7 +10,7 @@ image3: "/uploads/1787940897773_unnd.jpg"
 sizes:
   - name: "S"
     available: true
-    stock: 3
+    stock: 2
   - name: "M"
     available: true
     stock: 4
