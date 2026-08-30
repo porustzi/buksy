@@ -9,8 +9,8 @@ image2: "/uploads/1786798624330_u1jz.jpg"
 image3: "/uploads/1787940897773_unnd.jpg"
 sizes:
   - name: "S"
-    available: true
-    stock: 2
+    available: false
+    stock: 0
   - name: "M"
     available: true
     stock: 4
