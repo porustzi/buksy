@@ -8,7 +8,7 @@
     "ourStory": "НАША ІСТОРІЯ",
     "image": "/uploads/1786796182339_8ly5.jpg",
     "video": "",
-    "useVideo": false,
+    "useVideo": true,
     "scroll": "ГОРТАЙ"
   },
   "featured": {
