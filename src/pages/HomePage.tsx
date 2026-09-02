@@ -61,13 +61,13 @@ export function HomePage() {
             <p className="text-lg text-white/70 leading-relaxed mb-10 max-w-lg"><Editable path="homepage.hero.description" as="span">{hero.description}</Editable></p>
           </motion.div>
         </div>
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col sm:flex-row gap-4 z-10 w-full max-w-lg px-4">
-          <Link to="/shop" className="btn-primary flex items-center justify-center gap-3"><Editable path="homepage.hero.shopNow" as="span">{hero.shopNow}</Editable><ArrowRight size={18} /></Link>
-          <Link to="/about" className="btn-secondary text-center"><Editable path="homepage.hero.ourStory" as="span">{hero.ourStory}</Editable></Link>
-        </motion.div>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="absolute bottom-28 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
           <span className="text-white/40 text-xs tracking-[0.2em] font-body">{hero.scroll}</span>
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}><ChevronDown size={20} className="text-blood" /></motion.div>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col sm:flex-row gap-4 z-10 w-full max-w-lg px-4 justify-center">
+          <Link to="/shop" className="btn-primary flex items-center justify-center gap-3"><Editable path="homepage.hero.shopNow" as="span">{hero.shopNow}</Editable><ArrowRight size={18} /></Link>
+          <Link to="/about" className="btn-secondary text-center"><Editable path="homepage.hero.ourStory" as="span">{hero.ourStory}</Editable></Link>
         </motion.div>
       </section>
 
