@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, ChevronDown } from 'lucide-react';
@@ -20,6 +20,13 @@ export function HomePage() {
   const heroImg = hero.image || 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200';
   const heroVideo = hero.video || '';
   const useVideo = !!hero.useVideo && !!heroVideo;
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (useVideo && videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
+  }, [useVideo]);
 
   return (
     <div className="overflow-hidden">
@@ -41,7 +48,7 @@ export function HomePage() {
       <section className="relative h-screen">
         <div className="absolute inset-0">
           {useVideo ? (
-            <video src={heroVideo} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+            <video ref={videoRef} src={heroVideo} autoPlay muted loop playsInline preload="auto" className="w-full h-full object-cover" />
           ) : (
             <img src={heroImg} alt="BUKSY Dark Luxury Streetwear" fetchPriority="high" className="w-full h-full object-cover" />
           )}
