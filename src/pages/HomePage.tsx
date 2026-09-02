@@ -59,12 +59,16 @@ export function HomePage() {
             <p className="font-heading text-sm tracking-[0.4em] text-blood mb-4"><Editable path="homepage.hero.tagline" as="span">{hero.tagline}</Editable></p>
             <h1 className="font-display text-5xl sm:text-6xl lg:text-7xl font-light text-white leading-tight mb-6"><Editable path="homepage.hero.title1" as="span">{hero.title1}</Editable><br /><span className="text-blood"><Editable path="homepage.hero.title2" as="span">{hero.title2}</Editable></span></h1>
             <p className="text-lg text-white/70 leading-relaxed mb-10 max-w-lg"><Editable path="homepage.hero.description" as="span">{hero.description}</Editable></p>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="flex flex-col sm:flex-row gap-4 mt-3">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="hidden sm:flex flex-row gap-4 mt-3">
               <Link to="/shop" className="btn-primary flex items-center justify-center gap-3"><Editable path="homepage.hero.shopNow" as="span">{hero.shopNow}</Editable><ArrowRight size={18} /></Link>
               <Link to="/about" className="btn-secondary text-center"><Editable path="homepage.hero.ourStory" as="span">{hero.ourStory}</Editable></Link>
             </motion.div>
           </motion.div>
         </div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.6 }} className="sm:hidden absolute bottom-4 left-0 right-0 flex flex-col gap-3 z-10 px-4">
+          <Link to="/shop" className="btn-primary flex items-center justify-center gap-3"><Editable path="homepage.hero.shopNow" as="span">{hero.shopNow}</Editable><ArrowRight size={18} /></Link>
+          <Link to="/about" className="btn-secondary text-center"><Editable path="homepage.hero.ourStory" as="span">{hero.ourStory}</Editable></Link>
+        </motion.div>
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.5 }} className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
           <span className="text-white/40 text-xs tracking-[0.2em] font-body">{hero.scroll}</span>
           <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 1.5, repeat: Infinity }}><ChevronDown size={20} className="text-blood" /></motion.div>
