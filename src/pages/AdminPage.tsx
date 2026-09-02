@@ -624,6 +624,8 @@ function VideoPanel({ sectionFile }: { sectionFile: string }) {
         setBusy('upload');
         api('upload', { name: fname, content: b64, folder: 'public/uploads' }).then(async (res) => {
           const saved = (res.path as string).replace(/^public/, '');
+          setVideo(saved);
+          setUseVideo(true);
           await readAndWrite((hero) => { hero.video = saved; hero.useVideo = true; });
           setBusy('');
         }).catch((e) => { setError(e.message); setBusy(''); });
