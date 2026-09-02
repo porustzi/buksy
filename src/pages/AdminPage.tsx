@@ -458,6 +458,7 @@ function PreviewView({ url, sectionFile }: { url: string; sectionFile: string })
         </div>
       </div>
       {sectionFile && <ImagesPanel sectionFile={sectionFile} />}
+      {sectionFile === 'content/pages/homepage/homepage.json' && <VideoPanel sectionFile={sectionFile} />}
       <iframe
         ref={iframeRef}
         src={url}
@@ -570,6 +571,107 @@ function setFieldByPath(obj: Record<string, unknown>, path: string, value: unkno
     cur = cur[p] as Record<string, unknown>;
   }
   cur[parts[parts.length - 1]] = value;
+}
+
+// ============================================================
+// Hero video (homepage)
+// ============================================================
+function VideoPanel({ sectionFile }: { sectionFile: string }) {
+  const [video, setVideo] = useState('');
+  const [useVideo, setUseVideo] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState('');
+  const [error, setError] = useState('');
+
+  const load = () => {
+    setError('');
+    api('read', { path: sectionFile }).then((d) => {
+      if (!d) return;
+      let data: Record<string, unknown> = {};
+      try { data = JSON.parse(utf8decode(d.content)); } catch { data = {}; }
+      const hero = (data.hero || {}) as Record<string, unknown>;
+      setVideo((hero.video as string) || '');
+      setUseVideo(!!hero.useVideo);
+    }).catch((e) => setError(e.message));
+  };
+
+  useEffect(() => { load(); }, [sectionFile]);
+
+  const readAndWrite = async (mutate: (hero: Record<string, unknown>) => void) => {
+    const d = await api('read', { path: sectionFile });
+    let data: Record<string, unknown> = {};
+    try { data = JSON.parse(utf8decode(d.content)); } catch { data = {}; }
+    const hero = (data.hero || {}) as Record<string, unknown>;
+    mutate(hero);
+    data.hero = hero;
+    await api('write', { path: sectionFile, content: JSON.stringify(data, null, 2), sha: d.sha, message: 'Update hero video' });
+    load();
+  };
+
+  const upload = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'video/*';
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      if (!/^video\//.test(file.type)) { setError('Оберіть відеофайл'); return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const b64 = (reader.result as string).split(',')[1];
+        const ext = (file.name.split('.').pop() || 'mp4').toLowerCase().replace(/jpeg/g, 'jpg');
+        const fname = 'hero_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6) + '.' + ext;
+        setBusy('upload');
+        api('upload', { name: fname, content: b64, folder: 'public/uploads' }).then(async (res) => {
+          const saved = (res.path as string).replace(/^public/, '');
+          await readAndWrite((hero) => { hero.video = saved; hero.useVideo = true; });
+          setBusy('');
+        }).catch((e) => { setError(e.message); setBusy(''); });
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
+
+  const toggleVideo = async (v: boolean) => {
+    setBusy('toggle');
+    try { await readAndWrite((hero) => { hero.useVideo = v; }); } catch (e) { setError((e as Error).message); }
+    setBusy('');
+  };
+
+  const remove = async () => {
+    setBusy('remove');
+    try { await readAndWrite((hero) => { hero.video = ''; hero.useVideo = false; }); } catch (e) { setError((e as Error).message); }
+    setBusy('');
+  };
+
+  if (!open) {
+    return (
+      <div className="px-5 py-1.5 border-b border-white/10 bg-[#141414] flex-shrink-0">
+        <button onClick={() => setOpen(true)} className="text-xs text-white/40 hover:text-white">🎬 Відео в hero</button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-5 py-3 border-b border-white/10 bg-[#141414] flex-shrink-0 flex items-center gap-4 overflow-x-auto">
+      <button onClick={() => setOpen(false)} className="text-white/40 hover:text-white text-xs whitespace-nowrap">✕ Закрити</button>
+      {error && <span className="text-[#ff6b6b] text-xs">{error}</span>}
+      <label className="flex items-center gap-2 text-xs text-white/60 whitespace-nowrap cursor-pointer">
+        <input type="checkbox" checked={useVideo} disabled={busy === 'toggle'} onChange={(e) => toggleVideo(e.target.checked)} /> Використати відео як фон
+      </label>
+      {video ? (
+        <>
+          <video src={video} className="w-24 h-16 object-cover rounded border border-white/10" muted controls playsInline />
+          <span className="text-[10px] text-white/40 max-w-[160px] truncate">{video}</span>
+          <button onClick={upload} disabled={busy === 'upload'} className="text-[10px] text-[#e53935] hover:underline whitespace-nowrap">{busy === 'upload' ? '…' : 'Замінити відео'}</button>
+          <button onClick={remove} disabled={busy === 'remove'} className="text-[10px] text-[#e53935] hover:underline whitespace-nowrap">{busy === 'remove' ? '…' : 'Прибрати'}</button>
+        </>
+      ) : (
+        <button onClick={upload} disabled={busy === 'upload'} className="text-[10px] text-[#e53935] hover:underline whitespace-nowrap">{busy === 'upload' ? '…' : '🎬 Завантажити відео (10–20 сек)'}</button>
+      )}
+    </div>
+  );
 }
 
 // ============================================================

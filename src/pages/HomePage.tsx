@@ -18,6 +18,8 @@ export function HomePage() {
   const best = homepage.bestsellers || {};
   const coll = homepage.collections || {};
   const heroImg = hero.image || 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=1200';
+  const heroVideo = hero.video || '';
+  const useVideo = !!hero.useVideo && !!heroVideo;
 
   return (
     <div className="overflow-hidden">
@@ -37,7 +39,14 @@ export function HomePage() {
         }) }}
       />
       <section className="relative h-screen">
-        <div className="absolute inset-0"><img src={heroImg} alt="BUKSY Dark Luxury Streetwear" fetchPriority="high" className="w-full h-full object-cover" /><div className="absolute inset-0 bg-gradient-to-r from-noir via-noir/80 to-noir/40" /><div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-noir/50" /></div>
+        <div className="absolute inset-0">
+          {useVideo ? (
+            <video src={heroVideo} autoPlay muted loop playsInline className="w-full h-full object-cover" />
+          ) : (
+            <img src={heroImg} alt="BUKSY Dark Luxury Streetwear" fetchPriority="high" className="w-full h-full object-cover" />
+          )}
+          <div className="absolute inset-0 bg-gradient-to-r from-noir via-noir/80 to-noir/40" /><div className="absolute inset-0 bg-gradient-to-t from-noir via-transparent to-noir/50" />
+        </div>
         <div className="relative z-10 h-full flex flex-col justify-center max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1, delay: 0.2 }} className="max-w-2xl">
             <p className="font-heading text-sm tracking-[0.4em] text-blood mb-4"><Editable path="homepage.hero.tagline" as="span">{hero.tagline}</Editable></p>

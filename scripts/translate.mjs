@@ -15,7 +15,7 @@ const SKIP_KEYS = new Set([
   'slug', 'id', 'category', 'value', 'year', 'rating', 'reviewCount',
   'price', 'originalPrice', 'stock', 'image', 'image1', 'image2', 'image3',
   'images', 'icon', 'href', 'url', 'instagram', 'tiktok', 'telegram',
-  'email', 'emailUser', 'emailDomain', 'code', 'date', 'verified',
+  'email', 'emailUser', 'emailDomain', 'code', 'date', 'verified', 'video',
 ]);
 
 function looksNonTranslatable(v) {
