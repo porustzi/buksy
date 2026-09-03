@@ -13,7 +13,7 @@ sizes:
     stock: 0
   - name: "M"
     available: true
-    stock: 3
+    stock: 2
   - name: "L"
     available: true
     stock: 3
