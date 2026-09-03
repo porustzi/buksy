@@ -16,13 +16,24 @@ async function getPubKey(env) {
     const res = await fetch('https://api.monobank.ua/api/merchant/pubkey', { headers: { 'X-Token': TOKEN } });
     if (!res.ok) return cache.key ? cache : null;
     const data = await res.json();
-    cache = { key: data.key, raw: data.key, ts: now };
+    // Monobank returns `key` as base64-encoded PEM. Decode once to get the PEM string.
+    let pemStr = data.key;
+    try {
+      const decoded = base64ToString(data.key);
+      if (decoded && decoded.includes('PUBLIC KEY')) pemStr = decoded;
+    } catch (e) { console.error('[CALLBACK] pubkey decode error:', e.message); }
+    cache = { key: pemStr, raw: pemStr, ts: now };
     return cache;
   } catch { return cache.key ? cache : null; }
 }
 
-function derToRaw(derBytes) {
-  // Monobank signs in DER (ASN.1 SEQUENCE { INTEGER r, INTEGER s }).
+function base64ToString(b64) {
+  if (typeof atob === 'function') return atob(b64);
+  const bytes = base64ToUint8Array(b64);
+  return new TextDecoder().decode(bytes);
+}
+
+function derToRaw(derBytes) {  // Monobank signs in DER (ASN.1 SEQUENCE { INTEGER r, INTEGER s }).
   // WebCrypto expects raw r||s (64 bytes for P-256). Convert.
   if (!derBytes || derBytes.length < 8 || derBytes[0] !== 0x30) return derBytes;
   try {
