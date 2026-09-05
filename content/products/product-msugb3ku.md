@@ -16,7 +16,7 @@ sizes:
     stock: 12
   - name: "L"
     available: true
-    stock: 12
+    stock: 11
 inStock: true
 stock: 30
 isNew: false
