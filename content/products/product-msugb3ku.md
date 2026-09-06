@@ -2,7 +2,7 @@
 id: "1786802892510"
 name: "Double belt shorts Buksy🩸"
 slug: "product-msugb3ku"
-price: 599
+price: 1149
 category: "shorts"
 image1: "/uploads/1786802960883_271v.jpg"
 image2: "/uploads/1786802965153_oedk.jpg"
@@ -10,7 +10,7 @@ image3: "/uploads/1786802978421_5euu.jpg"
 sizes:
   - name: "S"
     available: true
-    stock: 12
+    stock: 11
   - name: "M"
     available: true
     stock: 12
