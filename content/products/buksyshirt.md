@@ -9,9 +9,9 @@ image1: "/uploads/11231321.jpg"
 image2: "/uploads/43424234.jpg"
 image3: "/uploads/12313123133.jpg"
 sizes:
-  - available: true
+  - available: false
     name: "S"
-    stock: 1
+    stock: 0
   - available: true
     name: "M"
     stock: 5
