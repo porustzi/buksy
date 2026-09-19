@@ -4,7 +4,7 @@ name: "hoodie Buksy son l’m proud of you🩸"
 slug: "product-mu84sl96"
 price: 1849
 category: "longsleeves"
-image1: "/uploads/1789807397704_wijz.png"
+image1: "/uploads/1789807484277_2l7e.jpg"
 image2: "/uploads/1789807425818_99ic.jpg"
 image3: "/uploads/1789807440909_ae7m.jpg"
 sizes:
