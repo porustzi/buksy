@@ -1,7 +1,7 @@
 ---
 id: "1789806861978"
 name: "hoodie Buksy son i’m proud of you🩸"
-slug: "product-mu84sl96"
+slug: "hoodiebuksy"
 price: 1849
 category: "longsleeves"
 image1: "/uploads/1789807484277_2l7e.jpg"
