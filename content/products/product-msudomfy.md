@@ -19,8 +19,8 @@ sizes:
     stock: 3
 inStock: true
 stock: 12
-isNew: true
-isHot: true
+isNew: false
+isHot: false
 isFeatured: false
 isBestseller: false
 rating: 0
