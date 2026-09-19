@@ -20,7 +20,7 @@ sizes:
 inStock: true
 stock: 1
 isNew: true
-isHot: false
+isHot: true
 isFeatured: false
 isBestseller: false
 rating: 0
