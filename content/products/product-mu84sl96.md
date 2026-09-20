@@ -13,10 +13,10 @@ sizes:
     stock: 3
   - name: "M"
     available: true
-    stock: 4
+    stock: 3
   - name: "L"
     available: true
-    stock: 4
+    stock: 3
 inStock: true
 stock: 1
 isNew: true
