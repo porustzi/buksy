@@ -11,7 +11,7 @@ image3: "/uploads/12313123133.jpg"
 sizes:
   - available: false
     name: "S"
-    stock: 0
+    stock: 1
   - available: true
     name: "M"
     stock: 5
